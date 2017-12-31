@@ -229,7 +229,7 @@ void ccGroup_read_uncomp(struct ccGroup* grp, int first, int frames) {
 
 		if (n != len) {
 			printf("Expected %d bytes, got %d\n", len, n);
-		}		
+		}
 	}
 
 }
@@ -322,7 +322,7 @@ int ccGroup_find(struct ccGroup *grp, const char *name) {
 int ccGroup_insert_file(struct ccGroup *grp, const char *target_file, int i)
 {
 	FILE *f;
-	int len, n;		
+	int len, n;
 
 	f = fopen(target_file, "rb");
 	if (f == NULL) {

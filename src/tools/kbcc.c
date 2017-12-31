@@ -674,6 +674,7 @@ int main(int argc, char *argv[]) {
 	int next = 0;	// next arg is "archive name"	
 
 	int mode = -1; // error
+
 	filename[0] = 0;
 	listfile[0] = 0;
 	target_file[0] = 0;

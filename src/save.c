@@ -34,7 +34,7 @@ KBgame* KB_loadDAT(const char* filename) {
 
 	f = fopen(filename, "rb");
 	if (f == NULL) return NULL;
-	
+
 	n = fread(buf, sizeof(char), DAT_SIZE, f);
 	fclose(f);
 	if (n != DAT_SIZE) return NULL;

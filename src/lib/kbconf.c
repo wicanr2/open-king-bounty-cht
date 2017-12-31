@@ -371,6 +371,7 @@ void wipe_config(struct KBconfig *conf) {
 int read_env_config(struct KBconfig *conf) {
 
 	char *pPath;
+
 #ifdef USE_WINAPI
 	/* Altho WIN32 equivavelnt of /home/username is %USERPROFILE%,
 	 * nobody writes there, and "Application Data" is considered good

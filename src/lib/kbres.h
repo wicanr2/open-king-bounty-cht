@@ -87,7 +87,7 @@
 \
 	_(DAT_WORLD)	/* complete world map ; subId - undefined */ \
 	_(DAT_LAND) 	/* map for specific continent ; subId - continent index */ \
-	_(DAT_MENUCONTROLS)	/* [16?] applicable options from global known set ; subId - undefined */ \
+	_(DAT_MENUCONTROLS)/* [16?] applicable options from global known set ; subId - undefined */ \
 	_(WDAT_SGOLD)	/* [4] starting gold for specific class; subId - undefined */ \
 	_(WDAT_STROOP)	/* [2] starting troop type; subId - class */ \
 	_(WDAT_SNUMBER)	/* [2] starting troop count; subId - class */ \
@@ -143,7 +143,7 @@
 	_(STR_TROOP)	/* troop name ; subId - troop index */ \
 	_(STR_MULTI)	/* troops name ; subId - troop index */ \
 	_(STR_RANK) 	/* rank name ; subId - rank + (class index * 4) */ \
-	_(STR_CASTLE) 	/* castle name ; subId - castle index */ \
+	_(STR_CASTLE)	/* castle name ; subId - castle index */ \
 	_(STR_TOWN) 	/* town name ; subId - town index */ \
 	_(STR_VNAME)	/* villain name ; subId - villain index */ \
 	_(STR_VDESC)	/* villain description line ; subId - line (villain index * 14) */ \
@@ -168,8 +168,8 @@
 	_(STRL_ENDINGS)	/* ending text ; subId - 0=game won, 1=game lost */
 
 #define _(R) R,
-enum { 
-	RESOURCES 
+enum {
+	RESOURCES
 	GR_HERO = GR_CURSOR,
 	FIRST_STR = STR_SIGN,
 	FIRST_STRL = STRL_SIGNS,
@@ -179,35 +179,35 @@ enum {
 extern const char *KBresid_names[]; 
 
 /* Possible values for RECT_UI subid: */
-#define FRAME_TOP   	0
-#define FRAME_LEFT  	1
-#define FRAME_RIGHT 	2
+#define FRAME_TOP	0
+#define FRAME_LEFT	1
+#define FRAME_RIGHT	2
 #define FRAME_BOTTOM	3
 #define FRAME_MIDDLE	4
 
 /* Possible values for SN_TUNE subid: */
-#define TUNE_WALK 	0
-#define TUNE_BUMP 	1
+#define TUNE_WALK	0
+#define TUNE_BUMP	1
 #define TUNE_CHEST	5
 #define TUNE_DEFEAT	7
 
 /* Refrence to EGA pallete, mostly used by DOS module. */
-#define EGA_BLACK 	0
-#define EGA_DBLUE 	1
+#define EGA_BLACK	0
+#define EGA_DBLUE	1
 #define EGA_DGREEN	2
-#define EGA_DCYAN 	3
-#define EGA_DRED  	4
+#define EGA_DCYAN	3
+#define EGA_DRED	4
 #define EGA_MAGENTA	5
-#define EGA_BROWN 	6
-#define EGA_GREY  	7
-#define EGA_DGREY 	8
-#define EGA_BLUE  	9
-#define EGA_GREEN 	10
-#define EGA_CYAN  	11
-#define EGA_RED   	12
+#define EGA_BROWN	6
+#define EGA_GREY	7
+#define EGA_DGREY	8
+#define EGA_BLUE	9
+#define EGA_GREEN	10
+#define EGA_CYAN	11
+#define EGA_RED 	12
 #define EGA_VIOLET	13
 #define EGA_YELLOW	14
-#define EGA_WHITE 	15
+#define EGA_WHITE	15
 #define EGA_DVIOLET EGA_MAGENTA
 #define EGA_DYELLOW EGA_BROWN
 #define EGA_DWHITE  EGA_GREY
@@ -275,14 +275,14 @@ enum {
 #define TILE_ARTIFACT_1 	0x92
 #define TILE_ARTIFACT_2 	0x93
 
-#define IS_GRASS(M) 	((M) < 2 || (M) == 0x80)
+#define IS_GRASS(M)	((M) < 2 || (M) == 0x80)
 #define IS_CASTLE(M)	((M) >= 0x02 && (M) <= 0x07)
 #define IS_MAPOBJECT(M)	((M) >= 0x0a && (M) <= 0x13)
-#define IS_BRIDGE(M) 	((M) >= 0x08 && (M) <= 0x09)
-#define IS_WATER(M) 	((M) >= 0x14 && (M) <= 0x20)
-#define IS_TREE(M)  	((M) >= 0x21 && (M) <= 0x2D)
+#define IS_BRIDGE(M)	((M) >= 0x08 && (M) <= 0x09)
+#define IS_WATER(M)	((M) >= 0x14 && (M) <= 0x20)
+#define IS_TREE(M)	((M) >= 0x21 && (M) <= 0x2D)
 #define IS_DESERT(M)	((M) >= 0x2e && (M) <= 0x3a)
-#define IS_ROCK(M)  	((M) >= 0x3b && (M) <= 0x47)
+#define IS_ROCK(M)	((M) >= 0x3b && (M) <= 0x47)
 
 #define IS_DEEP_WATER(M) ((M) == TILE_DEEP_WATER)
 
@@ -337,7 +337,7 @@ extern SDL_Surface* DOS_LoadIMGROW_RW(SDL_RWops *rw, word first, word frames);
 extern SDL_Surface* DOS_LoadRAWIMG_RW(SDL_RWops *rw, byte bpp);
 extern SDL_Surface* DOS_LoadIMGROW_DIR(KB_DIR *d, word first, word frames);
 
-/* Laziest function */ 
+/* Laziest function */
 SDL_Surface* KB_LoadIMG(const char *filename);
 
 #endif

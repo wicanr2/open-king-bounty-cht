@@ -177,9 +177,9 @@ char *text_input(int max_len, int numbers_only, int x, int y, int loc_id, int tr
 			redraw = 1;
 		} else
 		if (key) {
-			if (key < 128 && isascii(key) && 
+			if (key < 128 && isascii(key) &&
 				 ( !numbers_only ||
-				   ( isdigit(key) ) 
+				   ( isdigit(key) )
 				 )
 			   ) {
 				if (curs < max_len) {
@@ -349,7 +349,7 @@ void refill_rules() {
 	}
 
 	for (i = 0; i < MAX_VILLAINS; i++) {
-		if (villain_reward)	villain_rewards[i] = villain_reward[i];
+		if (villain_reward) villain_rewards[i] = villain_reward[i];
 		for (j = 0; j < 5; j++) {
 			if (villain_troop_types) villain_army_troops[i][j] = villain_troop_types[i * 5 + j];
 			if (villain_troop_numbers) villain_army_numbers[i][j] = villain_troop_numbers[i * 5 + j];
@@ -357,8 +357,8 @@ void refill_rules() {
 	}
 
 	for (i = 0; i < MAX_TROOPS; i++) {
-		if (ranged_min)	troops[i].ranged_min = ranged_min[i];
-		if (ranged_max)	troops[i].ranged_max = ranged_max[i];
+		if (ranged_min) troops[i].ranged_min = ranged_min[i];
+		if (ranged_max) troops[i].ranged_max = ranged_max[i];
 		if (ranged_ammo) troops[i].ranged_ammo = ranged_ammo[i];
 		if (melee_min) troops[i].melee_min = melee_min[i];
 		if (melee_max) troops[i].melee_max = melee_max[i];
@@ -568,7 +568,7 @@ KBgame *load_game() {
 
 	if (num_files == 0) {
 		KB_MessageBox("This disk has no characters on it. Try creating a new\ncharacter or copy one from another disk.", 0);
-		return NULL;		
+		return NULL;
 	}
 
 	/* Prepare menu */
@@ -910,7 +910,7 @@ void display_logo() {
 
 			SDL_BlitSurface( title, NULL , screen, &pos );
 
-	    	SDL_Flip( screen );
+			SDL_Flip( screen );
 
 			SDL_FreeSurface(title);
 
@@ -950,7 +950,7 @@ void display_title() {
 
 			SDL_BlitSurface( title, NULL , screen, &pos );
 
-	    	SDL_Flip( screen );
+			SDL_Flip( screen );
 
 			SDL_FreeSurface(title);
 
@@ -1074,7 +1074,7 @@ void draw_location(int loc_id, int troop_id, int frame) {
 void draw_sidebar(KBgame *game, int tick) {
 	SDL_Surface *screen = sys->screen;
 
-	SDL_Rect *right_frame  = local.frames[FRAME_RIGHT];	
+	SDL_Rect *right_frame  = local.frames[FRAME_RIGHT];
 
 	SDL_Surface *purse = SDL_TakeSurface(GR_PURSE, 0, 0);
 	SDL_Surface *sidebar = SDL_TakeSurface(GR_UI, 0, 0);
@@ -1261,7 +1261,7 @@ void draw_combat(KBcombat *war) {
 
 			SDL_Rect src = { war->omap[j][i] * tile->w, 0, tile->w, tile->h };
 			SDL_Rect dst = { i * tile->w, j * tile->h, tile->w, tile->h };
-			
+
 			dst.x += local.map.x;
 			dst.y += local.map.y;
 
@@ -2594,7 +2594,6 @@ void visit_town(KBgame *game) {
 			id = i;
 		}
 	}
-
 
 	SDL_Rect *fs = &sys->font_size;
 
@@ -5245,7 +5244,6 @@ int options_menu(KBgame *game) {
 		key = KB_event(&adventure_state);
 
 #define KEY_ACT(ACT) (ARROW_KEYS + 1 + KBACT_ ## ACT)
-
 		if (key == 0xFF) {
 			key = 0;
 			break;
@@ -5541,7 +5539,7 @@ static signed char target_move_offset_y[9] = { -1,-1,-1,  0, 0,  1, 1, 1 };
 /* Shows a target cursor and allows player to move over the battlefield using arrow keys.
  *  The "filter" argument should be:
  *   0 - no filter, accept any tile, not too usefull
- *	 1 - tile unoccupied
+ *   1 - tile unoccupied
  *   2 - tile with a unit on it
  *   3 - friendly unit
  *   4 - enemy unit
