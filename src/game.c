@@ -1249,7 +1249,7 @@ void draw_combat(KBcombat *war) {
 
 	Uint32 *colors_size = KB_Resolve(COL_TEXT, CS_CHROME);
 
-	int draw_army_size = ((KBgame*)war->heroes[0])->options[4]; /* Hack -- get player */
+	int draw_army_size = ((KBgame*)war->heroes[0])->options[OPT_ARMYSIZE]; /* Hack -- get player */
 
 	/** Draw combat **/
 	{
