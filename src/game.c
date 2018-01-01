@@ -268,6 +268,9 @@ void refill_rules() {
 	byte *villain_troop_types = KB_Resolve(DAT_VTROOP, 0);
 	word *villain_troop_numbers = KB_Resolve(WDAT_VNUMBER, 0);
 	word *spell_cost = KB_Resolve(WDAT_SCOST, 0);
+	byte *spell_action = KB_Resolve(DAT_SACTION, 0);
+	word *spell_power = KB_Resolve(WDAT_SDAMAGE, 0);
+	byte *spell_filter = KB_Resolve(DAT_SFILTER, 0);
 
 	byte *castle_x = KB_Resolve(DAT_CASTLEX, 0);
 	byte *castle_y = KB_Resolve(DAT_CASTLEY, 0);
@@ -347,6 +350,9 @@ void refill_rules() {
 
 	for (j = 0; j < MAX_SPELLS; j++) {
 		if (spell_cost) spell_costs[j] = spell_cost[j];
+		if (spell_action) spell_actions[j] = spell_action[j];
+		if (spell_power) spell_powers[j] = spell_power[j];
+		if (spell_filter) spell_filters[j] = spell_filter[j];
 	}
 
 	for (i = 0; i < MAX_VILLAINS; i++) {
@@ -394,6 +400,9 @@ void refill_rules() {
 	free(villain_troop_types);
 	free(villain_troop_numbers);
 	free(spell_cost);
+	free(spell_action);
+	free(spell_power);
+	free(spell_filter);
 
 	free(castle_x);
 	free(castle_y);
@@ -4225,42 +4234,34 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 
 			} else {
 
-				switch (spell_id) {
-					case 0:	clone_army(game, combat);	break;
-					case 1: teleport_army(game, combat);break;
-					case 2:
+				switch (spell_actions[spell_id]) {
+					case SPELL_CLONE:	clone_army(game, combat); break;
+					case SPELL_TELEPORT: teleport_army(game, combat); break;
+					case SPELL_DAMAGE:
 						//fireball
-						damage_army(game, combat, 25, spell_id);
-					break;
-					case 3:
 						//lightning
-						damage_army(game, combat, 10, spell_id);
+						damage_army(game, combat,
+							/*damage=*/spell_powers[spell_id],
+							spell_id);
 					break;
-					case 4:
-						//freeze
-						freeze_army(game, combat);
-					break;
-					case 5:
-						//resurrect
-						resurrect_army(game, combat);
-					break;
-					case 6:
+					case SPELL_FREEZE:  	freeze_army(game, combat); break;
+					case SPELL_RESURRECT:	resurrect_army(game, combat); break;
+					case SPELL_TURNUNDEAD:
 						//turn undead
-						damage_army(game, combat, 50, spell_id);
+						damage_army(game, combat, spell_powers[spell_id], spell_id);
 					break;
-					case 7:	build_bridge(game);	break;
-					case 8: time_stop(game);	break;
-					case 9:
-						/* Find vilain */
+					case SPELL_BRIDGE:	build_bridge(game); break;
+					case SPELL_TIMESTOP: time_stop(game); break;
+					case SPELL_FINDVILLAIN:
 						find_villain(game);
 						draw_map(game, 0);
 						draw_sidebar(game, 0);
 						view_contract(game);
 					break;
-					case 10: select_gate(game, 0);	break; /* Castle gate */
-					case 11: select_gate(game, 1);	break; /* Town gate */
-					case 12: instant_army(game);	break;
-					case 13: raise_control(game);	break;
+					case SPELL_CASTLEGATE:	select_gate(game, 0); break;
+					case SPELL_TOWNGATE:	select_gate(game, 1); break;
+					case SPELL_INSTANTARMY:	instant_army(game); break;
+					case SPELL_RAISECONTROL:raise_control(game); break;
 				}
 
 				/* Spend 1 spell */

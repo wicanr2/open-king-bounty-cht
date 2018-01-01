@@ -422,6 +422,60 @@ word spell_costs[MAX_SPELLS] = {
 	 500, /* 0D */
 };
 
+byte spell_actions[MAX_SPELLS] = {
+	SPELL_CLONE,    //00
+	SPELL_TELEPORT, //01
+	SPELL_DAMAGE,   //02
+	SPELL_DAMAGE,   //03
+	SPELL_FREEZE,   //04
+	SPELL_RESURRECT, //05
+	SPELL_TURNUNDEAD,//SPELL_DAMAGE,	//06
+
+	SPELL_BRIDGE,     //07
+	SPELL_TIMESTOP,   //08
+	SPELL_FINDVILLAIN,//09
+	SPELL_CASTLEGATE, //0A
+	SPELL_TOWNGATE,   //0B
+	SPELL_INSTANTARMY,//0C
+	SPELL_RAISECONTROL,//0D
+};
+
+word spell_powers[MAX_SPELLS] = {
+	10,	//00
+	0,  //01
+	25, //02
+	10, //03
+	1,  //04
+	1,  //05
+	50, //06
+
+	2, //07
+	40, //08
+	1, //09
+	1, //0A
+	1, //0B
+	1, //0C
+	1, //0D
+};
+
+byte spell_filters[MAX_SPELLS] = { /* currently unused */
+	0x00,//00
+	0x00,//01
+	0x00,//02
+	0x00,//03
+	0x00,//04
+	0x00,//05
+	0x00,//06
+
+	0x00,//07
+	0x00,//08
+	0x00,//09
+	0x00,//0A
+	0x00,//0B
+	0x00,//0C
+	0x00,//0D
+};
+
 char artifact_names[MAX_ARTIFACTS][32] = {
 	"The Sword of Prowess",     	//00 (7)
 	"The Shield of Protection", 	//01 (1)

@@ -309,6 +309,22 @@ typedef struct KBcombat {
 #define POWER_DOUBLE_MAX_SPELLS 	0x40
 #define POWER_INCREASED_DAMAGE     	0x80
 
+/* Spell types */
+#define SPELL_DAMAGE       0
+#define SPELL_CLONE        1
+#define SPELL_TELEPORT     2
+#define SPELL_FREEZE       3
+#define SPELL_RESURRECT    4
+#define SPELL_TURNUNDEAD   5
+#define SPELL_BRIDGE       6
+#define SPELL_TIMESTOP     7
+#define SPELL_FINDVILLAIN  8
+#define SPELL_CASTLEGATE   9
+#define SPELL_TOWNGATE     10
+#define SPELL_INSTANTARMY  11
+#define SPELL_RAISECONTROL 12
+
+
 /* Data provided by bounty.c */
 extern KBtroop troops[MAX_TROOPS];
 extern byte morale_chart[5][5];
@@ -329,8 +345,13 @@ extern char dwelling_names[MAX_DWELLINGS][32];
 extern char town_names[MAX_TOWNS][32];
 extern char castle_names[MAX_CASTLES + 1][32];
 extern byte town_inversion[MAX_CASTLES];
+
 extern char spell_names[MAX_SPELLS][32];
 extern word spell_costs[MAX_SPELLS];
+extern byte spell_actions[MAX_SPELLS];
+extern word spell_powers[MAX_SPELLS];
+extern byte spell_filters[MAX_SPELLS];
+
 extern char artifact_names[MAX_ARTIFACTS][32];
 extern byte artifact_powers[MAX_ARTIFACTS];
 extern byte artifact_inversion[MAX_ARTIFACTS];
