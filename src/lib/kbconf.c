@@ -66,6 +66,7 @@ int write_default_config(const char *path) {
 	fprintf(f, ";savedir = \n");
 	fprintf(f, ";datadir = \n");
 	fprintf(f, "autodiscover = 1\n");
+	fprintf(f, "fallback = 0\n");
 	fprintf(f, "[sdl]\n");
 	fprintf(f, "sound = 0\n");
 	fprintf(f, "fullscreen = 0\n");
