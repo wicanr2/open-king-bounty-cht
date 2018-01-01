@@ -146,6 +146,9 @@ install: all
 	$(INSTALL_DATA) data $(DESTDIR)$(datadir)/openkb
 	$(INSTALL_DATA) docs/openkb.6 $(DESTDIR)$(mandir)/man6/openkb.6
 
+freeworld: data/free/land.tmx
+	python src/tools/kbtmx.py data/free/land.tmx data/free
+
 dist/win/openkb.rc: dist/win/openkb.rc.in
 	cp dist/win/openkb.rc.in $@
 	sed -i.bak s/@VERSION@/$(VERSION)/g $@
