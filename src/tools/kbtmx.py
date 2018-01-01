@@ -33,10 +33,10 @@ for layer in root.findall("layer"):
 	m = re.match(r"Continent (\d+)", name)
 	if m is not None:
 		cont = int(m.group(1))
-		print "Reading landscape for continent %d" % cont 
+		print "Reading landscape for continent %d" % cont
 	else:
 		print "Undefined layer %s" % name
-		continue	
+		continue
 
 	x = 0
 	y = 0
@@ -61,7 +61,7 @@ for layer in root.findall("layer"):
 			tile = 0x91
 			num_foes[cont] = num_foes[cont] + 1
 
-		map[cont][y][x] = tile 
+		map[cont][y][x] = tile
 
 		x = x + 1
 		if x >= 64:
@@ -413,7 +413,6 @@ for sign in signposts:
 fh.close()
 
 # Save!
-
 
 mapfile = outdir + "/" + "land.org"
 

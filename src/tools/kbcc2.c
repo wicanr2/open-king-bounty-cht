@@ -576,6 +576,52 @@ KB_File * KB_fopenCC_in( const char * filename, const char * mode, KB_DIR *dirp 
 }
 #endif
 
+int uncompress_external_file(const char *filename, const char *target_file) {
+
+	KB_File *f;
+
+	int i, n;
+
+	f = KB_fopen(filename, "rb");
+
+	char mbuf[4];
+	char *p = mbuf;
+	int len;
+	char *buffer;
+
+	KB_fseek(f, 0, SEEK_SET);
+	KB_fread(mbuf, sizeof(char), 4, f);
+
+	len = READ_WORD_BE(p);
+
+	/* Allocate that much bytes */
+	buffer = malloc(sizeof(char) * len);
+
+	/* Unpack LZW data */
+	KB_fseek(f, 4, 0);
+	n = KB_funLZW(buffer, len, f);
+
+	if (n != len) {
+		printf("Expected %d bytes, got %d\n", len, n);
+	}
+
+	FILE *fw;
+
+	printf("Uncompressed size: %d\n", n);
+
+	fw = fopen(target_file, "wb");
+	if (!fw) {
+		perror("fopen");
+		fprintf(stderr, "Unable to open file `%s` for writing\n", target_file);
+		return 3;
+	}
+	fwrite(buffer, sizeof(char), n, fw);
+	fclose(fw);
+
+	printf("* %s  \t[uncompressed]\n", target_file);
+	return 0;
+}
+
 int extract_single_file(const char *filename, const char *target_file) {
 
 	struct ccGroup *grp;
@@ -965,6 +1011,14 @@ int main(int argc, char *argv[]) {
 	if (mode == 3 && target_file[0] != 0) {
 
 		remove_single_file(filename, target_file);
+		return 0;
+
+	}
+
+	/* G) Uncompress stand-alone file */
+	if (mode == 4 && target_file[0] != 0) {
+
+		uncompress_external_file(filename, target_file);
 		return 0;
 
 	}

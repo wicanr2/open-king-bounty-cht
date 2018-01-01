@@ -41,9 +41,37 @@ KBgame* load_land(const char *filename) {
 
 	} else {
 		printf("Unable to OPEN file %s\n", filename);
+		free(game);
+		return NULL;
 	}
 
 	return game;
+}
+
+KBmodule* preload_module(const char *datadir) {
+
+	wipe_config(&KBconf);
+	read_env_config(&KBconf);
+
+	strcpy(KBconf.data_dir, datadir);
+	KBconf.autodiscover = 1;
+
+	KBconfig *conf = &KBconf; //shortcut
+
+	/* Module auto-discovery */
+	if (conf->autodiscover)
+		discover_modules(conf->data_dir, conf);
+
+	/* No module! (Unlikely...) */
+	if (conf->num_modules == 0) {
+		KB_errlog("No modules found.\n");
+		return NULL;
+	}
+
+	/* Initialize module(s) */
+	init_module(&conf->modules[1]);
+
+	return &conf->modules[1];
 }
 
 void interactive_edit(KBgame *game) {
@@ -96,6 +124,9 @@ void interactive_main(KBgame *game) {
 		KB_errlog("No modules found.\n");
 		return;
 	}
+
+	/* Initialize module(s) */
+	init_modules(conf);
 
 	/* Load and use module font */
 	sys->font = KB_LoadIMG8(GR_FONT, 0);

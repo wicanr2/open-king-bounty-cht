@@ -131,6 +131,7 @@ char *input_text(int max_len, int numbers_only, int x, int y) {
 		else
 		if (key == SDLK_BACKSPACE) {
 			if (curs) {
+				entered_name[curs+1] = '\0';
 				entered_name[curs] = ' ';
 				curs--;
 				entered_name[curs] = ' ';
@@ -144,7 +145,7 @@ char *input_text(int max_len, int numbers_only, int x, int y) {
 				   ( isdigit(key) ) 
 				 )
 			   ) {
-				if (curs < max_len) {
+				if (curs < max_len - 1) {
 					entered_name[curs] = (char)key;
 					curs++;
 					entered_name[curs] = '\0';
