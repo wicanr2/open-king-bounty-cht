@@ -137,12 +137,153 @@ void interactive_main(KBgame *game) {
 	/* Run editor loop */
 	interactive_edit(game);
 
+	/* Kill modules */
+	stop_modules(conf);
 	/* --- @ @ @ --- */
 	KB_stopENV(sys);
 }
 
+extern void* DOS_Resolve(KBmodule *mod, int id, int sub_id);
+
+char *sign_split(char *src) {
+	strtok(src, "\n");
+	char *s = strtok(NULL,"\n");
+	if (!s) return "";
+	return s;
+}
+
+void stdout_game_tmx(KBgame *game, KBmodule *mod) {
+	char *signs = mod ? DOS_Resolve(mod, STRL_SIGNS, 0) : NULL;
+
+	int i;
+	int x, y, continent = 0;
+printf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+printf("<map version=\"1.0\" orientation=\"orthogonal\" width=\"64\" height=\"64\" tilewidth=\"48\" tileheight=\"36\">\n");
+printf(" <tileset firstgid=\"1\" name=\"tileseta\" tilewidth=\"48\" tileheight=\"34\">\n");
+printf("  <image source=\"tileseta.png\" trans=\"ffffff\" width=\"1728\" height=\"34\"/>\n");
+printf(" </tileset>\n");
+printf(" <tileset firstgid=\"37\" name=\"tilesetb\" tilewidth=\"48\" tileheight=\"34\">\n");
+printf("  <image source=\"tilesetb.png\" trans=\"ffffff\" width=\"1728\" height=\"34\"/>\n");
+printf(" </tileset>\n");
+	for (continent = 0; continent < MAX_CONTINENTS; continent++) {
+printf(" <layer name=\"Continent %d\" width=\"64\" height=\"64\" visible=\"%d\">\n", continent, continent==0?1:0);
+printf("  <properties>\n");
+printf("   <property name=\"Name\" value=\"%s\"/>\n", continent_names[continent]);
+printf("  </properties>\n");
+printf("  <data>\n");
+	for (y = 0; y < 64; y++) {
+	for (x = 0; x < 64; x++) {
+		byte tile = game->map[continent][63-y][x];
+		if (tile == TILE_SIGNPOST && signs) tile = TILE_GRASS;
+		tile &= 0x7F;
+printf("   <tile gid=\"%d\"/>\n", tile + 1);
+	}
+	}
+printf("  </data>\n");
+printf(" </layer>\n");
+	}
+	int sign_id = -1;
+	for (continent = 0; continent < MAX_CONTINENTS; continent++) {
+//hardcoded GIDs?? TODO: figure this out
+// Signposts
+printf(" <objectgroup name=\"Signposts %d\" width=\"64\" height=\"64\" visible=\"%d\">\n", continent, continent==0?1:0);
+printf("   <properties>\n");
+printf("     <property name=\"continent\" value=\"%d\"/>\n", continent);
+printf("   </properties>\n");
+		if (signs) {
+		for (y = 0; y < 64; y++) {
+		for (x = 0; x < 64; x++) {
+			byte tile = game->map[continent][y][x];
+			int py = 64-y;
+			if (tile == TILE_SIGNPOST) {
+				sign_id++;
+				char *sign = KB_strlist_peek(signs, sign_id);
+				char *line1 = strdup(sign);
+				char *line2 = sign_split(line1);
+printf("   <object type=\"Signpost\" gid=\"17\" x=\"%d\" y=\"%d\">\n", x*48, py*36);
+printf("     <properties>\n");
+printf("       <property name=\"Text1\" value=\"%s\"/>\n", line1); // WHERE IS IT?!
+printf("       <property name=\"Text2\" value=\"%s\"/>\n", line2);
+printf("     </properties>\n");
+printf("   </object>\n");
+				free(line1);
+			}
+		}
+		}
+		}
+printf(" </objectgroup>\n");
+// Rest of them
+printf(" <objectgroup name=\"Locations %d\" width=\"64\" height=\"64\" visible=\"%d\">\n", continent, continent==0?1:0);
+printf("   <properties>\n");
+printf("     <property name=\"continent\" value=\"%d\"/>\n", continent);
+printf("   </properties>\n");
+		x = continent_entry[continent][0];
+		y = 64-continent_entry[continent][1];
+printf("   <object type=\"Nav\" gid=\"33\" x=\"%d\" y=\"%d\"/>\n", x*48, y*36);
+		if (special_coords[SP_ALCOVE][0] == continent) {
+			x = special_coords[SP_ALCOVE][1];
+			y = 64-special_coords[SP_ALCOVE][2];
+printf("   <object type=\"Magic Alcove\" gid=\"14\" x=\"%d\" y=\"%d\">\n", x*48, y*36);
+printf("     <properties>\n");
+printf("       <property name=\"Alcove\" value=\"%s\"/>\n", "yes");
+printf("     </properties>\n");
+printf("   </object>\n");
+		}
+		if (special_coords[SP_HOME][0] == continent) {
+			x = special_coords[SP_HOME][1];
+			y = 64-special_coords[SP_HOME][2];
+printf("   <object type=\"Castle\" name=\"Home\" gid=\"6\" x=\"%d\" y=\"%d\">\n", x*48, y*36);
+printf("     <properties>\n");
+printf("       <property name=\"Home\" value=\"%s\"/>\n", "yes");
+printf("     </properties>\n");
+printf("   </object>\n");
+		}
+	for (i = 0; i < MAX_CASTLES; i++) {
+		if (castle_coords[i][0] != continent) continue;
+		x = castle_coords[i][1];
+		y = 64-castle_coords[i][2];
+printf("   <object type=\"Castle\" name=\"%s\" gid=\"6\" x=\"%d\" y=\"%d\"/>\n", castle_names[i], x*48, y*36);
+	}
+
+	int boatoffx, boatoffy, gateoffx, gateoffy;
+	int castle_id;
+	for (castle_id = 0; castle_id < MAX_CASTLES; castle_id++) {
+		i = town_inversion[castle_id];
+		if (town_coords[i][0] != continent) continue;
+		x = town_coords[i][1];
+		y = 64-town_coords[i][2];
+		boatoffx = boat_coords[i][1] - x;
+		boatoffy = (64-boat_coords[i][2]) - y;
+		gateoffx = towngate_coords[i][1] - x;
+		gateoffy = (64-towngate_coords[i][2]) - y;
+printf("   <object type=\"Town\" name=\"%s\" gid=\"11\" x=\"%d\" y=\"%d\">\n", town_names[i], x*48, y*36);
+printf("     <properties>\n");
+printf("       <property name=\"Castle\" value=\"%s\"/>\n", castle_names[castle_id]);
+		if (boatoffx || boatoffy) {
+printf("       <property name=\"BoatX\" value=\"%d\"/>\n", boatoffx);
+printf("       <property name=\"BoatY\" value=\"%d\"/>\n", boatoffy);
+		}
+		if (gateoffx || gateoffy) {
+printf("       <property name=\"GateX\" value=\"%d\"/>\n", gateoffx);
+printf("       <property name=\"GateY\" value=\"%d\"/>\n", gateoffy);
+		}
+printf("     </properties>\n");
+printf("   </object>\n");
+	}
+printf(" </objectgroup>\n");
+}
+printf("</map>\n");
+}
+
 void stdout_game(KBgame *game) {
 	int cont, k, j, i;
+
+	#define _TOTAL 4
+	int num_hotspots[5] = { 0 };
+	int num_foes[5] = { 0 };
+	int num_grass[5] = { 0 };
+	int num_castles[5] = { 0 };
+	int num_towns[5] = { 0 };
 
 	printf("Difficulty: %d\n", game->difficulty);
 	printf("Scepter: %d, X=%d, Y=%d\n", game->scepter_continent, game->scepter_x, game->scepter_y);
@@ -150,13 +291,13 @@ void stdout_game(KBgame *game) {
 	printf("Player: %s the %s\n", game->name, "Player");
 	printf("Player: Level %d\n", game->rank);
 	printf("Player: Mount - %d\n", game->mount);
-	
+
 	printf("Player: Location: Continent %d, X=%d, Y=%d\n", game->continent, game->x, game->y);
 	printf("Player: Visited: Continent %d, X=%d, Y=%d\n", game->continent, game->last_x, game->last_y);
 
 	printf("Boat: Exists: %s\n", game->boat != 0xFF ? "YES" : "NO");
 	printf("Boat: Location: Continent %d, X=%d, Y=%d\n", game->boat, game->boat_x, game->boat_y);
-	
+
 	printf("Player: Siege Weapons: %s\n", game->siege_weapons ? "YES" : "NO");
 	printf("Player: Knows Magic: %s\n", game->knows_magic ? "YES" : "NO");
 	printf("Player: Owns Boat: %s\n", game->boat != 0xFF ? "YES" : "NO");
@@ -206,7 +347,16 @@ void stdout_game(KBgame *game) {
 			for (i = 0; i < LEVEL_W; i++) {
 				byte m = game->map[cont][j][i]; 
 				char c = '?';
-				
+
+				/* Stats */
+				if (m == 0x00) num_grass[cont]++;
+				if (m == 0x85) num_castles[cont]++;
+				if (m == 0x8A) num_towns[cont]++;
+				if (m == 0x8B) num_hotspots[cont]++;
+				if (m == 0x91) num_foes[cont]++;
+				/* End stats */
+
+
 				if (IS_WATER(m)) c = '~';
 				if (IS_GRASS(m)) c = '.';
 				if (IS_DESERT(m)) c = ',';
@@ -229,16 +379,27 @@ void stdout_game(KBgame *game) {
 		}
 	}
 
+	for (cont = 0; cont < MAX_CONTINENTS+1; cont++) {
+		printf("Stats,%s %d: ", cont == MAX_CONTINENTS ? "Total" : "Content", cont);
+		printf("Castles: %d, Towns: %d, Hotspots: %d, Foes: %d, Grass: %d\n",
+			num_castles[cont], num_towns[cont], num_hotspots[cont], num_foes[cont], num_grass[cont]);
+		num_castles[_TOTAL] += num_castles[cont];
+		num_towns[_TOTAL] += num_towns[cont];
+		num_hotspots[_TOTAL] += num_hotspots[cont];
+		num_foes[_TOTAL] += num_foes[cont];
+		num_grass[_TOTAL] += num_grass[cont];
+	}
+
 	for (cont = 0; cont < MAX_CONTINENTS; cont++) {
 		printf("Dwellings %d: ", cont);
 		for (i = 0; i < MAX_DWELLINGS; i++) {
-			printf("%02x ", 
+			printf("%02x ",
 				game->dwelling_troop[cont][i] // type
 			);
 		}
 		printf("| ");
 		for (i = 0; i < MAX_DWELLINGS; i++) {
-			printf("%d,%d ", 
+			printf("%d,%d ",
 				game->dwelling_coords[cont][i][0],//x
 				game->dwelling_coords[cont][i][1]//y
 			);
@@ -308,53 +469,109 @@ void stdout_game(KBgame *game) {
 }
 
 int main(int argc, char* argv[]) {
+	KB_logto_NULL();
 
 	int be_interactive = 1;
+	int file_is_land = 0;
+	int dump_type = -1;
+	int i;
 
 	KBgame *game;
+	char *filename;
+
+	KBmodule *module = NULL;
 
 	if (argc < 3) {
 	
 		printf("Usage: ./kbmaped [OPTION] SAVEFILE\n");
 		printf("OPTIONS are:\n");
 		printf("\t--dump\t Print textual representation of SAVEFILE and exit\n");
-		printf("\t--cheat\t Fill target SAVEFILE with dragons\n");
+		printf("\t--tmx\t Print TMX representation of SAVEFILE and exit\n");
+		//printf("\t--cheat\t Fill target SAVEFILE with dragons\n");
 		printf("\t--land\t Treat SAVEFILE as land.org\n");
 	
 		return -1;
 	}
 
-	if (!strcasecmp(argv[1], "--land")) {
+	filename = argv[argc-1];
 
-		game = load_land(argv[2]);
+	for (i = 1; i < argc-1; i++) {
+
+		if (!strcasecmp(argv[i], "--land")) {
+
+			file_is_land = 1;
+
+		}
+		if (!strcasecmp(argv[i], "--dump")) {
+
+			be_interactive = 0;
+			dump_type = 0;
+
+		}
+	
+		if (!strcasecmp(argv[i], "--tmx")) {
+
+			be_interactive = 0;
+			dump_type = 1;
+
+		}
+
+		if (!strcasecmp(argv[i], "--datadir")) {
+
+			module = preload_module(argv[i+1]);
+
+			if (!module) {
+				return -1;
+			}
+
+		}
 
 	}
-	else
 
-		game = KB_loadDAT(argv[2]);
-	
+
+	if (file_is_land) {
+
+		game = load_land(filename);
+
+	}
+	else {
+
+		game = KB_loadDAT(filename);
+
+	}
+
 	if (game == NULL) {
-	
+
 		printf("Unable to load game %s\n", argv[2]);
-		
+
 		return -2;
+
 	}
 
-	if (!strcasecmp(argv[1], "--dump")) {
+	if (dump_type == 0) {
 
-		be_interactive = 0;
-		printf("DUMPING\n");
 		stdout_game(game);
-		
+
 	}
-	
+	if (dump_type == 1) {
+
+		stdout_game_tmx(game, module);
+
+	}
+
 	if (be_interactive) {
 
 		interactive_main(game);
 
 	}
-	
+
 	free(game);
+
+	if (module) {
+
+		stop_module(module);
+
+	}
 
 	return 0;
 }
