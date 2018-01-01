@@ -6531,7 +6531,8 @@ void adventure_loop(KBgame *game) {
 					case TILE_DWELLING_2:
 					case TILE_DWELLING_3:	walk = visit_dwelling(game, m - TILE_DWELLING_1); break;
 					case TILE_SIGNPOST: 	read_signpost(game);    	break;
-					case TILE_FOE:      	walk = !attack_foe(game);	break;
+					case TILE_FOE:      	walk = !attack_foe(game);
+					if (walk) continue;	break;
 					case TILE_ARTIFACT_1:
 					case TILE_ARTIFACT_2:	take_artifact(game, m - TILE_ARTIFACT_1);	break;
 					default:
