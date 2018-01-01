@@ -1,0 +1,15 @@
+       Name: Sebastian Black
+       Alias: The Monk
+       Reward: 14,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Haircut of a cleric, despite
+  his proclaimed hate for all
+  things holy. His incompe-
+  nce is matched by arrogance.
+Crimes: Maurice is wanted for
+  pillaging the sacred shrines,
+  where he obtained forbidden
+  scrolls, items of power
+  as well as a piece of a map.
