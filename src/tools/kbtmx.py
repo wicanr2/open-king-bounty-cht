@@ -147,6 +147,9 @@ for objgroup in root.findall("objectgroup"):
 				"cont": cont,
 				"boat_x": 0,
 				"boat_y": 0,
+				"castle_name": None,
+				"castle": None,
+				"order": -1,
 			}
 
 			town["name"] = object.get("name");
@@ -162,6 +165,8 @@ for objgroup in root.findall("objectgroup"):
 					town["gate_x"] = x + int(prop.get('value'));
 				if prop.get('name') == 'GateY':
 					town["gate_y"] = y - int(prop.get('value'));
+				if prop.get('name') == 'Castle':
+					town["castle_name"] = prop.get('value');
 
 			#signpost["order"] = signpost["cont"] * 1024 + signpost["y"] * 64 + signpost["x"];
 
@@ -179,6 +184,8 @@ for objgroup in root.findall("objectgroup"):
 				"x": x,
 				"y": y,
 				"cont": cont,
+				"town": None,
+				"order": -1,
 			}
 			#print "x:", x, "y:", y, "cont:",cont
 			castle["name"] = object.get("name");
@@ -247,7 +254,76 @@ castles = sorted(castles, key=lambda k: k['name'])
 towns = sorted(towns, key=lambda k: k['name'])
 signposts = sorted(signposts, key=lambda k: k['order'])
 
-def print_coords(fh, obj):
+def find_castle_by_name(name):
+	for castle in castles:
+		if (castle["name"] == name):
+			return castle
+	return None
+
+def find_closest_castle(cont, x, y):
+	for castle in castles:
+		if castle["town"] is not None:
+			castle["dist"] = 4096 * 512
+		elif castle["cont"] != cont:
+			castle["dist"] = 4096
+		else:
+			diff_x = abs(castle["x"] - x)
+			diff_y = abs(castle["y"] - y)
+			castle["dist"] = diff_x + diff_y
+	sorted_castles = sorted(castles, key=lambda k: k['dist'])
+	castle = sorted_castles[0]
+	if castle["dist"] > 4096:
+		return None
+	return castle
+
+# Link towns to castles
+i = 0
+for castle in castles:
+	if castle["name"] is None:
+		castle["name"] = "Castle %c" % (65+i)
+	castle["order"] = i
+	i = i + 1
+
+i = -1
+for town in towns:
+	i = i + 1
+	town["order"] = i
+	if town["castle_name"] is None:
+		print "Warning! Town %d %s doesn't have 'Castle' property." % (i, town["name"]);
+		continue
+	castle = find_castle_by_name(town["castle_name"]);
+	if castle is None:
+		print "Warning! Town %d %s can't find castle '%s'." % (i, town["name"], town["castle_name"])
+		continue
+	if castle["town"]:
+		print "Warning! Overwriting castle ownership over town"
+	castle["town"] = town
+	if town["castle"]:
+		print "Warning! Overwriting town link to castle"
+	town["castle"] = castle
+
+# Auto-link
+for town in towns:
+	if town["castle"] is None:
+		castle = find_closest_castle(town["cont"], town["x"], town["y"])
+		if castle is None:
+			print "Warning! Unable to auto-link town %s" % town["name"]
+		castle["town"] = town
+		town["castle"] = castle
+		print "Auto-linked town %s to castle %s (dist:%d)" % (town["name"], castle["name"], castle["dist"])
+
+# Verify
+for castle in castles:
+	if castle["town"] is None:
+		print "Castle %s lacks town link" % castle["town"]
+for town in towns:
+	if town["castle"] is None:
+		print "Town %s lacks castle link" % town["castle"]
+
+# Reorder towns!
+towns = sorted(towns, key=lambda k: k['castle']['order'])
+
+def write_coords(fh, obj):
 	fh.write("x = %d\n" % obj["x"])
 	fh.write("y = %d\n" % obj["y"])
 	fh.write("continent = %d\n" % obj["cont"])
@@ -265,14 +341,14 @@ if home:
 	fh.write("[special0]\n")
 	fh.write(";home\n")
 	fh.write("name = of the King\n")
-	print_coords(fh, home)
+	write_coords(fh, home)
 	fh.write("\n")
 
 if alcove:
 	fh.write("[special1]\n")
 	fh.write(";alcove\n")
 	fh.write("name = Magic Alcove\n")
-	print_coords(fh, alcove)
+	write_coords(fh, alcove)
 	fh.write("\n")
 
 for continent in continents:
@@ -318,6 +394,8 @@ for town in towns:
 	fh.write("boat_x = %d\n" % town["boat_x"])
 	fh.write("boat_y = %d\n" % town["boat_y"])
 	fh.write("spell = 7\n")
+	#fh.write("castle_id = %d\n" % town["castle"]["order"])
+	fh.write("invert_id = %d\n" % town["order"])
 	fh.write("\n")
 	i = i + 1
 fh.close()

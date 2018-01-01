@@ -729,6 +729,15 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return coord;
 		}
 		break;
+		case DAT_TOWNC:
+		{
+			byte *coord =
+				GNU_downto_byte(
+					GNU_extract_ini(mod, "towns.ini", "town%d", "continent", 0, 26, NULL)
+					, 26, 1);
+			return coord;
+		}
+		break;
 		case DAT_TOWNY:
 		{
 			byte *coord =
@@ -751,7 +760,7 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 		{
 			byte *inversion =
 				GNU_downto_byte(
-					GNU_extract_ini(mod, "towns.ini", "town%d", "castle_id", 0, 26, NULL)
+					GNU_extract_ini(mod, "towns.ini", "town%d", "invert_id", 0, 26, NULL)
 					, 26, 1);
 			return inversion;
 		}

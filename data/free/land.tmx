@@ -152,7 +152,7 @@
    <tile gid="33"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="11"/>
+   <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -16555,12 +16555,12 @@
   <object name="Canicumar" type="Castle" gid="6" x="1728" y="1008"/>
   <object name="Elora" type="Castle" gid="6" x="2640" y="612"/>
   <object name="Akropos" type="Castle" gid="6" x="2112" y="1872"/>
-  <object type="Town" gid="11" x="2688" y="1080">
+  <object name="Dead End" type="Town" gid="11" x="2688" y="1080">
    <properties>
     <property name="Castle" value="Canicumar"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="1152" y="108"/>
+  <object name="Gnarl" type="Town" gid="11" x="1104" y="108"/>
   <object name="Baytown" type="Town" gid="11" x="480" y="2196">
    <properties>
     <property name="BoatX" value="1"/>
@@ -16578,23 +16578,23 @@
   <object name="Janok" type="Castle" gid="6" x="2064" y="324"/>
   <object name="Na Sing Se" type="Castle" gid="6" x="1776" y="1620"/>
   <object name="Fall" type="Castle" gid="6" x="144" y="1800"/>
-  <object type="Town" gid="11" x="336" y="540">
+  <object name="Eiharl" type="Town" gid="11" x="336" y="540">
    <properties>
     <property name="Castle" value="Kitty"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="768" y="1044">
+  <object name="Mullah" type="Town" gid="11" x="768" y="1044">
    <properties>
     <property name="Castle" value="Bakta"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2880" y="504">
+  <object name="Cattleton" type="Town" gid="11" x="2880" y="504">
    <properties>
     <property name="Castle" value="Elora"/>
    </properties>
   </object>
   <object type="Town" gid="11" x="1968" y="72"/>
-  <object type="Town" gid="11" x="1584" y="1512">
+  <object name="Orchid" type="Town" gid="11" x="1584" y="1512">
    <properties>
     <property name="Castle" value="Na Sing Se"/>
    </properties>
