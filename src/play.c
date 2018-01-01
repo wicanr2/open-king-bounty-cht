@@ -19,10 +19,8 @@
  */
 #include "bounty.h"
 #include "lib/kbstd.h"
+#include "play.h"
 
-/* forward-declare: */
-void player_accept_rank(KBgame *game);
-void clear_fog(KBgame *game);
 #define UID_AS_SIDE(UID) (UID > 5 ? 1 : 0)
 #define UID_AS_ID(UID) (UID > 5 ? UID - 6 : UID - 1)
 #define PACK_UID(SIDE,ID) (SIDE * 5 + ID + 1)

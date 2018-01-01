@@ -24,6 +24,8 @@
 #include "env.h"
 #include "ui.h"
 
+#include "../vendor/vendor.h" /* scale2x, inprint, etc */
+
 /* Global/main session */
 KBsession local = { NULL };
 

@@ -26,6 +26,10 @@
 #include "../vendor/vendor.h"
 #include "env.h"
 
+#ifdef HAVE_LIBSDL_IMAGE
+#include <SDL_image.h>
+#endif
+
 /* Forward-declare audio callback */
 void KBenv_audio_callback(void *userdata, Uint8 *stream, int len);
 

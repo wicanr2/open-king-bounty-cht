@@ -68,16 +68,16 @@ KB_DIR * KB_opendir_in(const char *filename, KB_DIR *top)
 
 	const char *ext = &filename[e + 1];
 
-	if (!strcasecmp(ext, "cc")) {
+	if (!KB_strcasecmp(ext, "cc")) {
 		type = KBDTYPE_GRPCC;
 	}
-	if (!strcasecmp(ext, "4")) {
+	if (!KB_strcasecmp(ext, "4")) {
 		type = KBDTYPE_GRPIMG;
 	}
-	if (!strcasecmp(ext, "16")) {
+	if (!KB_strcasecmp(ext, "16")) {
 		type = KBDTYPE_GRPIMG;
 	}
-	if (!strcasecmp(ext, "256")) {
+	if (!KB_strcasecmp(ext, "256")) {
 		type = KBDTYPE_GRPIMG;
 	}
 

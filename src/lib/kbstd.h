@@ -60,6 +60,7 @@ extern void KB_errlog(char *fmt, ...);
 
 extern void  KB_debuglog(int mod, char *fmt, ...);
 
+extern void KB_logto_STD(void);
 extern void KB_logto_NULL(void);
 
 /*
@@ -70,7 +71,7 @@ extern int KB_rand(int min, int max);
 /*
  * Clear strlist
  */
-extern int KB_strlist(char *list);
+extern int KB_strlist_clear(char *list);
 
 /*
  * Append value to strlist
@@ -100,9 +101,14 @@ extern int KB_strlistcmp(const char *list, const char *needle);
  * Return byte length of asciiz-list 
  */
 extern int KB_strlist_len(const char *list);
+/*
+ * Return number of entries of an asciiz-list
+ */
+extern int KB_strlist_max(const char *list);
 
 #ifdef HAVE_STRCASECMP
 
+#include <strings.h>
 #define KB_strcasecmp strcasecmp
 
 #else
@@ -113,6 +119,9 @@ extern int KB_strcasecmp(const char *left, const char *right);
 
 extern char* KB_strtoupper(char *src);
 
+/* note: this is also specified in vendor.h */
+extern size_t strlcat(char *dst, const char *src, size_t size);
+extern size_t strlcpy(char *dst, const char *src, size_t size);
 #define KB_strlcat strlcat
 #define KB_strlcpy strlcpy
 

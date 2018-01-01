@@ -2458,6 +2458,7 @@ void visit_own_castle(KBgame *game, int castle_id) {
 	}
 }
 
+/* TOH: */int run_combat(KBgame *game, int mode, int id);
 int lay_siege(KBgame *game, int castle_id) {
 
 	int id = castle_id;
@@ -3685,7 +3686,7 @@ void end_of_week(KBgame *game, int num) {
 
 	on_hand = game->gold;
 
-	byte creature = end_week(game, NULL);
+	byte creature = end_week(game);
 
 	game->days_left -= days_passed;
 
@@ -3787,6 +3788,7 @@ KBgamestate cross_choice = {
 	0
 };
 
+/* TOH: */int pick_target(KBcombat *war, int *x, int *y, int filter);
 
 int build_bridge(KBgame *game) {
 

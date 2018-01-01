@@ -37,6 +37,8 @@ extern int known_spells(KBgame *game);
 
 extern int has_power(KBgame *game, byte power);
 
+extern int player_has_boat(KBgame *game);
+
 extern int player_can_fly(KBgame *game);
 
 extern int player_army_slots(KBgame *game);
@@ -53,7 +55,15 @@ extern int player_commission(KBgame *game);
 
 extern int player_score(KBgame *game);
 
+extern word boat_cost(KBgame *game); 
+
+extern word week_id(KBgame *game);
+
+extern void roll_creature(int difficulty, byte *id, word *number);
+
 /** Player actions **/
+
+extern void player_accept_rank(KBgame *game);
 
 extern void promote_player(KBgame *game);
 
@@ -61,6 +71,7 @@ extern void clear_fog(KBgame *game);
 
 extern void sail_to(KBgame *game, byte continent);
 
+extern int add_troop(KBgame *game, byte troop_id, word number);
 extern int buy_troop(KBgame *game, byte troop_id, word number);
 
 extern void dismiss_troop(KBgame *game, byte slot);
@@ -69,11 +80,13 @@ extern int garrison_troop(KBgame *game, int castle_id, byte slot);
 
 extern int ungarrison_troop(KBgame *game, int castle_id, byte slot);
 
+
+
 /** Game events **/
 
 extern int end_day(KBgame *game);
 
-extern byte end_week(KBgame *game, dword *spent);
+extern byte end_week(KBgame *game);
 
 extern int spend_days(KBgame *game, word days);
 
@@ -84,6 +97,8 @@ extern void spend_gold(KBgame *game, word amount);
 extern void fullfill_contract(KBgame *game, byte villain_id);
 
 extern void temp_death(KBgame *game);
+
+extern void foes_follow(KBgame *game);
 
 /** Spell effects **/
 extern void time_stop(KBgame *game);
@@ -101,12 +116,16 @@ extern void prepare_units_player(KBcombat *war, int side, KBgame *game);
 extern void prepare_units_foe(KBcombat *war, int side, KBgame *game, int continent_id, int foe_id);
 extern void prepare_units_castle(KBcombat *war, int side, KBgame *game, int castle_id);
 extern void accept_units_player(KBgame *game, int side, KBcombat *war);
+extern void accept_units_foe(KBgame *game, int side, KBcombat *war, int continent_id, int foe_id);
+extern void accept_units_castle(KBgame *game, int side, KBcombat *war, int castle_id);
 extern void reset_turn(KBcombat *war);
 extern void wipe_battlefield(KBcombat *war);
 extern void reset_match(KBcombat *war, int castle);
+extern int compact_units(KBcombat *war);
 extern int next_turn(KBcombat *war);
 extern int next_unit(KBcombat *war);
 extern int units_are_friendly(KBcombat *war, int side, int id, int other_side, int other_id);
+extern int unit_under_control(KBcombat *war, int side, int id);
 extern int unit_touching(KBcombat *war, int side, int id, int other_side, int other_id);
 extern int unit_surrounded(KBcombat *war, int side, int id);
 extern int unit_ranged_shot(KBcombat *war, int side, int id, int other_side, int other_id);

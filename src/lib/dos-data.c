@@ -480,7 +480,7 @@ char* DOS_read_credits(KBmodule *mod, int off, int endoff) {
 		}
 		/* Apply decorations */
 		if (need_jump) {
-			strlcat(buf, "\n", newmax);
+			KB_strlcat(buf, "\n", newmax);
 			used++;
 			need_jump = 0;
 		}
@@ -492,7 +492,7 @@ char* DOS_read_credits(KBmodule *mod, int off, int endoff) {
 			need_tab = 0;
 		}
 		/* Apply actual string */
-		strlcat(buf, ptr, newmax);
+		KB_strlcat(buf, ptr, newmax);
 		used += mlen;
 
 		/* Advance pointer */
@@ -573,7 +573,7 @@ char* DOS_read_vdescs(KBmodule *mod, int off, int endoff, int skip_lines) {
 			need_tab = 0;
 		}
 		/* Apply actual string */
-		strlcat(buf, ptr, newmax);
+		KB_strlcat(buf, ptr, newmax);
 		used += mlen;
 		/* Hack -- Apply extra '%s' */
 		if (!strncasecmp(ptr, "last seen:", 10)
@@ -633,7 +633,7 @@ char* DOS_read_adescs(KBmodule *mod, int off, int endoff, int skip_lines) {
 		}
 
 		/* Apply actual string */
-		strlcat(buf, ptr, newmax);
+		KB_strlcat(buf, ptr, newmax);
 		used += mlen;
 
 		/* Advance pointer */

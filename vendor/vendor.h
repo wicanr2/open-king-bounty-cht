@@ -24,7 +24,7 @@ extern SDL_Surface* get_inline_font(void);
 #endif
 
 /* strlcat.c */
-size_t strlcat(char *dst, const char *src, size_t siz);
+extern size_t strlcat(char *dst, const char *src, size_t siz);
 
 /* strlcpy.c */
-size_t strlcpy(char *dst, const char *src, size_t siz);
+extern size_t strlcpy(char *dst, const char *src, size_t siz);

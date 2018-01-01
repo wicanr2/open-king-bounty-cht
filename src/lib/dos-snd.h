@@ -20,6 +20,8 @@
 #ifndef _OPENKB_LIBKB_DOSSOUND
 #define _OPENKB_LIBKB_DOSSOUND
 
+#include "kbfile.h"
+
 #define MAX_TUN_NOTES	255 /* There's actually no hard limit, it should be malloced at run-time */
 
 #define MAX_TUN_FILES	10

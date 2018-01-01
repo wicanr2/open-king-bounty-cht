@@ -22,6 +22,8 @@
 
 #define KBSND_DOS	0x01
 
+#include "dos-snd.h"
+
 typedef struct KBsound {
 
 	byte type;
@@ -45,10 +47,10 @@ typedef struct KBsound {
 #define AUDIO_16BIT
 #ifndef AUDIO_16BIT
 typedef byte aword;
-#define AUDIO_FORMAT AUDIO_U8; 
+#define AUDIO_FORMAT AUDIO_U8
 #else
 typedef word aword;
-#define AUDIO_FORMAT AUDIO_S16SYS;
+#define AUDIO_FORMAT AUDIO_S16SYS
 #endif
 
 #endif /* _OPENKB_LIBKB_SOUND */
