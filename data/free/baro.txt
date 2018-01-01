@@ -1,0 +1,14 @@
+       Name: Lord Ironfist
+       Alias: The Builder
+       Reward: 8,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Corrupted, cold, stone face.
+  Eye for jewelery and good brew.
+  Often seen in the taverns.
+Crimes: Overspending the King's
+  Budget, he fled to a remote land
+  through a magical portal. There,
+  he built his little kingdom and
+  awaits the King's return.

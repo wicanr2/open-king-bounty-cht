@@ -1,0 +1,14 @@
+       Name: Dread Pirate Robin
+       Alias: Bad Robin
+       Reward: 9,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Sometimes pretends to be blind.
+  Hook for an arm. Naval hat.
+  Tanned skin.
+Crimes: Exotic animal contraband,
+  bucaneering, gold laundering.
+  Excessive littering. In his
+  search for treasure, he obtained
+  a piece of the map.

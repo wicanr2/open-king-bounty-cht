@@ -1,0 +1,14 @@
+       Name: Princess Mia
+       Alias: Miasma
+       Reward: 7,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Long brown hair, charming smile,
+  butterfly tatoo and firm, regal
+  stance.
+Crimes: Refusing to comply to her
+  father's rule, Mia ran away from
+  the castle, snatching some royal
+  treasures in process. Along the
+  jewels lied a puzzle map...
