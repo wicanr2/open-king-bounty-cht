@@ -153,6 +153,10 @@ for objgroup in root.findall("objectgroup"):
 
 			town["name"] = object.get("name");
 
+			if not town["name"]:
+				town["name"] = "!NONAME!"
+				print("Error! Town at CONT=%d,X=%d Y=%d has no name!" % (cont,63-y,x))
+
 			map[cont][63-y][x] = 0x8A
 
 			for prop in props:
