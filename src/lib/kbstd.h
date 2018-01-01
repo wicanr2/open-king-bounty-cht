@@ -58,7 +58,9 @@
 extern void KB_stdlog(char *fmt, ...);
 extern void KB_errlog(char *fmt, ...);
 
-extern void  KB_debuglog(int mod, char *fmt, ...); 
+extern void  KB_debuglog(int mod, char *fmt, ...);
+
+extern void KB_logto_NULL(void);
 
 /*
  * Generic RND

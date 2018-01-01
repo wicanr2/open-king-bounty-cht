@@ -37,6 +37,31 @@
 
 #include "kbstd.h"
 
+static FILE *_stdout = NULL;
+static FILE *_stderr = NULL;
+
+void KB_logto_STD(void)
+{
+	FILE *f = fopen ("/dev/null", "w");
+	if (f == NULL)
+		f = fopen("nul", "w");
+	if (f == NULL)
+		return;
+	_stdout = stdout;
+	_stderr = stderr;
+}
+
+void KB_logto_NULL(void)
+{
+	FILE *f = fopen ("/dev/null", "w");
+	if (f == NULL)
+		f = fopen("nul", "w");
+	if (f == NULL)
+		return;
+	_stdout = f;
+	_stderr = f;
+}
+
 void KB_debuglog(int mod, char *fmt, ...) 
 {
 	static int level = 0;
@@ -46,8 +71,8 @@ void KB_debuglog(int mod, char *fmt, ...)
 	va_start(argptr, fmt);
 
 	level += mod;
-	for (i = 0; i < level; i++) fputc(' ', stdout); 
-	vfprintf(stdout, fmt, argptr);
+	for (i = 0; i < level; i++) fputc(' ', _stdout);
+	vfprintf(_stdout, fmt, argptr);
 
 	va_end(argptr);
 }
@@ -57,7 +82,7 @@ void  KB_stdlog(char *fmt, ...)
 { 
 	va_list argptr;
 	va_start(argptr, fmt);
-	vfprintf(stdout, fmt, argptr);
+	vfprintf(_stdout, fmt, argptr);
 	va_end(argptr);
 }
 
@@ -72,7 +97,7 @@ void  KB_errlog(char *fmt, ...)
 	vsprintf(buffer, fmt, argptr);
 	MessageBox(NULL, buffer, "Critical Error", MB_ICONEXCLAMATION);
 #endif
-	vfprintf(stderr, fmt, argptr);
+	vfprintf(_stderr, fmt, argptr);
 	va_end(argptr);
 }
 

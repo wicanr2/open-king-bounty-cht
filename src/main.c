@@ -59,6 +59,7 @@ void dump_version(void) {
 }
 
 int main(int argc, char* argv[]) {
+	KB_logto_STD();
 
 	int playing = 1;	/* Play 1 game of KB */
 

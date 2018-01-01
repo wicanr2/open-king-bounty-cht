@@ -143,7 +143,7 @@ int verify_file(const char *name, const char *path) {
 			}
 			if (!ok) continue;
 		}
-		printf("-%s- [%d]\n", name, j);
+		KB_debuglog(0, "File -%s- [%d]\n", name, j);
 		id = j;
 	}
 	return id;
