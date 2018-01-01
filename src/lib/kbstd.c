@@ -254,7 +254,7 @@ int KB_strlistcmp(const char *list, const char *needle)
 		if (list[i] != needle[j]) {
 			/* Goto end of word */
 			while(list[i] != '\0') i++;
-			if (list[++i] == '\0') return 0;
+			if (list[++i] == (char)0xFF) return 0;
 			/* Reset needle */
 			j = 0;
 			w++;
