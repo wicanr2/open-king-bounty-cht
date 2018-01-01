@@ -187,7 +187,7 @@ void stdout_game(KBgame *game) {
 
 				if (game->scepter_continent == cont && 
 					i == game->scepter_x &&
-					j == game->scepter_y) c = 'O';		
+					j == game->scepter_y) c = 'O';
 				if (game->boat == cont && 
 					i == game->boat_x &&
 					j == game->boat_y) c = 'B';

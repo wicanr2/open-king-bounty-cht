@@ -5023,6 +5023,10 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 				game->continent_found[game->continent+1] = 1;
 			msg = "+Map to next continent";
 		break;
+		case 'o':
+			game->orb_found[game->continent] = 1;
+			msg = "+Orb to this continent";
+		break;
 		default:
 			msg = "No such command";
 		break;
