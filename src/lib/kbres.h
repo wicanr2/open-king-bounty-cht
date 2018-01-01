@@ -99,7 +99,10 @@
 	_(DAT_MAXSPELL)	/* [4] "max spells" for specific rank; subId - class */ \
 	_(DAT_FAMILIAR)	/* [4] "instant army familiar" for specific rank; subId - class */ \
 	_(WDAT_SCOST)	/* [MAX_SPELLS] gold cost for specific spell; subId - undefined */ \
-	_(WDAT_VREWARD)	/* gold reward for specific villain ; subId - villain_id */ \
+	_(DAT_SACTION)	/* [MAX_SPELLS] spell action for specific spell; subId - undefined */ \
+	_(WDAT_SDAMAGE)	/* [MAX_SPELLS] spell power for specific spell; subId - undefined */ \
+	_(DAT_SFILTER)	/* [MAX_SPELLS] spell filter for specific spell; subId - undefined [UNUSED] */ \
+	_(WDAT_VREWARD)	/* [MAX_VILLAINS] gold reward for specific villain ; subId - villain_id */ \
 	_(DAT_VTROOP)	/* [MAX_VILLAINS * 5] villain troop type; subId - (villain index * 5) + army index */ \
 	_(WDAT_VNUMBER)	/* [MAX_VILLAINS * 5] villain troop count troop count; subId - (villain index * 5) + army index */ \
 	_(DAT_CASTLEX)	/* [MAX_CASTLES] X coordinate for castle ; subId - undefined */ \

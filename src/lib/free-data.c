@@ -59,6 +59,144 @@ word* GNU_downto_word(dword *src, int len, int freesrc) {
 	return b;
 }
 
+byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
+	int i, j;
+
+	static const char *names[] = { /* Should map to spell action indexes defined as SPELL_* in bounty.h */
+		"magic_damage", //0
+		"clone",
+		"teleport",
+		"freeze",
+		"resurrect",
+		"turn_undead",
+		"bridge",
+		"time_stop",
+		"find_villain",
+		"castle_gate",
+		"town_gate",
+		"instant_army",
+		"raise_control"//12
+	};
+	int num_names = 13;
+
+	byte *actions = malloc(sizeof(byte) * num);
+	if (actions == NULL) return NULL;
+
+	for (i = 0; i < num; i++) {
+		char *flag = KB_strlist_peek(types, i);
+		int found = 0;
+		for (j = 0; j < num_names; j++) {
+			if (!KB_strcasecmp(names[j], flag)) {
+
+				actions[i] = j;
+
+				found = 1;
+				break;
+			}
+		}
+		if (!found) {
+			KB_errlog("Failed to parse %s spell type", flag);
+		}
+	}
+	if (freesrc) {
+		free(types);
+	}
+	return actions;
+}
+
+
+int GNU_parse_troop(const char *line, byte *type, word *num, char *troop_names) {
+	char name[256];
+	int val = 0;
+	int i;
+	if (sscanf(line, "%d x %s", &val, name) == 2
+	|| sscanf(line, "%dx%s", &val, name) == 2
+	|| sscanf(line, "%d x%s", &val, name) == 2
+	|| sscanf(line, "%dx %s", &val, name) == 2
+	|| sscanf(line, "%d %s", &val, name) == 2) {
+
+		for (i = 0; i < 25; i++) {
+			char *troop_name = KB_strlist_peek(troop_names, i);
+			if (!KB_strcasecmp(troop_name, name)) {
+
+				*num = (word)val;
+				*type = i;
+
+				return 1;
+			}
+		}
+
+	}
+	return 0;
+}
+
+/* Parse "20 x Peasants" string, return TROOP TYPE */
+byte* GNU_army_downto_byte(int first, int num, char **armies, int army_len, char *troop_names, int freesrc) {
+	int i, j;
+	int max = num - first;
+	int len = max * army_len;
+	byte *b = malloc(sizeof(byte) * len);
+	for (j = 0; j < num; j++) {
+		for (i = 0; i < army_len; i++) {
+			char *line = KB_strlist_peek(armies[i], j);
+			if (!line) break;
+			byte type;
+			word num;
+			int ok = GNU_parse_troop(line, &type, &num, troop_names);
+			if (ok) {
+				b[j * army_len + i] = type;
+			}
+			else {
+				KB_errlog("! Can't parse army `%s`\n", line);
+				return NULL;
+			}
+		}
+		for (; i < army_len; i++) {
+			b[j * army_len + i] = 0;
+		}
+	}
+	if (freesrc) {
+		for (i = 0; i < army_len; i++) {
+			free(armies[i]);
+		}
+		free(troop_names);
+	}
+	return b;
+}
+/* Parse "20 x Peasants" string, return TROOP NUMBER */
+word* GNU_army_downto_word(int first, int num, char **armies, int army_len, char *troop_names, int freesrc) {
+	int i, j;
+	int max = num - first;
+	int len = max * army_len;
+	word *b = malloc(sizeof(word) * len);
+	for (j = first; j < num; j++) {
+		for (i = 0; i < army_len; i++) {
+			char *line = KB_strlist_peek(armies[i], j);
+			if (!line) break;
+			byte type;
+			word num;
+			int ok = GNU_parse_troop(line, &type, &num, troop_names);
+			if (ok) {
+				b[j * army_len + i] = type;
+			}
+			else {
+				KB_errlog("! Can't parse army `%s`\n", line);
+				return NULL;
+			}
+		}
+		for (;i < army_len; i++) {
+			b[j * army_len + i] = 0;
+		}
+	}
+	if (freesrc) {
+		for (i = 0; i < army_len; i++) {
+			free(armies[i]);
+		}
+		free(troop_names);
+	}
+	return b;
+}
+
 char* GNU_string_ini(KBmodule *mod, const char *inifile, const char *module, const char *name, int first, int num, char *dst) {
 
 	int len = num * 32;
@@ -675,6 +813,24 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return goldcost;
 		}
 		break;
+		case DAT_SACTION:	/* [MAX_SPELLS] spell action for specific spell; subId - undefined */ \
+		{
+			byte *spelltypes =
+				GNU_spell_downto_byte(
+					GNU_string_ini(mod, "spells.ini", "spell%d", "type", 0, 14, NULL)
+					, 14, 1);
+			return spelltypes;
+		}
+		break;
+		case WDAT_SDAMAGE: /* [MAX_SPELLS] spell power for specific spell; subId - undefined */ \
+		{
+			word *damages =
+				GNU_downto_word(
+					GNU_extract_ini(mod, "spells.ini", "spell%d", "damage", 0, 14, NULL)
+					, 14, 1);
+			return damages;
+		}
+		break;
 		case DAT_SPECIALX:
 		{
 			byte *coord =
@@ -810,6 +966,50 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return hp;
 		}
 		break;
+		case DAT_VTROOP:	/* [MAX_VILLAINS * 5] villain troop type; subId - (villain index * 5) + army index */ \
+		{
+			char *troop_names = GNU_Resolve(mod, STRL_TROOPS, 0);
+			char *army0 = GNU_string_ini(mod, "villains.ini", "villain%d", "army0", 0, 17, NULL);
+			char *army1 = GNU_string_ini(mod, "villains.ini", "villain%d", "army1", 0, 17, NULL);
+			char *army2 = GNU_string_ini(mod, "villains.ini", "villain%d", "army2", 0, 17, NULL);
+			char *army3 = GNU_string_ini(mod, "villains.ini", "villain%d", "army3", 0, 17, NULL);
+			char *army4 = GNU_string_ini(mod, "villains.ini", "villain%d", "army4", 0, 17, NULL);
+			char *armies[5] = {
+				army0,
+				army1,
+				army2,
+				army3,
+				army4,
+			};
+			return GNU_army_downto_byte(
+				0, 17,
+				armies, 5,
+				troop_names,
+				1
+			);
+		}
+		case WDAT_VNUMBER:
+		{
+			char *troop_names = GNU_Resolve(mod, STRL_TROOPS, 0);
+			char *army0 = GNU_string_ini(mod, "villains.ini", "villain%d", "army0", 0, 17, NULL);
+			char *army1 = GNU_string_ini(mod, "villains.ini", "villain%d", "army1", 0, 17, NULL);
+			char *army2 = GNU_string_ini(mod, "villains.ini", "villain%d", "army2", 0, 17, NULL);
+			char *army3 = GNU_string_ini(mod, "villains.ini", "villain%d", "army3", 0, 17, NULL);
+			char *army4 = GNU_string_ini(mod, "villains.ini", "villain%d", "army4", 0, 17, NULL);
+			char *armies[5] = {
+				army0,
+				army1,
+				army2,
+				army3,
+				army4,
+			};
+			return GNU_army_downto_word(
+				0, 17,
+				armies,	5,
+				troop_names,
+				1
+			);
+		}
 		case DAT_WORLD:
 		{
 			KB_File *f;
