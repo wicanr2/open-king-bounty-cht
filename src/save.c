@@ -26,8 +26,6 @@
 
 KBgame* KB_loadDAT_amiga(const char* filename);
 KBgame* KB_loadDAT(const char* filename) {
-	return KB_loadDAT_amiga(filename);
-
 	char buf[DAT_SIZE];
 	KBgame *game;
 	FILE *f;
