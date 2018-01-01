@@ -1,0 +1,14 @@
+       Name: Karn the Wizard
+       Alias: None
+       Reward: 10,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Middle-aged yet balding, with
+  an abnoramly pesky nose. Wears
+  robes and carries magic.
+Crimes: Karn was once a trusted
+  advisor to the King. His love
+  for dark arts and lust for
+  power made him a dangerous
+  adversary since then.
