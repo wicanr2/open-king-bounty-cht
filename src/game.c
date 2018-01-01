@@ -1701,7 +1701,7 @@ void view_character(KBgame *game) {
 
 	SDL_Rect stats = { pos.x + portrait->w, pos.y + fs->h / 4 + fs->h / 8, pos.w - portrait->w, 2 };
 	
-	SDL_Rect line = { pos.x + portrait->w , pos.y + fs->h / 2, pos.w - portrait->w, fs->h / 8 };
+	SDL_Rect line = { pos.x + portrait->w - fs->w / 8 , pos.y + fs->h / 2, pos.w - portrait->w + fs->w / 8, fs->h / 8 };
 
 	KB_icolor(colors);
 
