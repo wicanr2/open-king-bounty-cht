@@ -1,0 +1,14 @@
+       Name: Adam the Rogue
+       Alias: ADOM
+       Reward: 6,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Permanent death does not scare
+  him. Randomly-generated dungeons
+  are his home.
+Crimes: Grave robbing, looting,
+  maradeuring. Not only does he
+  commits those crimes, ADOM
+  relishes in them. Sacked King's
+  Treasury.
