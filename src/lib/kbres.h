@@ -178,6 +178,14 @@ enum {
 
 extern const char *KBresid_names[]; 
 
+/* Option names */
+#define OPT_DELAY	0
+#define OPT_SOUNDS	1
+#define OPT_WALKBEEP	2
+#define OPT_ANIMATION	3
+#define OPT_ARMYSIZE	4
+#define OPT_CGAPAL	5
+
 /* Possible values for RECT_UI subid: */
 #define FRAME_TOP	0
 #define FRAME_LEFT	1

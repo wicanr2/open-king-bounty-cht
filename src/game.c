@@ -5434,7 +5434,7 @@ printf("Drawing item %d, which is item %d, %s\n", i, j, item_names[j]);
 				if (game->options[n] > 7) game->options[n] = 0;
 
 			}
-			if (n == 5) { /* HACK! Refresh CGA Palette */
+			if (n == OPT_CGAPAL) { /* HACK! Refresh CGA Palette */
 				int old_ind = game->options[n] - 1;
 				if (old_ind < 0) old_ind = 7;
 				SDL_Color* old_pal = KB_Resolve(PAL_PALETTE, old_ind);
