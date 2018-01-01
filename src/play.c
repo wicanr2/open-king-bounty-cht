@@ -1615,6 +1615,8 @@ dword isqrt32(dword h) {
 /* Shorthand Pythagorean distance formula (integer-based) */
 #define calc_distance(x1, y1, x2, y2) isqrt32(ipow2((x2) - (x1)) + ipow2((y2) - (y1)))
 
+#undef calc_distance
+#define calc_distance(x1, y1, x2, y2) abs((x2) - (x1)) + abs((y2) - (y1))
 /* Find a tile around position_x/position_y, which has the minimal distance
  * between target_x/target_y and origin_x/origin_y.
  * Thus:

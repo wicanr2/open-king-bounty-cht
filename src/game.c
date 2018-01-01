@@ -40,6 +40,7 @@ KBenv *sys = NULL;
 
 void update_ui_frames();
 void draw_location(int loc_id, int troop_id, int frame);
+int auto_battle = 0;
 
 void prepare_resources() {
 
@@ -1527,6 +1528,8 @@ void view_minimap(KBgame *game, int force_orb) {
 			}
 		}
 
+		if (KB_rand(0,10) == 0) redraw = 2;
+
 		if (redraw) {
 
 			int i;
@@ -1560,8 +1563,10 @@ void view_minimap(KBgame *game, int force_orb) {
 					SDL_FillRect(screen, &pixel, color);
 				}
 				/* DOS aestetics: */
+				/**/if (redraw == 1) {
 				/**/SDL_Flip(sys->screen);
 				/**/SDL_Delay(10);
+				/**/}
 			}
 
 			SDL_Flip(sys->screen);
@@ -6120,7 +6125,7 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 
 			if (++combat->units[combat->side][combat->unit_id].frame > 3) {
 				combat->units[combat->side][combat->unit_id].frame = 0;
-				if (combat->side == 1 || combat->units[combat->side][combat->unit_id].out_of_control
+				if (auto_battle || combat->side == 1 || combat->units[combat->side][combat->unit_id].out_of_control
 				) pass = ai_unit_think(combat); /* AI makes his move */
 			}
 
