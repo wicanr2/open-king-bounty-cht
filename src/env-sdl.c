@@ -175,12 +175,12 @@ void KB_stopENV(KBenv *env) {
 	SDL_Quit();
 }
 
-inline void KB_flip(KBenv *env) {
+void KB_flip(KBenv *env) {
 	SDL_Flip(env->screen);
 }
 
 
-inline void KB_loc(KBenv *env, word base_x, word base_y) {
+void KB_loc(KBenv *env, word base_x, word base_y) {
 	env->base_x = base_x;
 	env->base_y = base_y;
 	env->cursor_x = 0;
@@ -188,17 +188,17 @@ inline void KB_loc(KBenv *env, word base_x, word base_y) {
 	env->line_height = env->font_size.h;
 }
 
-inline void KB_curs(KBenv *env, word cursor_x, word cursor_y) {
+void KB_curs(KBenv *env, word cursor_x, word cursor_y) {
 	env->cursor_x = cursor_x;
 	env->cursor_y = cursor_y;
 }
 
-inline void KB_getpos(KBenv *env, word *x, word *y) {
+void KB_getpos(KBenv *env, word *x, word *y) {
 	*x = env->base_x + env->cursor_x * env->font_size.w;
 	*y = env->base_y + env->cursor_y * env->line_height;
 }
 
-inline void KB_lh(KBenv *env, byte h) {
+void KB_lh(KBenv *env, byte h) {
 	env->line_height = (h == 0 ? env->font_size.h : h);
 }
 
