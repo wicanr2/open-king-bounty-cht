@@ -113,7 +113,7 @@ $(VEND_SOURCES):
 vendor-clean:
 	rm $(VEND_SOURCES) $(VEND_DEPS)
 
-vendor: $(VEND_SOURCES)
+vendor: $(VEND_SOURCES) $(VEND_DEPS)
 	@true
 
 config:
