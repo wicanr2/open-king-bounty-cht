@@ -182,8 +182,8 @@ extern int KB_event(KBgamestate *state);
 /* Utilities */
 extern char* KB_KeyLabel(int key1, int key2);
 extern void SDL_TextRect(SDL_Surface *dest, SDL_Rect *r, Uint32 fore, Uint32 back, int top);
-inline void KB_Wait();
-inline void KB_Pause();
+extern void KB_Wait();
+extern void KB_Pause();
 /* Text output */
 extern SDL_Rect* KB_MessageBox(const char *str, byte flag);
 extern SDL_Rect* KB_BottomFrame();

@@ -516,17 +516,17 @@ void SDL_TextRect(SDL_Surface *dest, SDL_Rect *r, Uint32 fore, Uint32 back, int 
 
 
 /* Wait for ~1.5 seconds or a keypress */
-inline void KB_Wait() { 
- 	Uint32 delay = 1500;
- 	while (!KB_event(&press_any_key) && delay) {
- 		delay -= 10;
- 		SDL_Delay(10);
- 	}
+void KB_Wait() {
+	Uint32 delay = 1500;
+	while (!KB_event(&press_any_key) && delay) {
+		delay -= 10;
+		SDL_Delay(10);
+	}
 }
 
 /* Wait for a keypress */
-inline void KB_Pause() { 
- 	while (!KB_event(&press_any_key)) SDL_Delay(10);
+void KB_Pause() {
+	while (!KB_event(&press_any_key)) SDL_Delay(10);
 }
 
 
