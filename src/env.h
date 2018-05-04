@@ -97,10 +97,10 @@ extern void KB_vprintf(KBenv *env, const char *fmt, va_list argptr);
 extern SDL_Rect *KB_fontsize(KBenv *env);
 extern void KB_setfont(KBenv *env, SDL_Surface *surf);
 extern void KB_setcolor(KBenv *env, Uint32* colors); /* Colors must be in 0x00RRGGBB format ! */
-inline void KB_loc(KBenv *env, word base_x, word base_y);
-inline void KB_curs(KBenv *env, word cursor_x, word cursor_y);
-inline void KB_lh(KBenv *env, byte h);
-inline void KB_getpos(KBenv *env, word *x, word *y);
+extern void KB_loc(KBenv *env, word base_x, word base_y);
+extern void KB_curs(KBenv *env, word cursor_x, word cursor_y);
+extern void KB_lh(KBenv *env, byte h);
+extern void KB_getpos(KBenv *env, word *x, word *y);
 
 /* Short-hand aliases for above functions */
 #define KB_ifont(ARGS...) KB_setfont(sys, ## ARGS)

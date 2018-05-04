@@ -310,9 +310,10 @@ extern char* DOS_location_names[];
 #include <SDL.h>
 #include "kbdir.h" // for KB_DIR
 #include "kbconf.h" // for KBresolve_cb
-/* Provide useful functions to modules */
-inline SDL_Surface* SDL_CreatePALSurface(Uint32 width, Uint32 height);
-inline void SDL_ClonePalette(SDL_Surface *dst, SDL_Surface *src);
+
+/* Provide usefull functions to modules */
+extern SDL_Surface* SDL_CreatePALSurface(Uint32 width, Uint32 height);
+extern void SDL_ClonePalette(SDL_Surface *dst, SDL_Surface *src);
 extern void SDL_BlitXBPP(const char *src, SDL_Surface *dest, SDL_Rect *dstrect, int bpp);
 extern void SDL_BlitMASK(const char *src, SDL_Surface *dest, SDL_Rect *dstrect);
 extern void SDL_ReplaceIndex(SDL_Surface *dest, SDL_Rect *dstrect, byte search, byte replace);
