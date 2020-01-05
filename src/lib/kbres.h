@@ -319,6 +319,10 @@ extern void SDL_BlitMASK(const char *src, SDL_Surface *dest, SDL_Rect *dstrect);
 extern void SDL_ReplaceIndex(SDL_Surface *dest, SDL_Rect *dstrect, byte search, byte replace);
 extern void SDL_ReplaceColors(SDL_Surface *dest, SDL_Rect *dstrect, Uint32* search, Uint32* replace, int n);
 
+/* Store/retreive audio device parameters */
+extern int KB_GetAudioSpec(SDL_AudioSpec *spec);
+extern void KB_SetAudioSpec(SDL_AudioSpec *spec);
+
 /* Simple palette manipulation */
 extern void put_mono_pal(SDL_Surface *dest);
 extern void put_cga_pal(SDL_Surface *dest);

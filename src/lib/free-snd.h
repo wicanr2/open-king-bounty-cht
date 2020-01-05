@@ -1,6 +1,6 @@
 /*
- *  kbsound.h -- Sound format and playing routines definitions
- *  Copyright (C) 2012 Vitaly Driedfruit
+ *  free-snd.h -- WAV files reader/player interface
+ *  Copyright (C) 2020 Vitaly Driedfruit
  *
  *  This file is part of openkb.
  *
@@ -17,42 +17,27 @@
  *  You should have received a copy of the GNU General Public License
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _OPENKB_LIBKB_SOUND
-#define _OPENKB_LIBKB_SOUND
+#ifndef _OPENKB_LIBKB_FREESOUND
+#define _OPENKB_LIBKB_FREESOUND
 
-#define KBSND_DOS	0x01
-#define KBSND_WAV	0xE0
+#include "kbfile.h"
 
-#include "dos-snd.h"
-#include "free-snd.h"
+struct wavFile {
 
-typedef struct KBsound {
+	struct wavHeader {
 
-	byte type;
+	} header;
 
-	union {
+	byte *bytes;
+	unsigned int num_bytes;
 
-		struct {
+	/* ----------------------------------------------------------- */
+	int playhead;
+};
 
-		};
-		struct {
-
-		};
-
-	};
-
-	void *data;
-
-} KBsound;
+extern struct wavFile* wavFile_load_FILE(KB_File *f, SDL_AudioSpec *spec);
+extern int wavFile_play(struct wavFile *wav, Uint8 *stream, int len, int freq);
+extern int wavFile_reset(struct wavFile *wav, Uint16 format);
 
 
-#define AUDIO_16BIT
-#ifndef AUDIO_16BIT
-typedef byte aword;
-#define AUDIO_FORMAT AUDIO_U8
-#else
-typedef word aword;
-#define AUDIO_FORMAT AUDIO_S16SYS
 #endif
-
-#endif /* _OPENKB_LIBKB_SOUND */

@@ -34,6 +34,20 @@ RESOURCES
 #endif
 #include "kbfile.h"
 
+static SDL_AudioSpec _audio_mixer;
+static int audio_spec_set = 0;
+int KB_GetAudioSpec(SDL_AudioSpec *spec)
+{
+	if (audio_spec_set == 0) return 1;
+	*spec = _audio_mixer;
+	return 0;
+}
+void KB_SetAudioSpec(SDL_AudioSpec *spec)
+{
+	_audio_mixer = *spec;
+	audio_spec_set = 1;
+}
+
 SDL_Surface* SDL_CreatePALSurface(Uint32 width, Uint32 height)
 {
 	return SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8, 0xFF, 0xFF, 0xFF, 0x00);

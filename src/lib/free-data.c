@@ -22,6 +22,7 @@
 #include "kbres.h"	/* GR_? defines */
 #include "kbfile.h"	/* KB_File operations */
 #include "kbauto.h"	/* KB_fopen_with */
+#include "kbsound.h"/* KBsound */
 
 #include <SDL.h>  	/* SDL data types */
 #ifdef HAVE_LIBSDL_IMAGE
@@ -30,6 +31,8 @@
 #warning "SDL_Image is not used, PNG support disabled!"
 #endif
 
+#include "dos-snd.h"
+#include "free-snd.h"
 
 #define TILE_W 48
 #define TILE_H 34
@@ -282,6 +285,9 @@ dword* GNU_extract_ini(KBmodule *mod, const char *inifile, const char *module, c
 	char module_test[256];
 	int module_test_len, name_test_len;
 	int i, section;
+	int section_first = first;
+	int section_num = num;
+	int section_slice = 1;
 
 	filename = KB_fastpath(mod->slotA_name, "/", inifile);
 	if (filename == NULL) return NULL; /* Out of memory */
@@ -308,9 +314,16 @@ dword* GNU_extract_ini(KBmodule *mod, const char *inifile, const char *module, c
 	section = -1;
 	if (strpbrk(module, "%") != NULL) {
 		module_test_len = sprintf(module_test, module_fmt, section + 1);
+		section_first = first;
+		section_num = num;
 	} else {
 		strcpy(module_test, module_fmt);
 		module_test_len = strlen(module_test);
+		section_first = 0;
+		section_num = 1;
+	}
+	if (strpbrk(name, "%") != NULL) {
+		section_slice = 0;
 	}
 	name_test_len = strlen(name);
 
@@ -321,11 +334,30 @@ dword* GNU_extract_ini(KBmodule *mod, const char *inifile, const char *module, c
 			module_test_len = sprintf(module_test, module_fmt, (++section)+1);
 			continue;
 		}
-		if (section < first) {
+		if (section < section_first) {
 			continue;
 		}
-		if (section > num) {
+		if (section > section_first + section_num) {
 			break;
+		}
+
+		if (!section_slice) {
+			char key[256];
+			char value[256];
+			if (sscanf(line, "%s = %s", key, value) == 2) {
+				int idx;
+				if (sscanf(key, name, &idx) == 1) {
+					if (idx < first || idx > first + num) {
+						/* Out of range */
+					} else {
+						dword val;
+						if (sscanf(value, "%d", &val) == 1) {
+							dst[idx] = val;
+						}
+					}
+				}
+			}
+			continue;
 		}
 
 		if (!strncasecmp(line, name, name_test_len)) {
@@ -523,6 +555,264 @@ char* GNU_read_textfile(KBmodule *mod, const char *textfile, int split) {
 
 	return buf;
 }
+
+const dword note_hertz[12*9] = {
+	/* Octave 0 */
+	/* C0  */ 16, /* C#0 */ 17, /* D0  */ 18, /* D#0 */ 19,
+	/* E0  */ 21, /* F0  */ 22, /* F#0 */ 23, /* G0  */ 25,
+	/* G#0 */ 26, /* A0  */ 28, /* A#0 */ 29, /* B0  */ 31,
+	/* Octave 1 */
+	/* C1  */ 33, /* C1# */ 35, /* D1  */ 37, /* D#1 */ 39,
+	/* E1  */ 41, /* F1  */ 44, /* F#1 */ 46, /* G1  */ 49,
+	/* G#1 */ 52, /* A1  */ 55, /* A#1 */ 58, /* B1  */ 62,
+	/* Octave 2 */
+	/* C2  */  65, /* C#2 */  69, /* D2  */  73, /* D#2 */  78,
+	/* E2  */  82, /* F2  */  87, /* F#2 */  92, /* G2  */  98,
+	/* G#2 */ 104, /* A2  */ 110, /* A#2 */ 116, /* B2  */ 123,
+	/* Octave 3 */
+	/* C3  */ 131, /* C#3 */ 138, /* D3  */ 147, /* D#3 */ 156,
+	/* E3  */ 165, /* F3  */ 175, /* F#3 */ 185, /* G3  */ 196,
+	/* G#3 */ 208, /* A3  */ 220, /* A#3 */ 233, /* B3  */ 247,
+	/* Octave 4 */
+	/* C4  */ 262, /* C#4 */ 277, /* D4  */ 294, /* D#4 */ 311,
+	/* E4  */ 330, /* F4  */ 349, /* F#4 */ 370, /* G4  */ 392,
+	/* G#4 */ 415, /* A4  */ 440, /* A#4 */ 466, /* B4  */ 494,
+	/* Octave 5 */
+	/* C5  */ 523, /* C#5 */ 554, /* D5  */ 587, /* D#5 */ 622,
+	/* E5  */ 659, /* F5  */ 698, /* F#5 */ 740, /* G5  */ 784,
+	/* G#5 */ 831, /* A5  */ 880, /* A#5 */ 932, /* B5  */ 988,
+	/* Octave 6 */
+	/* C6  */ 1046, /* C#6 */ 1109, /* D6  */ 1175, /* D#6 */ 1245,
+	/* E6  */ 1319, /* F6  */ 1397, /* F#6 */ 1480, /* G6  */ 1568,
+	/* G#6 */ 1661, /* A6  */ 1760, /* A#6 */ 1865, /* B6  */ 1976,
+	/* Octave 7 */
+	/* C7  */ 2093, /* C#7 */ 2217, /* D7  */ 2349, /* D#7 */ 2489,
+	/* E7  */ 2637, /* F7  */ 2794, /* F#7 */ 2960, /* G7  */ 3136,
+	/* G#7 */ 3322, /* A7  */ 3520, /* A#7 */ 3729, /* B7  */ 3951,
+	/* Octave 8 */
+	/* C8  */ 4186, /* C#8 */ 4435, /* D8  */ 4699, /* D#8 */ 4978,
+	/* E8  */ 5274, /* F8  */ 5588, /* F#8 */ 5920, /* G8  */ 6272,
+	/* G#8 */ 6645, /* A8  */ 7040, /* A#8 */ 7459, /* B8  */ 7902,
+};
+word default_delays[16] = {
+	1000, 750, 500, 250,
+	 125, 100,  62,	 50,
+	  31,  15,   7,	  4,
+	   3,   2, 	 1,   1,
+};
+
+char letter_to_note[12] = {
+	/* 'a' */ 9,
+	/* 'b' */ 11,
+	/* 'c' */ 0,
+	/* 'd' */ 2,
+	/* 'e' */ 4,
+	/* 'f' */ 5,
+	/* 'g' */ 7,
+};
+
+KBsound* GNU_load_tune_ini(KBmodule *mod, const char* tunefile) {
+	KBsound *snd;
+	struct tunFile *tun_file;
+
+	dword palC[7] = { 0 }, palCs[7] = { 0 }, palD[7] = { 0 },
+		  palDs[7] = { 0 }, palE[7] = { 0 }, palF[7] = { 0 },
+		  palFs[7] = { 0 }, palG[7] = { 0 }, palGs[7] = { 0 },
+		  palA[7] = { 0 }, palAs[7] = { 0 }, palB[7] = { 0 };
+	dword palLengths[16] = { 0 };
+	dword *pal_ptr[12] = {
+		palC, palCs, palD, palDs, palE, palF,
+		palFs, palG, palGs, palA, palAs, palB
+	};
+	char *commandstring;
+	dword freq_pal[88];
+	dword delay_pal[16];
+	byte note_res[255];
+	byte delay_res[255];
+	int res_idx = 0;
+
+	GNU_extract_ini(mod, tunefile, "palette", "C%d", 0, 6, palC);
+	GNU_extract_ini(mod, tunefile, "palette", "C#%d", 0, 6, palCs);
+	GNU_extract_ini(mod, tunefile, "palette", "D%d", 0, 6, palD);
+	GNU_extract_ini(mod, tunefile, "palette", "D#%d", 0, 6, palDs);
+	GNU_extract_ini(mod, tunefile, "palette", "E%d", 0, 6, palE);
+	GNU_extract_ini(mod, tunefile, "palette", "F%d", 0, 6, palF);
+	GNU_extract_ini(mod, tunefile, "palette", "F#%d", 0, 6, palFs);
+	GNU_extract_ini(mod, tunefile, "palette", "G%d", 0, 6, palG);
+	GNU_extract_ini(mod, tunefile, "palette", "G#%d", 0, 6, palGs);
+	GNU_extract_ini(mod, tunefile, "palette", "A%d", 0, 6, palA);
+	GNU_extract_ini(mod, tunefile, "palette", "A#%d", 0, 6, palAs);
+	GNU_extract_ini(mod, tunefile, "palette", "B%d", 0, 6, palB);
+
+	GNU_extract_ini(mod, tunefile, "palette", "L%d", 0, 16, palLengths);
+
+	commandstring = GNU_string_ini(mod, tunefile, "tune", "play", 0, 1, NULL);
+	if (commandstring == NULL) return NULL;
+
+	int i, j;
+	for (j = 0; j < 7; j++) { //for each octave
+		for (i = 0; i < 12; i++) { //for each note
+			dword hertz = pal_ptr[i][j];
+			if (hertz)
+				freq_pal[j*12+i] = hertz;
+			else /* use default palette */
+				freq_pal[j*12+i] = note_hertz[j*12+i];
+		}
+	}
+	for (i = 0; i < MAX_TUN_DELAYS; i++) { //for each "lenght"
+		if (palLengths[i])
+			delay_pal[i] = palLengths[i];
+		else
+			delay_pal[i] = default_delays[i];
+	}
+
+	int current_octave = 3;
+	int sharp_modifier = 0;
+	int current_length = 0;
+	int last_argument = 0;
+	int last_command = 0;
+	int last_note = -1;
+	int last_octave = -1;
+
+	char numbuf[16];
+	int numlen = 0;
+
+	int l = strlen(commandstring);
+	for (i = 0; i < l + 1; i++) {
+		char c;
+		if (i < l) c = commandstring[i];
+		else c = ' ';
+		/* To lower */
+		if (c >= 'A' && c <= 'Z') c = c - ('A' - 'a');
+		/* Numeric input */
+		if (c >= '0' && c <= '9') {
+			numbuf[numlen++] = c;
+			numbuf[numlen] = '\0';
+			continue;
+		} else {
+			/* End numeric input */
+			if (numlen) {
+				last_argument = atoi(numbuf);
+				numlen = 0;
+				/* Flush it */
+				if (last_command) {
+					if (last_command == 'o')
+					{
+						current_octave = last_argument;
+					}
+					else if (last_command == 'l')
+					{
+						current_length = last_argument;
+					}
+					last_argument = 0;
+					last_command = 0;
+				} else if (last_note != -1){
+					last_octave = last_argument;
+					last_argument = 0;
+				}
+			}
+			if (c == ' ') {
+				if (last_note != -1) {
+					if (last_octave == -1) last_octave = current_octave;
+
+					/* Resolve final note */
+					int final_note = last_octave * 12 + last_note + sharp_modifier;
+
+					/* Add new "entry" */
+					note_res[res_idx] = final_note;
+					delay_res[res_idx] = current_length;
+					res_idx++;
+
+					// printf("Adding note %d -> #%d (%d hz), #%d (%d ms)\n", res_idx-1, 
+					// 	note_res[res_idx-1],
+					// 	freq_pal[note_res[res_idx-1]],
+					// 	delay_res[res_idx-1],
+					// 	delay_pal[delay_res[res_idx-1]]
+					// );
+
+					if (res_idx >= MAX_TUN_NOTES) break;
+
+					/* Reset everything */
+					sharp_modifier = 0;
+					last_octave = -1;
+					last_note = -1;
+				}
+			}
+			else if (c == '>') { current_octave++; }
+			else if (c == '<') { current_octave--; }
+			else if (c == 'o') { last_command = 'o'; }
+			else if (c == 'l') { last_command = 'l'; }
+			else if (c >= 'a' && c <= 'g') { last_note = letter_to_note[c - 'a']; }
+			else if (c == '#' || c == '+') { sharp_modifier = 1; }
+			else if (c == '-') { sharp_modifier = -1; }
+		}
+	}
+	free(commandstring);
+
+	if (res_idx == 0) return NULL; /* Zero notes */
+
+	/* Prepare tunFile */
+	tun_file = malloc(sizeof(struct tunFile));
+	if (tun_file == NULL) return NULL; /* Out of memory */
+	for (i = 0; i < MAX_TUN_DELAYS; i++) {
+		tun_file->palette.duration[i] = delay_pal[i];
+	}
+	for (i = 0; i < MAX_TUN_FREQS; i++) {
+		tun_file->palette.freq[i] = freq_pal[i];
+	}
+	for (i = 0; i < res_idx; i++)
+	{
+		tun_file->delay[i] = delay_res[i];
+		tun_file->notes[i] = note_res[i];
+	}
+	tun_file->num_notes = res_idx;
+
+	/* Prepare KBsound */
+	snd = malloc(sizeof(KBsound));
+	if (snd == NULL) {
+		free(tun_file);
+		return NULL; /* Out of memory */
+	}
+	snd->type = KBSND_DOS;
+	snd->data = tun_file;
+	return snd;
+}
+
+KBsound* GNU_load_tune_wav(KBmodule *mod, const char* tunefile) {
+	KBsound *snd;
+	KB_File *f;
+
+	f = KB_fopen_with(tunefile, "rb", mod);
+	if (f == NULL) return NULL;
+
+	SDL_AudioSpec audio_device_spec;
+	struct wavFile *wav_file;
+
+	if (KB_GetAudioSpec(&audio_device_spec))
+	{
+		KB_debuglog(0, "[free] Refusing to load '%s', audio device off.\n", tunefile);
+		KB_fclose(f);
+		return NULL;
+	}
+
+	wav_file = wavFile_load_FILE(f, &audio_device_spec);
+	if (wav_file == NULL) {
+		KB_fclose(f);
+		return NULL;
+	}
+
+	/* Prepare KBsound */
+	snd = malloc(sizeof(KBsound));
+	if (snd == NULL) {
+		free(wav_file);
+		return NULL; /* Out of memory */
+	}
+	snd->type = KBSND_WAV;
+	snd->data = wav_file;
+	return snd;
+}
+
+
 
 void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 
@@ -1025,6 +1315,17 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return world;
 		}
 		break;
+		case SN_TUNE:
+		{
+			KBsound* snd;
+			char tunefile[256];
+			sprintf(tunefile, "tune%02d.wav", sub_id);
+			snd = GNU_load_tune_wav(mod, tunefile);
+			if (snd) return snd;
+			sprintf(tunefile, "tune%02d.ini", sub_id);
+			snd = GNU_load_tune_ini(mod, tunefile);
+			return snd;
+		}
 		case RECT_UI:
 		{
 			if (sub_id < 0 || sub_id > 4) return NULL;

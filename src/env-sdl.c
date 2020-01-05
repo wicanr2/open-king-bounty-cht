@@ -142,6 +142,8 @@ KBenv *KB_startENV(KBconfig *conf) {
 				nsys->mixer.channels, nsys->mixer.freq, nsys->mixer.samples);
 
 			SDL_PauseAudio(0); /* Start playing */
+
+			KB_SetAudioSpec(&nsys->mixer); /* Store for later */
 		}
 	}
 
@@ -674,6 +676,11 @@ void KB_play(KBenv *sys, KBsound *snd) {
 			n = tunFile_reset(snd->data, sys->mixer.format);
 
 		break;
+		case KBSND_WAV:
+
+			n = wavFile_reset(snd->data, sys->mixer.format);
+
+		break;
 		default:
 		break;
 	}
@@ -702,6 +709,11 @@ void KBenv_audio_callback(void *userdata, Uint8 *stream, int len) {
 			case KBSND_DOS:
 
 				n = tunFile_play(snd->data, stream, len, sys->mixer.freq * sys->mixer.channels);
+
+			break;
+			case KBSND_WAV:
+
+				n = wavFile_play(snd->data, stream, len, sys->mixer.freq * sys->mixer.channels);
 
 			break;
 			default:
