@@ -504,10 +504,10 @@ KBgame *create_game(int pclass) {
 			KB_iprintf("   Impossible?  %3d     x4 \n", days_per_difficulty[3]);
 
 			if (has_name) {
+				int i;
 				KB_iloc(menu.x + fs->w, menu.y + fs->h * 10);
 				KB_iprint("\x18\x19 to select   Ent to Accept");		
 
-				int i;
 				KB_iloc(menu.x + fs->w, menu.y + fs->h * 5);
 				for (i = 0; i < 4; i++) 
 					KB_iprint((sel == i ? ">\n" : " \n"));
@@ -562,10 +562,10 @@ KBgame *load_game() {
 	KB_DIR *d = KB_opendir(conf->save_dir);
 	KB_Entry *e;
     while ((e = KB_readdir(d)) != NULL) {
-		if (e->d_name[0] == '.') continue;
-		
 		char base[255];
 		char ext[255];
+
+		if (e->d_name[0] == '.') continue;
 		
 		name_split(e->d_name, base, ext);
 
@@ -803,7 +803,7 @@ int select_module() {
 
 	/* Just for fun, do some error-checking */
 	if (conf->num_modules < 1) {
-		KB_errlog("No modules found! You must either enable auto-discovery, either provide explicit file paths via config file.\n"); 	
+		KB_errlog("No modules found! You must either enable auto-discovery, either provide explicit file paths via config file.\n");
 		return -1;
 	}
 
@@ -978,7 +978,7 @@ void KB_BlitMap(SDL_Surface *dest, SDL_Surface *tileset, SDL_Rect *viewport) {
 
 }
 
-inline byte KB_GetMapTile(KBgame *game, byte continent, int y, int x) {
+byte KB_GetMapTile(KBgame *game, byte continent, int y, int x) {
 	/* If coordinates are in bounds, return the tile */
 	return  (y >= 0 && y < LEVEL_H && x >= 0 && x < LEVEL_W)
 			? game->map[continent][y][x] & 0x7F /* ***WITH INTERACTIVITY BIT REMOVED*** */
@@ -3025,7 +3025,7 @@ int visit_dwelling(KBgame *game, byte rtype) {
 			else if (result == 2) KB_BottomBox("", "No troop slots left!", 1);//verify this one
 
 			/* Calculate new "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
-			max = army_leadership(game, troop_id) / troops [ troop_id ].hit_points;
+			max = army_leadership(game, troop_id) / troops[ troop_id ].hit_points;
 		}
 
 		redraw = 1;
@@ -3958,6 +3958,7 @@ int resurrect_army(KBgame *game, KBcombat *war) {
 
 	ok = pick_target(war, &x, &y, 3);
 
+	return 0;
 }
 
 int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id) {
@@ -4949,7 +4950,7 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 			word cx, cy;
 			KB_getpos(sys, &cx, &cy);
 			char *txt = text_input(4, 1, cx, cy, 0xff,00);
-			if (!txt) return;
+			if (!txt) return 0;
 			int val = atoi(txt);
 			srand(val);
 			msg = "RNG Seeded";
@@ -4966,20 +4967,20 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 			int troop_id = -1;
 			while (troop_id == -1 || troop_id >= MAX_TROOPS) {
 				troop_id = KB_event(&alphabet_letter) - 1;
-				if (troop_id == 0xFF) return;
+				if (troop_id == 0xFF) return 0;
 			}
 			KB_iprintf(" %c\n", 'A' + troop_id);
 			KB_iprintf(" %s,\n How many? (MAX) ", troops[troop_id].name);
 			word cx, cy;
 			KB_getpos(sys, &cx, &cy);
 			char *txt = text_input(4, 1, cx, cy, 0xff,00);
-			if (!txt) return;
+			if (!txt) return 0;
 			int val = atoi(txt);
 			if (val <= 0) val = troop_numbers[troop_id][game->continent];
 			if (val <= 0) val = 1;
 			add_troop(game, troop_id, val);
 			KB_iprint("\n");
-			return;
+			return 0;
 		}
 		break;
 		case 'w':
@@ -4992,11 +4993,11 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 				return 1;
 			}
 			win_game(game);
-			return;
+			return 0;
 		break;
 		case 'l':
 			lose_game(game);
-			return;
+			return 0;
 		break;
 		case 'f':
 			game->mount = KBMOUNT_FLY;
@@ -6121,7 +6122,7 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 			int ox = combat_move_offset_x[(key-1)/2];
 			int oy = combat_move_offset_y[(key-1)/2];
 
-			move_unit(combat, 0, combat->unit_id, ox, oy);
+			redraw = move_unit(combat, 0, combat->unit_id, ox, oy);
 		}
 
 		if (key == COMBAT_SYN_EVENT) {

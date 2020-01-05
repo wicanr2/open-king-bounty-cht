@@ -374,7 +374,7 @@ int read_env_config(struct KBconfig *conf) {
 	char *pPath;
 
 #ifdef USE_WINAPI
-	/* Altho WIN32 equivavelnt of /home/username is %USERPROFILE%,
+	/* Altho WIN32 equivalent of /home/username is %USERPROFILE%,
 	 * nobody writes there, and "Application Data" is considered good
 	 * tone. Thus, we use %APPDATA%: */
 	pPath = (char*)getenv("APPDATA");

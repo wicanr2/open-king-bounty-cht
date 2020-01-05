@@ -400,7 +400,7 @@ void RESOURCE_DefaultConfig(KBconfig* _conf) { conf = _conf; }
  * Take conf->filter into account and zoom accordingly.
  *
  * If 'flip' is set, make the resulting surface twice as large, and
- *  blit a horizontally-flipped copy resulting space.
+ *  blit a horizontally-flipped copy into resulting space.
  * If 'flip' is 1, do that horizontally, vertically if 2.
  */
 SDL_Surface *SDL_LoadRESOURCE(int id, int sub_id, int flip) {

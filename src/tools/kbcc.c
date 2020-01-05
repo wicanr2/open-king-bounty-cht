@@ -7,8 +7,13 @@
 #define __LITTLE_ENDIAN 1234
 #define __BYTE_ORDER __LITTLE_ENDIAN
 #else
+#ifdef __APPLE__
+#include <machine/endian.h>
+#else
 #include <endian.h>
 #endif
+#endif
+
 #if (__BYTE_ORDER == __LITTLE_ENDIAN)
 
 #else

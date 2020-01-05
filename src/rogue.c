@@ -123,13 +123,13 @@ void furnish_map(KBgame* game) {
 						tile = base_offset[base] + tile_offset[base][6];	
 					else if ((flag & N_DIFF))
 						tile = base_offset[base] + tile_offset[base][7];	
-					else if ((flag == NE_DIFF))
+					else if (flag == NE_DIFF)
 						tile = base_offset[base] + tile_offset[base][8];	
-					else if ((flag == NW_DIFF))
+					else if (flag == NW_DIFF)
 						tile = base_offset[base] + tile_offset[base][9];	
-					else if ((flag == SE_DIFF))
+					else if (flag == SE_DIFF)
 						tile = base_offset[base] + tile_offset[base][10];
-					else if ((flag == SW_DIFF))
+					else if (flag == SW_DIFF)
 						tile = base_offset[base] + tile_offset[base][11];	
 
 					game->map[cont][y][x] = tile;

@@ -772,5 +772,9 @@ int KB_saveDAT(const char* filename, KBgame *game) {
 	n = fwrite(buf, sizeof(char), DAT_SIZE, f);
 	fclose(f);
 
+	/* Wrong filesize */
 	if (n != DAT_SIZE) return 2;
+
+	/* Success */
+	return 0;
 }

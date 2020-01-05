@@ -200,7 +200,7 @@ KB_File* execomp_uncompress(KB_File *f)
 	/* Verify this file is actually compressed, and not just an exe */
 	/* We check if 0x200 contains "e99900". Another approach is to check
 	 * if 0x24d contains "KB.EXE" */
-	char mini_buf[4];
+	unsigned char mini_buf[4];
 	KB_fseek(f, 0x200, SEEK_SET);
 	n = KB_fread(mzHeader, sizeof(char), 4, f); /* read bytes */
 	if (n < 4 || mini_buf[0] != 0xE9 || mini_buf[1] != 0x99 || mini_buf[2] != 0x00) {
@@ -257,7 +257,7 @@ KB_File* execomp_uncompress(KB_File *f)
 	innerMz.min_extra_paragraphs = fullSize / 64;	/* I don't know how to determine BSS properly :/ */
 
 	/* Write everything out */
-	char *buffer;
+	unsigned char *buffer;
 
 	buffer = malloc(sizeof(char) * fullSize);
 
@@ -400,7 +400,7 @@ KB_File* exepack_uncompress(KB_File *f)
 	int finalSize = packed.dest_len * 16L;
 	//printf("\tExpected unpacked size: %d bytes\n", finalSize);
 
-	char out[finalSize];
+	unsigned char out[finalSize];
 	memset(&out[0], 0xFF, finalSize);
 	memcpy(&out[0], &buffer[0], exeLen);
 
@@ -424,13 +424,13 @@ KB_File* exepack_uncompress(KB_File *f)
 	/* unpack relocation table */
 	int section = 0;
 
-	char rout[reloc_table_full];
+	unsigned char rout[reloc_table_full];
 
 	int relocSize = 0;
 	
-	char *pb = &pbuffer[pLen];
+	unsigned char *pb = &pbuffer[pLen];
 
-	char *pw = &rout[0];
+	unsigned char *pw = &rout[0];
 
 	for (section = 0; section < 16; section++) {
 
@@ -507,7 +507,7 @@ KB_File* exepack_uncompress(KB_File *f)
 	/* save new exe */
 	int j;
 
-	char *obuffer;
+	unsigned char *obuffer;
 	
 	obuffer = malloc(sizeof(char) * fullSize);
 
@@ -515,7 +515,7 @@ KB_File* exepack_uncompress(KB_File *f)
 		return NULL;
 	}
 
-	char *p = &obuffer[0];
+	unsigned char *p = &obuffer[0];
 
 	exeHeader_write(&obuffer[0], &newexe);	p += mzSize;
 

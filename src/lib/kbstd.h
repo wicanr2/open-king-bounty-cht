@@ -27,7 +27,7 @@
     #ifdef HAVE_MALLOC_H
 	#include <malloc.h>
     #else
-	#include <memory.h>
+	#include <stdlib.h>
     #endif
 #endif
 
@@ -120,8 +120,8 @@ extern int KB_strcasecmp(const char *left, const char *right);
 extern char* KB_strtoupper(char *src);
 
 /* note: this is also specified in vendor.h */
-extern size_t strlcat(char *dst, const char *src, size_t size);
-extern size_t strlcpy(char *dst, const char *src, size_t size);
+//extern size_t strlcat(char *dst, const char *src, size_t size);
+//extern size_t strlcpy(char *dst, const char *src, size_t size);
 #define KB_strlcat strlcat
 #define KB_strlcpy strlcpy
 

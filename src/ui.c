@@ -230,6 +230,8 @@ int KB_reset(KBgamestate *state) {
 	for (i = 0; i < 512; i++) {
 		kbd_state[i] = 0;
 	}
+
+	return 0;
 }
 
 void KB_imenu(KBgamestate *state, int id, int cols) {
@@ -301,7 +303,7 @@ int KB_event(KBgamestate *state) {
 			mouse_x = event.motion.x;
 			mouse_y = event.motion.y;
 		}
-		if ((event.type == SDL_QUIT)) {
+		if (event.type == SDL_QUIT) {
 			int found = 0;
 			for (i = 0; i < state->max_spots; i++) {
 				KBhotspot *sp = &state->spots[i];

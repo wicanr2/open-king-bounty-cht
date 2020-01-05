@@ -20,6 +20,7 @@ vendor/*/
 *.vo
 *.6
 autoscan*.log
+configure
 stderr.txt
 stdout.txt
 config.*
@@ -29,3 +30,4 @@ autom4te.cache/
 mkinstalldirs
 install-sh
 ltmain.sh
+.DS_Store

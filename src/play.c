@@ -578,6 +578,8 @@ int army_leadership(KBgame *game, byte troop_id) {
 		}
 	}
 
+	if (free_leadership < 0) free_leadership = 0;
+
 	return free_leadership;
 }
 

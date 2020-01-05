@@ -212,7 +212,7 @@ int ccGroup_append_list(struct ccGroup *grp, const char *filename) {
 /*
  * Returns Number of bytes read, 0 on error 
  */
-int KB_funLZW(char *result, unsigned int max, KB_File *f) {
+int KB_funLZW(unsigned char *result, int max, KB_File *f) {
 
 	int i, n, j;
 
@@ -503,7 +503,7 @@ KB_File * KB_fopenCC_by(int i, KB_DIR *dirp)
 	struct ccGroup *grp = (struct ccGroup *)dirp->d;
 
 	KB_File *stream;
-	char *data;
+	unsigned char *data;
 	int n;
 
 	if (grp->top == NULL) return NULL;

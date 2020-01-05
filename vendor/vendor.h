@@ -23,8 +23,12 @@ extern SDL_Surface* get_inline_font(void);
 
 #endif
 
+#ifndef HAVE_STRLCAT
 /* strlcat.c */
 extern size_t strlcat(char *dst, const char *src, size_t siz);
+#endif
 
+#ifndef HAVE_STRLCPY
 /* strlcpy.c */
 extern size_t strlcpy(char *dst, const char *src, size_t siz);
+#endif
