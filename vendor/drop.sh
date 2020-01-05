@@ -64,11 +64,24 @@ install_scale2x()
 
 	cp ${WORKDIR}${DROP_NAME}/contrib/sdl/scale2x.c ${WORKDIR}${LAST_NAME}
 }
+
+download_curl()
+{
+	curl -L -o "${WORKDIR}${FILE_NAME}" ${FILE_URL} \
+		|| (echo "[$DROP_NAME] Unable to download $FILE_NAME from $FILE_URL" && rm ${WORKDIR}${FILE_NAME})
+
+	if [ ! -f ${WORKDIR}${FILE_NAME} ]; then
+		return 1
+	fi
+}
+
 download_wget()
 {
 	HAS_WGET=`which wget`
+	HAS_CURL=`which curl`
 
 	if [ ! ${HAS_WGET} ]; then
+		if [ ! ${HAS_CURL} ]; then
 		echo "This environment seems to lack wget."
 		echo "Get it from your package manager or "
 		echo "http://ftp.gnu.org/gnu/wget/"
@@ -77,6 +90,10 @@ download_wget()
 		echo "${FILE_URL}"
 		echo "Just save it as ${WORKDIR}${FILE_NAME}"
 		exit 2
+		else
+			# Have curl instead of wget, good enough for us
+			download_curl
+		fi
 	fi
 
 	wget --quiet ${FILE_URL} -O "${WORKDIR}${FILE_NAME}" \
