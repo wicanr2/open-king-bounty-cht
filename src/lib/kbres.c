@@ -137,6 +137,14 @@ void SDL_ReplaceColors(SDL_Surface *dest, SDL_Rect *dstrect, Uint32 *search, Uin
 		if (++x >= dstrect->w) { x = 0; y++; }
 	}
 }
+Uint32 SDL_RemapColor(SDL_Surface* dst, Uint32 argb) {
+	SDL_Color c;
+	c.r = (argb & 0xFF0000) >> 16;
+	c.g = (argb & 0x00FF00) >> 8;
+	c.b = (argb & 0x0000FF) >> 0;
+	return SDL_MapRGB(dst->format, c.r, c.g, c.b);
+}
+
 
 Uint8 herc_pallete_ega[16] =
 {

@@ -318,6 +318,7 @@ extern void SDL_BlitXBPP(const char *src, SDL_Surface *dest, SDL_Rect *dstrect, 
 extern void SDL_BlitMASK(const char *src, SDL_Surface *dest, SDL_Rect *dstrect);
 extern void SDL_ReplaceIndex(SDL_Surface *dest, SDL_Rect *dstrect, byte search, byte replace);
 extern void SDL_ReplaceColors(SDL_Surface *dest, SDL_Rect *dstrect, Uint32* search, Uint32* replace, int n);
+extern Uint32 SDL_RemapColor(SDL_Surface* dst, Uint32 argb);
 
 /* Store/retreive audio device parameters */
 extern int KB_GetAudioSpec(SDL_AudioSpec *spec);

@@ -492,7 +492,7 @@ void SDL_TextRect(SDL_Surface *dest, SDL_Rect *r, Uint32 fore, Uint32 back, int 
 	SDL_Rect *fs = &sys->font_size;
 
 	/* Choose colors, Fill Rect */
-	SDL_FillRect(dest, r, back);	
+	SDL_FillRect(dest, r, SDL_RemapColor(dest, back));
 	incolor(fore, back);
 
 	/* Top and bottom (horizontal fill) */
@@ -578,7 +578,7 @@ SDL_Rect* KB_MessageBox(const char *str, byte flag) {
 	frame.w = text.w + fs->w * 2;
 	frame.h = text.h + fs->h * 2;
 	SDL_TextRect(screen, &frame, ui, bg, 1);
-	SDL_FillRect(screen, &text, 0xFF0000);
+	SDL_FillRect(screen, &text, SDL_RemapColor(screen, bg));
 
 	/* Restore color */
 	incolor(fg, bg);
@@ -690,7 +690,7 @@ SDL_Rect* KB_TopBox(byte flag, const char *str, ...) {
 	}
 
 	/* Clear line */
-	SDL_FillRect(sys->screen, &local.status, colors[COLOR_BACKGROUND]);
+	SDL_FillRect(sys->screen, &local.status, SDL_RemapColor(sys->screen, colors[COLOR_BACKGROUND]));
 
 	/* Print string [with varargs] */
 	KB_icolor(colors);

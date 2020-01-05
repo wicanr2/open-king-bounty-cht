@@ -660,7 +660,7 @@ KBgame *load_game() {
 			KB_iloc(menu.x + fs->w, menu.y + fs->h*4 - fs->h/2);
 			KB_iprint("             ");
 
-			SDL_FillRect(screen, &menu_inner, colors_inner[COLOR_BACKGROUND]);
+			SDL_FillRect(screen, &menu_inner, SDL_RemapColor(screen, colors_inner[COLOR_BACKGROUND]));
 
 			for (i = 0; i < num_files; i++) {
 				incolor(colors[COLOR_TEXT], colors[COLOR_BACKGROUND]);
@@ -871,9 +871,10 @@ int select_module() {
 
 			int i;
 
-			SDL_FillRect(screen, NULL, bgcolor);
-
-			SDL_TextRect(screen, &menu, colors[COLOR_TEXT], colors[COLOR_BACKGROUND], 1);
+			SDL_FillRect(screen, NULL, SDL_RemapColor(screen, bgcolor));
+			SDL_TextRect(screen, &menu,
+				SDL_RemapColor(screen, colors[COLOR_TEXT]),
+				colors[COLOR_BACKGROUND], 1);
 
 			for (i = 0; i < conf->num_modules; i++) {
 				KB_icolor(i == sel ? colors : invcolors); /* Note: because inline font is color-inverted */
@@ -916,11 +917,11 @@ void display_logo() {
 			RECT_Size(&pos, title);
 			RECT_Center(&pos, screen);
 
-			SDL_FillRect( screen , NULL, 0xFF3366);
+			SDL_FillRect(screen , NULL, SDL_RemapColor(screen, 0xFF3366));
 
-			SDL_BlitSurface( title, NULL , screen, &pos );
+			SDL_BlitSurface(title, NULL , screen, &pos);
 
-			SDL_Flip( screen );
+			SDL_Flip(screen);
 
 			SDL_FreeSurface(title);
 
@@ -1569,7 +1570,7 @@ void view_minimap(KBgame *game, int force_orb) {
 						color = KB_rand(0, 0xFFFFFF);
 					}
 
-					SDL_FillRect(screen, &pixel, color);
+					SDL_FillRect(screen, &pixel, SDL_RemapColor(screen, color));
 				}
 				/* DOS aestetics: */
 				/**/if (redraw == 1) {
@@ -1863,8 +1864,9 @@ void view_army(KBgame *game) {
 				SDL_Rect tbox =  { pos.x + tile->w, pos.y + i * tile->h, pos.w - tile->w, tile->h - fs->h / 8};
 				SDL_Rect tline =  { pos.x + tile->w, pos.y + (i+1) * tile->h - fs->h / 8, pos.w - tile->w, fs->h / 8 };
 
-				SDL_FillRect(sys->screen, &tbox, orig_bg);
-				SDL_FillRect(sys->screen, &tline, i < 4 ? colors[COLOR_FRAME] : orig_bg);
+				SDL_FillRect(sys->screen, &tbox, SDL_RemapColor(sys->screen, orig_bg));
+				SDL_FillRect(sys->screen, &tline,
+					SDL_RemapColor(sys->screen, i < 4 ? colors[COLOR_FRAME] : orig_bg));
 
 				if (game->player_numbers[i] == 0) continue;
 				
@@ -1876,7 +1878,8 @@ void view_army(KBgame *game) {
 				colors[COLOR_BACKGROUND] = troop_colors[ troops[troop_id].dwells ];
 				KB_icolor(colors);
 
-				SDL_FillRect(sys->screen, &tbox, troop_colors[ troops[troop_id].dwells ]);
+				SDL_FillRect(sys->screen, &tbox,
+					SDL_RemapColor(sys->screen, troop_colors[ troops[troop_id].dwells ]));
 
 				KB_iloc(tbox.x, tbox.y + fs->h / 2 - fs->h / 8);
 				KB_ilh(fs->h + 4);
