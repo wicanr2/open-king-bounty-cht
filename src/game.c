@@ -1,6 +1,6 @@
 /*
  *  game.c -- core gameplay routines
- *  Copyright (C) 2011-2014 Vitaly Driedfruit
+ *  Copyright (C) 2011-2020 Vitaly Driedfruit
  *
  *  This file is part of openkb.
  *
@@ -1475,7 +1475,7 @@ void view_puzzle(KBgame *game) {
 
 KBgamestate minimap_toggle = {
 	{
-		{	__NON, SDLK_SPACE, 0, 0      	},
+		{	_NON, SDLK_SPACE, 0, 0      	},
 		0
 	},
 	0
@@ -1517,7 +1517,7 @@ void view_minimap(KBgame *game, int force_orb) {
 	SDL_FillRect(sys->screen, &map, 0x112233);
 
 	KB_iloc(border.x + fs->w, border.y + fs->h/2);
-	KB_iprintf("   %s", continent_names[game->continent]);
+	KB_iprintf("   % -15s", continent_names[game->continent]);
 
 	KB_iloc(border.x + fs->w, border.y + map.h + (fs->h*2) - fs->h/2);
 	KB_iprintf("X=%2d Position Y=%2d", game->x, game->y);
@@ -3731,7 +3731,7 @@ void end_of_week(KBgame *game, int num) {
 		word cost = game->player_numbers[i] * troops[troop_id].recruit_cost;
 		army_cost += cost;
 		KB_icurs(14, 2 + i);
-		KB_iprintf("%-8s% 6d", troops[troop_id].name, cost);
+		KB_iprintf("%-9s% 5d", troops[troop_id].name, cost);
 	}
 
 	KB_icurs(0, 2);
@@ -4617,7 +4617,7 @@ KBgamestate target_state = {
 
 		{	_NON, SDLK_RETURN, 0, 0      	},
 
-		{	{ SOFT_WAIT }, SDLK_SYN, 0, KFLAG_TIMER },
+		{	__NON, { SOFT_WAIT }, SDLK_SYN, 0, KFLAG_TIMER },
 		0,
 	},
 	0

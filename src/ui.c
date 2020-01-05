@@ -66,8 +66,8 @@ KBgamestate press_any_key_interactive = {
 
 KBgamestate yes_no_interactive = {
 	{
-		{	{ 0 }, SDLK_y, 0, 0      	},
-		{	{ 0 }, SDLK_n, 0, 0      	},
+		{	_NON, SDLK_y, 0, 0      	},
+		{	_NON, SDLK_n, 0, 0      	},
 		{	_TIME(SHORT_WAIT), SDLK_SYN, 0, KFLAG_TIMER },
 		0
 	},
