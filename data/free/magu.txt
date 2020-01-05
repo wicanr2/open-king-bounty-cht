@@ -1,0 +1,14 @@
+       Name: Solidus the Wise
+       Alias: None
+       Reward: 40,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Has an otherworldy gaze, and a
+  beard. Wears purple robes and
+  a golden amulet.
+Crimes: Solidus practices 
+  forbidden magics and has 
+  resurrected several of the 
+  King's foes for his own 
+  nefarious purposes.

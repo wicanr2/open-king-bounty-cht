@@ -1,0 +1,14 @@
+       Name: Czar Boris III
+       Alias: Raving Dog Boris
+       Reward: 35,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  A swell beard, power-obsessed
+  eyes, diminitive constitution
+  and a ruby-encrusted crown.
+Crimes: Czar Boris refuses
+  to acknowledge the King's rule.
+  He has never payed the taxes,
+  and his army of followers
+  openly disrepects our law.

@@ -1,0 +1,14 @@
+       Name: Mahogany Klaw
+       Alias: Sheepstealer
+       Reward: 25,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Gigantic stature, crooked teeth
+  and a singular eye, with a nasty
+  gaze.
+Crimes: Stealing sheep from villa-
+  gers, leading Giants and Ogres
+  against King's armies, disho-
+  noring territorial treaties.
+  No farm is safe with him around.

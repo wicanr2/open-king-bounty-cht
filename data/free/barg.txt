@@ -1,0 +1,14 @@
+       Name: Grishmak
+       Alias: Snotface
+       Reward: 16,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  An ugly, disgusting face. A
+  cackling, unmistakable laughter.
+  Green skin and sharp tusks.
+Crimes: Grishmak's hordes are
+  ravaging the countryside, 
+  burning villages and stealing
+  food from the Peasants. His
+  kin are all wanted dead.

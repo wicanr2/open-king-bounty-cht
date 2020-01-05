@@ -1,0 +1,14 @@
+       Name: Sir James the Traitor
+       Alias: The Traitor
+       Reward: 30,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  A royal mount and an escort of
+  finest regal troops. Skilled in
+  swordsplay and is well-read.
+Crimes: Betrayed the King's trust.
+  Sir James, disenchanted in the
+  cause, decided to make life his
+  own. For such high treason he is
+  wanted dead or alive.

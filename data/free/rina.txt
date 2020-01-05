@@ -1,0 +1,14 @@
+       Name: Skellor Boroughes
+       Alias: The Leech 
+       Reward: 18,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Animated corpse, complete lack
+  of flesh, exposed rib-cage.
+  Wields dangerous magic.
+Crimes: Skellor was once King's
+  alchemist, executed for treason.
+  He was ressurected by Solidus
+  the Wise, and now leads
+  countless undead armies.

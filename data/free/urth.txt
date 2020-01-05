@@ -1,0 +1,14 @@
+       Name: Aklor Deathbringer
+       Alias: The Usurper
+       Reward: 45,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Protruding horns, long claws,
+  demonic attitude towards
+  intruders.
+Crimes: Aklor aims to claim the
+  throne for himself. Assisting
+  the turncoats in the conspiracy
+  against the crown, he maneuvers
+  himself into power.

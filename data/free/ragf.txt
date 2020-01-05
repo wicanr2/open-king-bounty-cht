@@ -1,0 +1,14 @@
+       Name: Scarecrow
+       Alias: None
+       Reward: 20,000 gold
+       Last Seen: %s
+          Castle: %s
+Distinguishing features:
+  Bones barely holding together
+  by rotting flesh, an undead
+  corpse with an evil purpose.
+Crimes: Executed on King's orders
+  this abomination has been 
+  brough back to life to serve as
+  one of the Solidus minions. Its
+  whole existance is a crime.

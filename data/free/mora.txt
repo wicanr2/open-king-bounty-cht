@@ -1,14 +1,14 @@
-       Name: Sir James the Traitor
-       Alias: The Traitor
+       Name: Ragnar Lodbrok
+       Alias: The Conquerer
        Reward: 12,000 gold
        Last Seen: %s
           Castle: %s
 Distinguishing features:
-  A royal mount and an escort of
-  finest regal troops. Skilled in
-  swordsplay and is well-read.
-Crimes: Betrayed the King's trust.
-  Sir James, disenchanted in the
-  cause, decided to make life his
-  own. For such high treason he is
-  wanted dead or alive.
+  Long unhinged beard, helmet
+  with sharp horns, wields a large
+  battleaxe.
+Crimes: Coming from distant lands
+  with his band of bandits, this
+  warrior took control of several
+  castles that were loyal to the
+  crown.
