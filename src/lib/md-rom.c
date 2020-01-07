@@ -9,6 +9,7 @@
 #define VILLAIN_OFFSET 0x04B04C
 #define CURSOR_OFFSET (0x062D6C - (16 * 8))
 #define TROOP_OFFSET 0x000668EC
+#define MAP_OFFSET 0x1AA8E /* -64 // ? */
 
 /* A tile is composed of several sub-tiles */
 /* Each subtile is 8 x 8 */
@@ -86,7 +87,28 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 			frames = 4;
 			offset += (TILE_LEN * frames) * sub_id;
 		}
-		break;		
+		break;
+		case DAT_WORLD:	/* World data for all 4 continents, sub_id - undefined */
+		{
+			KB_File *f;
+			int n;
+			byte *world;
+			int len = 64 * 64 * 4;
+
+			world = malloc(sizeof(byte) * len);
+			if (!world) return NULL;
+
+			f = KB_fopen(mod->slotA_name, "rb");
+			if (f == NULL) return NULL;
+
+			KB_fseek(f, MAP_OFFSET, 0);
+			n = KB_fread(world, sizeof(byte), len, f);
+			if (n != len) return NULL;
+
+			KB_fclose(f);
+			return world;
+		}
+		break;
 		default: break;
 	}
 
