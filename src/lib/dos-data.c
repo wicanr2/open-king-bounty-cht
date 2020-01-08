@@ -825,6 +825,22 @@ void DOS_AdjustSlots(KBmodule *mod) {
 		KB_strcat(mod->slotB_name, "#");
 
 		KB_debuglog(0, "* SlotB: %s\n", mod->slotB_name);
+
+		if (mod->slotC_name[0] == 0 && mod->bpp == 8) { //empty string
+			KB_dircpy(mod->slotC_name, mod->slotA_name);
+			if (test_directory(mod->slotC_name, 0))
+				KB_grpsep(mod->slotC_name);
+			else
+				KB_dirsep(mod->slotC_name);
+
+			if (!match_file(mod->slotC_name, "416.CC", &name[0]))
+				return;
+
+			KB_strcat(mod->slotC_name, name);
+			KB_strcat(mod->slotC_name, "#");
+
+			KB_debuglog(0, "* SlotC: %s\n", mod->slotC_name);
+		}
 	}
 
 }
