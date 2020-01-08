@@ -444,6 +444,40 @@ void put_8bpp(SDL_Surface *dest, char *src, unsigned long n, int width, int heig
 }
 #endif
 
+/* Render "fake" mask for VGA image: colorkeyed pixels become black,
+ * rest of the pixels become white.
+ * This is used for display purposes only */
+void put_1bpp_ck(SDL_Surface *dest, char *src, unsigned long n, Uint8 mask_index, SDL_Rect *dest_rect)
+{
+	/* 8 bits contain 1 pixel */
+	unsigned long i;
+	unsigned long dx = 0, dy = 0;
+
+	for (i = 0; i < n; i += 1) {
+
+		unsigned char c[1];
+		c[0] = src[i];
+
+		Uint8 *p;
+		int j;
+		for (j = 0; j < 1; j++) {
+			p = (Uint8*) dest->pixels + (dy + dest_rect->y) * dest->pitch + (dx + dest_rect->x);
+			*p = (c[j] == mask_index) ? 0x00 : 0x0F;
+
+			dx++;
+			if (dx >= dest_rect->w) {
+				dx = 0; dy++;
+				if (dy >= dest_rect->h) {
+					return;
+				}
+			}
+		}
+
+	}
+
+}
+
+
 SDL_Surface *show_font(char *filename, unsigned long off)
 {
 	int width = 128 * 8;
@@ -530,7 +564,7 @@ SDL_Surface *show_tiles(char *filename, int show_mask, int frame, int frame_num,
 		return NULL;
 	}
 
-	n = fread ( buf, sizeof(char), flen, f);
+	n = fread(buf, sizeof(char), flen, f);
 	fclose(f);
 	
 	if (n != flen) {
@@ -719,7 +753,10 @@ SDL_Surface *show_tiles(char *filename, int show_mask, int frame, int frame_num,
 		dest_rect.y = y * _v + height * _h;
 
 		if (mask_pos[i] && show_mask)
-			put_1bpp(surf, &buf[mask_pos[i]], n - mask_pos[i], width, height, dest_rect.x, dest_rect.y);
+			if (render_mode != RENDER_VGA)
+				put_1bpp(surf, &buf[mask_pos[i]], n - mask_pos[i], width, height, dest_rect.x, dest_rect.y);
+			else
+				put_1bpp_ck(surf, &buf[offset], frame_len[i], buf[offset], &dest_rect);
 
 		y += (height + padding) * _v;
 		x += (width + padding) * _h;
@@ -845,11 +882,9 @@ void display_surface(SDL_Surface *tiles, const char *caption)
 
 			SDL_FillRect(screen, NULL, 0);
 
-			SDL_BlitSurface( tiles, NULL , screen, NULL  );
+			SDL_BlitSurface( tiles, NULL , screen, NULL );
 
 	    	SDL_Flip( screen );
-
-			SDL_FreeSurface(tiles);
 
 			SDL_Delay(10);
 
@@ -994,6 +1029,8 @@ int main( int argc, char* args[] )
 	else
 		tiles = show_tiles(input_file, show_mask, first_frame, total_frames, horizontal_align, vertical_align, frame_padding);
 
+	if (tiles == NULL) return 1;
+
 	if (output_mode == -1)
 		display_surface(tiles, input_file);
 	else
@@ -1002,6 +1039,8 @@ int main( int argc, char* args[] )
 	else
 		if (output_mode == 1) /* PNG */
 			SDL_SavePNG(tiles, output_file);
+
+	SDL_FreeSurface(tiles);
 
 	return 0; 
 }
