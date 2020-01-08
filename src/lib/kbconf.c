@@ -448,9 +448,9 @@ int find_config(struct KBconfig *conf) {
 	/* Try the local directory */
 								//TODO: proper local name of *binary*
 	pPath = (char*)getcwd(config_file, sizeof(config_file));//NULL?
-	KB_strcpy(config_file, pPath);
 	KB_dirsep(config_file);
 	KB_strcat(config_file, CONFIG_INI_NAME);
+
 	KB_stdlog("Looking for config at '%s'\n", config_file);
 	if (!test_config(config_file, 0))
 	{
