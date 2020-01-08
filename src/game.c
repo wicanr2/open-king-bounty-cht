@@ -3319,6 +3319,10 @@ void take_artifact(KBgame *game, byte num) {
 }
 
 void draw_victory(KBgame *game, word spoils, int villain_id, int captured) {
+	KBsound *snd_victory = KB_Resolve(SN_TUNE, TUNE_VICTORY);
+
+	KB_play(sys, snd_victory);
+
 	SDL_Rect border;
 
 	SDL_Rect *fs = &sys->font_size;
@@ -3388,6 +3392,8 @@ void draw_victory(KBgame *game, word spoils, int villain_id, int captured) {
 
 	KB_flip(sys);
 	KB_Pause();
+
+	free(snd_victory);
 }
 
 void draw_defeat(KBgame *game) {
