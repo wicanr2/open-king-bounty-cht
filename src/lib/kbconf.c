@@ -68,7 +68,7 @@ int write_default_config(const char *path) {
 	fprintf(f, "autodiscover = 1\n");
 	fprintf(f, "fallback = 0\n");
 	fprintf(f, "[sdl]\n");
-	fprintf(f, "sound = 0\n");
+	fprintf(f, "sound = 1\n");
 	fprintf(f, "fullscreen = 0\n");
 	fprintf(f, "filter = normal2x\n");
 	fprintf(f, ";[module]\n");
