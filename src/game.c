@@ -1113,10 +1113,9 @@ void draw_sidebar(KBgame *game, int tick) {
 
 	/* ..Face */
 	if (game->contract != 0xFF) {
-		SDL_Surface *face = SDL_LoadRESOURCE(GR_VILLAIN, game->contract, 0);
+		SDL_Surface *face = SDL_TakeSurface(GR_VILLAIN, game->contract, 0);
 		SDL_Rect vsrc = { tick * hsrc.w, 0, hsrc.w, hsrc.h };
-		SDL_BlitSurface( face, &vsrc, screen, &hdst);
-		SDL_FreeSurface(face);
+		SDL_BlitSurface(face, &vsrc, screen, &hdst);
 	}
 
 	/* Siege weapons */
