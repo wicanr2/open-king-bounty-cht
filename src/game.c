@@ -1517,6 +1517,8 @@ void view_minimap(KBgame *game, int force_orb) {
 
 	SDL_FillRect(sys->screen, &map, 0x112233);
 
+	KB_icolor(colors);
+
 	KB_iloc(border.x + fs->w, border.y + fs->h/2);
 	KB_iprintf("   % -15s", continent_names[game->continent]);
 

@@ -1358,10 +1358,11 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 				"submenu",  /* CS_MINIMENU == 6 */
 				"character",/* CS_VIEWCHAR == 7 */
 				"army",     /* CS_VIEWARMY == 8 */
-				"chrome",   /* CS_CHROME   == 9 */
-				"ending",   /* CS_ENDING   == 10 */
+				"maplegend",/* CS_MINIMAP  == 9 */
+				"chrome",   /* CS_CHROME   == 10 */
+				"ending",   /* CS_ENDING   == 11 */
 			};
-			if (sub_id < 0 || sub_id > 10) return NULL;
+			if (sub_id < 0 || sub_id > 11) return NULL;
 			return GNU_ReadTextColors(mod, "colors.ini", CS_names[sub_id]);
 		}
 		break;
