@@ -285,6 +285,10 @@ KB_File* KB_fopenIMG_in(const char * filename, const char * mode, KB_DIR *dirp)
 	/* Calculate area and byte length */
 	dword area = grp->cache.files[i].w * grp->cache.files[i].h;
 	f->len = (area) / (8 / grp->cache.bpp) + 4;
+
+	/* If this image also has mask data, add to len */
+	if (grp->head.files[i].mask_offset && grp->cache.bpp != 8)
+		f->len += area / 8;
 #if 0
 KB_debuglog(0, "[imgdir]Craving for image <%d> [%s]\n", i, filename);
 KB_debuglog(0, "[imgdir] offset: %08x mask: %08x w: %d, h: %d	| len: %ld\n", 
@@ -359,10 +363,9 @@ void DOS_BlitRAWIMG(SDL_Surface *surf, SDL_Rect *destrect, const char *buf, byte
 	SDL_BlitXBPP(buf, surf, destrect, bpp);
 	if (mask_pos) {
 		if (bpp != 8)	SDL_BlitMASK(&buf[mask_pos - 4], surf, destrect);
-		else			SDL_ReplaceIndex(surf, destrect, buf[mask_pos - 4], 0xFF);
+		else			SDL_ReplaceIndex(surf, destrect, buf[0], 0xFF);
 		SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0xFF);
 	}
-
 }
 
 SDL_Surface *DOS_LoadRAWCH_BUF(char *buf, int len) 
@@ -487,7 +490,7 @@ SDL_Surface *DOS_LoadIMGROW_DIR(KB_DIR *dirp, word first, word frames)
 
 		if (mask_pos) mask_pos -= base_offset;
 
-		DOS_BlitRAWIMG(surf, &dest, &buf[4], bpp, mask_pos );
+		DOS_BlitRAWIMG(surf, &dest, &buf[4], bpp, mask_pos);
 		DOS_SetColors(surf, bpp);		
 
 		x += dest.w;
@@ -607,7 +610,7 @@ SDL_Surface* DOS_LoadIMGROW_RW(SDL_RWops *file, word first, word frames)
 
 		if (mask_pos) mask_pos -= base_offset;
 
-		DOS_BlitRAWIMG(surf, &dest, &buf[4], bpp, mask_pos );
+		DOS_BlitRAWIMG(surf, &dest, &buf[4], bpp, mask_pos);
 		DOS_SetColors(surf, bpp);
 
 		x += dest.w;
