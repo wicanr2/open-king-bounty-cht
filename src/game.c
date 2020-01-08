@@ -4701,18 +4701,18 @@ KBgamestate combat_state = {
 #define KBACT_VIEW_CONTROLS	1 
 #define KBACT_FLY       	2
 #define KBACT_LAND      	3
-#define KBACT_VIEW_CONTRACT	4
-#define KBACT_VIEW_MAP  	5
-#define KBACT_VIEW_PUZZLE  	6
-#define KBACT_SEARCH    	7
-#define KBACT_USE_MAGIC 	8
-#define KBACT_VIEW_CHAR 	9
-#define KBACT_END_WEEK  	10
-#define KBACT_SAVE_QUIT 	11
-#define KBACT_FAST_QUIT 	12
-#define KBACT_DISMISS_ARMY 	13
-#define KBACT_VIEW_OPTIONS 	14
-#define KBACT_NEW_CONTINENT	15
+#define KBACT_NEW_CONTINENT	4
+#define KBACT_VIEW_CONTRACT	5
+#define KBACT_VIEW_MAP  	6
+#define KBACT_VIEW_PUZZLE  	7
+#define KBACT_SEARCH    	8
+#define KBACT_USE_MAGIC 	9
+#define KBACT_VIEW_CHAR 	10
+#define KBACT_END_WEEK  	11
+#define KBACT_SAVE_QUIT 	12
+#define KBACT_FAST_QUIT 	13
+#define KBACT_DISMISS_ARMY 	14
+#define KBACT_VIEW_OPTIONS 	15
 #define KBACT_CHEAT     	16
 
 KBgamestate adventure_state = {
@@ -4740,6 +4740,7 @@ KBgamestate adventure_state = {
 		{	_NON, SDLK_c, 0, 0      	},
 		{	_NON, SDLK_f, 0, 0      	},
 		{	_NON, SDLK_l, 0, 0      	},
+		{	_NON, SDLK_n, 0, 0      	},
 		{	_NON, SDLK_i, 0, 0      	},
 		{	_NON, SDLK_m, 0, 0      	},
 		{	_NON, SDLK_p, 0, 0      	},
@@ -4752,7 +4753,6 @@ KBgamestate adventure_state = {
 		{	_NON, SDLK_q, KMOD_CTRL, 0	},
 		{	_NON, SDLK_d, 0, 0      	},
 		{	_NON, SDLK_o, 0, 0      	},
-		{	_NON, SDLK_n, 0, 0      	},
 
 		{	_NON, SDLK_F10, 0, 0      	},
 		{	__NON, { SOFT_WAIT }, SDLK_SYN, 0, KFLAG_TIMER },
@@ -5182,6 +5182,7 @@ int options_menu(KBgame *game) {
 		"Controls",
 		"Fly",
 		"Land",
+		"New Continent",
 		"Contract Info",
 		"Auto-mapping",
 		"Puzzle Solve",
@@ -6407,8 +6408,10 @@ void adventure_loop(KBgame *game) {
 		}
 
 		if (key == KEY_ACT(NEW_CONTINENT)) {
-			weekend = navigate_continent(game);
-			redraw = 1;
+			if (game->mount == KBMOUNT_SAIL) {
+				weekend = navigate_continent(game);
+				redraw = 1;
+			}
 		}
 
 		if (key == KEY_ACT(END_WEEK)) {
