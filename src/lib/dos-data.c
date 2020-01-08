@@ -901,6 +901,7 @@ void* DOS_Resolve(KBmodule *mod, int id, int sub_id) {
 
 	int row_start = 0;
 	int row_frames = 4;
+	int force_transperancy = 0;
 
 	enum {
 		UNKNOWN,
@@ -969,6 +970,7 @@ void* DOS_Resolve(KBmodule *mod, int id, int sub_id) {
 			suffix = bpp_names[mod->bpp];
 			snprintf(subId_str, 8, "#%d", sub_id + 2);
 			ident = subId_str;
+			if (sub_id + 2 == 4) force_transperancy = 1;
 		}
 		break;
 		case GR_ENDTILES:
@@ -1670,7 +1672,7 @@ void* DOS_Resolve(KBmodule *mod, int id, int sub_id) {
 					KB_fclose(f);
 
 					if (method == RAW_IMG) {
-						surf = DOS_LoadRAWIMG_BUF(&buf[0], n, bpp);
+						surf = DOS_LoadRAWIMG_BUF(&buf[0], n + force_transperancy, bpp);
 						//if (mod->bpp == 1) DOS_SetColors(surf, 1);
 						DOS_SetPalette(mod, surf, mod->bpp);
 					}
