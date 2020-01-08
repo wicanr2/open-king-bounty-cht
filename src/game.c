@@ -4462,7 +4462,7 @@ void win_game(KBgame *game) {
 
 	SDL_BlitSurface( image, NULL, sys->screen, &pos );
 
-	SDL_FillRect(sys->screen, &half, colors[COLOR_BACKGROUND]); /* dark blue */
+	SDL_FillRect(sys->screen, &half, SDL_RemapColor(sys->screen, colors[COLOR_BACKGROUND])); /* dark blue */
 	KB_iloc(half.x, half.y);
 	KB_icolor(colors);
 	KB_iprint(message);
@@ -4523,7 +4523,7 @@ void lose_game(KBgame *game) {
 
 	SDL_BlitSurface( image, NULL, sys->screen, &pos );
 
-	SDL_FillRect(sys->screen, &half, colors[COLOR_SELECTION + COLOR_BACKGROUND]); /* dark blue */
+	SDL_FillRect(sys->screen, &half, SDL_RemapColor(sys->screen, colors[COLOR_SELECTION + COLOR_BACKGROUND])); /* dark blue */
 	KB_iloc(half.x, half.y);
 	KB_icolor(colors + COLOR_SELECTION);
 	KB_iprint(message);
