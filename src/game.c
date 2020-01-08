@@ -682,6 +682,14 @@ KBgame *load_game() {
 
 	}
 	free(colors_inner);
+
+	if (game)
+	{
+		/* TODO: move somewhere else */
+		refill_rules();
+		refill_names();
+	}
+
 	return game;
 }
 
