@@ -16,6 +16,8 @@ root = tree.getroot()
 
 map = np.zeros([4, 64, 64], int)
 
+continent_names = [ "C0", "C1", "C2", "C3" ]
+
 hotspots = [ 0, 0, 0, 0 ];
 num_castles = [ 0, 0, 0, 0 ];
 num_towns = [ 0, 0, 0, 0 ];
@@ -36,6 +38,13 @@ for layer in root.findall("layer"):
 	else:
 		print("Undefined layer %s" % name)
 		continue
+
+	# Read layer properties to determine continent name
+	_t = layer.find("properties");
+	props = _t.findall("property") if _t is not None else [ ]
+	for prop in props:
+		if prop.get('name') == 'Name':
+			continent_names[cont] = str(prop.get('value'));
 
 	x = 0
 	y = 0
@@ -79,10 +88,10 @@ towns = [ ]
 home = None
 alcove = None
 continents = [
-	{ "name": "C0", "nav_x": 0, "nav_y": 0 },
-	{ "name": "C1", "nav_x": 0, "nav_y": 0 },
-	{ "name": "C2", "nav_x": 0, "nav_y": 0 },
-	{ "name": "C3", "nav_x": 0, "nav_y": 0 },
+	{ "name": continent_names[0], "nav_x": 0, "nav_y": 0 },
+	{ "name": continent_names[1], "nav_x": 0, "nav_y": 0 },
+	{ "name": continent_names[2], "nav_x": 0, "nav_y": 0 },
+	{ "name": continent_names[3], "nav_x": 0, "nav_y": 0 },
 ]
 
 for objgroup in root.findall("objectgroup"):
@@ -96,7 +105,7 @@ for objgroup in root.findall("objectgroup"):
 	m = re.match(r".+ (\d+)", name)
 	if m is not None:
 		cont = int(m.group(1))
-		print("Reading objects for continent %d" % cont)
+		print("Reading objects for continent %d (layer '%s')" % (cont, name))
 	else:
 		print("Undefined layer '%s'" % name)
 		continue
