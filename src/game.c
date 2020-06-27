@@ -6242,7 +6242,6 @@ int save_game(KBgame *game) {
 	KB_dircpy(buffer, sys->conf->save_dir);
 	KB_dirsep(buffer);
 	KB_strcat(buffer, game->savefile);
-	KB_strcat(buffer, "2");//TODO: Remove this '2', it's for debug purposes only
 
 	err = KB_saveDAT(buffer, game);
 	if (err) KB_errlog("Unable to save game '%s'\n", buffer);
