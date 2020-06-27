@@ -146,6 +146,8 @@ for objgroup in root.findall("objectgroup"):
 				"cont": cont,
 				"boat_x": 0,
 				"boat_y": 0,
+				"gate_x": 0,
+				"gate_y": 0,
 				"castle_name": None,
 				"castle": None,
 				"order": -1,
@@ -318,6 +320,45 @@ for town in towns:
 		town["castle"] = castle
 		print("Auto-linked town %s to castle %s (dist:%d)" % (town["name"], castle["name"], castle["dist"]))
 
+# Set boat/gate coords
+def find_nearby_water(cont, x, y):
+	offsets = [
+		(1, 0), (-1, 0), (0, 1), (0, -1),
+		(1, 1), (-1, 1), (-1, -1), (1, -1),
+	]
+	for i, j in offsets:
+		my = y + j
+		mx = x + i
+		if (mx < 0): mx = 0
+		if (mx > 63): mx = 63
+		if (my < 0): my = 0
+		if (my > 63): my = 63
+		if map[cont][63-my][mx] >= 20 and map[cont][63-my][mx] <= 32:
+			return mx, my
+	return x, y
+
+def find_nearby_grass(cont, x, y):
+	offsets = [
+		(1, 0), (-1, 0), (0, 1), (0, -1),
+		(1, 1), (-1, 1), (-1, -1), (1, -1),
+	]
+	for i, j in offsets:
+		my = y + j
+		mx = x + i
+		if (mx < 0): mx = 0
+		if (mx > 63): mx = 63
+		if (my < 0): my = 0
+		if (my > 63): my = 63
+		if map[cont][63-my][mx] == 0:
+			return mx, my
+	return x, y
+
+for town in towns:
+	if not town["boat_x"] and not town["boat_y"]:
+		town["boat_x"], town["boat_y"] = find_nearby_water(town["cont"], town["x"], town["y"])
+	if not town["gate_x"] and not town["gate_y"]:
+		town["gate_x"], town["gate_y"] = find_nearby_grass(town["cont"], town["x"], town["y"])
+
 # Verify
 for castle in castles:
 	if castle["town"] is None:
@@ -402,6 +443,8 @@ for town in towns:
 	fh.write("y = %d\n" % town["y"])
 	fh.write("boat_x = %d\n" % town["boat_x"])
 	fh.write("boat_y = %d\n" % town["boat_y"])
+	fh.write("gate_x = %d\n" % town["gate_x"])
+	fh.write("gate_y = %d\n" % town["gate_y"])
 	fh.write("spell = 7\n")
 	#fh.write("castle_id = %d\n" % town["castle"]["order"])
 	fh.write("invert_id = %d\n" % town["order"])

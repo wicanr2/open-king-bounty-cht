@@ -1292,10 +1292,18 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 		break;
 		case DAT_TOWNINV:
 		{
-			byte *inversion =
+			byte *inversion = malloc(sizeof(byte) * 26);
+			if (inversion == NULL) return NULL;
+			byte *ids =
 				GNU_downto_byte(
 					GNU_extract_ini(mod, "towns.ini", "town%d", "invert_id", 0, 26, NULL)
 					, 26, 1);
+			int i;
+			for (i = 0; i < 26; i++)
+			{
+				inversion[ids[i]] = i;
+			}
+			free(ids);
 			return inversion;
 		}
 		break;
@@ -1317,12 +1325,30 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return coord;
 		}
 		break;
+		case DAT_GATEY:
+		{
+			byte *coord =
+				GNU_downto_byte(
+					GNU_extract_ini(mod, "towns.ini", "town%d", "gate_y", 0, 26, NULL)
+					, 26, 1);
+			return coord;
+		}
+		break;
+		case DAT_GATEX:
+		{
+			byte *coord =
+				GNU_downto_byte(
+					GNU_extract_ini(mod, "towns.ini", "town%d", "gate_x", 0, 26, NULL)
+					, 26, 1);
+			return coord;
+		}
+		break;
 		case DAT_NAVY:
 		{
 			byte *coord =
 				GNU_downto_byte(
-					GNU_extract_ini(mod, "land.ini", "continent%d", "nav_y", 0, 26, NULL)
-					, 26, 1);
+					GNU_extract_ini(mod, "land.ini", "continent%d", "nav_y", 0, 4, NULL)
+					, 4, 1);
 			return coord;
 		}
 		break;
@@ -1330,12 +1356,12 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 		{
 			byte *coord =
 				GNU_downto_byte(
-					GNU_extract_ini(mod, "land.ini", "continent%d", "nav_x", 0, 26, NULL)
-					, 26, 1);
+					GNU_extract_ini(mod, "land.ini", "continent%d", "nav_x", 0, 4, NULL)
+					, 4, 1);
 			return coord;
 		}
 		break;
-		case DAT_HPS:  	/* [MAX_TROOPS] hit points for specific troop; subId - undefined */ \
+		case DAT_HPS:	/* [MAX_TROOPS] hit points for specific troop; subId - undefined */ \
 		{
 			byte *hp =
 				GNU_downto_byte(

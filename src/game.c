@@ -2553,6 +2553,10 @@ void visit_castle(KBgame *game) {
 		}
 	}
 
+	if (ctype == your || ctype == enemy) {
+		game->castle_visited[id] = 1;
+	}
+
 	if (ctype == not_found) {
 		KB_errlog("Can't find castle at continent %d - X=%d Y=%d\n",game->continent,game->x,game->y);
 		return; 
@@ -2624,6 +2628,8 @@ void visit_town(KBgame *game) {
 			id = i;
 		}
 	}
+
+	game->town_visited[id] = 1;
 
 	SDL_Rect *fs = &sys->font_size;
 
@@ -4033,10 +4039,11 @@ int select_gate(KBgame *game, int mode) {
 	SDL_Rect *text;
 
 	int i;
+	int print_coma = 0;
 	
 	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
 
- 	text = KB_BottomBox("Towns you have been to:", "", 0);	
+	text = KB_BottomBox(mode ? "Towns you have been to:" : "Castles you have been to:", "", 0);
 
 	KB_iloc(text->x, text->y + fs->h * 2  );
 
@@ -4052,24 +4059,24 @@ int select_gate(KBgame *game, int mode) {
 
 		if (mode == 0) {
 			if (game->castle_visited[i] == 0) {
-				KB_iprint("  ");
 				continue;
 			}
 		}
 		else {
 			if (game->town_visited[town_inversion[i]] == 0) {
-				KB_iprint("  ");
 				continue; 
 			}
 		}
 
-		KB_iprintf("%c", 'A' + i);
-		if (i < MAX_CASTLES - 1)
+		if (print_coma)
 			KB_iprint(",");
+
+		KB_iprintf("%c", 'A' + i);
+		print_coma = 1;
 	}
 
 	KB_iloc(text->x, text->y + fs->h * 6 - fs->h / 4 - fs->h / 8);
-	KB_iprint("Revisit which town? ");
+	KB_iprint(mode ? "Revisit which town? " : "Revisit which castle? ");
 
 	word gate_x, gate_y, gate_continent;
 
@@ -4096,7 +4103,7 @@ int select_gate(KBgame *game, int mode) {
 			if (mode == 0) {
 				/* Castle mode */
 				index = key - 1;
-				printf("Going to castle: %d, %s\n", index, castle_names[index]);
+				KB_debuglog(0, "Going to castle: %d, %s\n", index, castle_names[index]);
 				if (game->castle_visited[index]) {
 
 					gate_continent = castle_coords[index][0];
@@ -4105,10 +4112,10 @@ int select_gate(KBgame *game, int mode) {
 
 					done = 2;
 				}
-			} else { 
+			} else {
 				/* Town mode */
 				index = town_inversion[key - 1];
-				printf("Going to town: %d, %s\n", index, town_names[index]);
+				KB_debuglog(0, "Going to town: %d, %s\n", index, town_names[index]);
 				if (game->town_visited[index]) {
 
 					gate_continent = towngate_coords[index][0];
