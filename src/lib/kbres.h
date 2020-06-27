@@ -102,6 +102,7 @@
 	_(DAT_SACTION)	/* [MAX_SPELLS] spell action for specific spell; subId - undefined */ \
 	_(WDAT_SDAMAGE)	/* [MAX_SPELLS] spell power for specific spell; subId - undefined */ \
 	_(DAT_SFILTER)	/* [MAX_SPELLS] spell filter for specific spell; subId - undefined [UNUSED] */ \
+	_(DAT_APOWER)	/* [MAX_ARTIFACTS] artifact power for specific artifact; subId - undefined */ \
 	_(WDAT_VREWARD)	/* [MAX_VILLAINS] gold reward for specific villain ; subId - villain_id */ \
 	_(DAT_VTROOP)	/* [MAX_VILLAINS * 5] villain troop type; subId - (villain index * 5) + army index */ \
 	_(WDAT_VNUMBER)	/* [MAX_VILLAINS * 5] villain troop count troop count; subId - (villain index * 5) + army index */ \

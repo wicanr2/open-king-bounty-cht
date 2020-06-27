@@ -600,12 +600,39 @@ char* DOS_read_vdescs(KBmodule *mod, int off, int endoff, int skip_lines) {
 
 char* DOS_read_adescs(KBmodule *mod, int off, int endoff, int skip_lines) {
 
-	char *buf, *raw, *ptr;
+	char *buf, *raw, *ptr, *ordered;
 	int max = endoff - off,
 		newmax = max + max / 2;
 
 	raw = DOS_read_strings(mod, off, endoff);
 	if (raw == NULL) return NULL;
+
+	/* Hack -- reorder lines */
+	ordered = malloc(sizeof(char) * max);
+	if (ordered == NULL) {
+		free(raw);
+		return NULL; /* Out of memory */
+	}
+	int retable[] = { 7, 1, 2, 4, 3, 0, 6, 5 };
+	int p = 0;
+	int n = KB_strlist_max(raw);
+	int i;
+	for (i = 0; i < n; i++) {
+		int orig_id = i / 5;
+		int subline = i - orig_id * 5;
+		int real_id = retable[orig_id];
+		int j = real_id * 5 + subline;
+		char *t = KB_strlist_peek(raw, j);
+		if (t == NULL) break;
+		int l = strlen(t);
+		memcpy(&ordered[p], t, l);
+		ordered[p+l] = '\0';
+		p += l+1;
+	}
+	ordered[p] = '\0';
+	free(raw);
+	raw = ordered;
+	/* End Hack */
 
 //	DOS_compact_strings(mod, raw, (endoff-off));
 //	printf("READ: %s\n", raw);
@@ -1505,7 +1532,7 @@ void* DOS_Resolve(KBmodule *mod, int id, int sub_id) {
 			return KB_strlist_peek(DOS_Resolve(mod, STRL_ADESCS, 0), sub_id);
 		}
 		break;
-		case STRL_ADESCS:
+		case STRL_ADESCS: /* subId - artifact id */
 		{
 			int line = sub_id * 5;
 			return DOS_read_adescs(mod, KBEXE_POS(exe_type, DOS_ADESCS), line);

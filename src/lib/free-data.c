@@ -107,6 +107,55 @@ byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
 	return actions;
 }
 
+byte* GNU_artifact_downto_byte(char *types, int num, int freesrc) {
+	int i, j;
+
+	static const char *names[] = { /* Map to artifact action indexes defined as POWER_* in bounty.h */
+		"unknown",
+		"quarter_protection",
+		"double_leadership",
+		"double_spell_power",
+		"increase_commission",
+		"cheaper_boat_rental",
+		"double_max_spells",
+		"increased_damage",
+	};
+	static const int powers[] = {
+		0x01,/* POWER_UNKNOWN_XXX1 */
+		0x02,/* POWER_QUARTER_PROTECTION */
+		0x04,/* POWER_DOUBLE_LEADERSHIP */
+		0x08,/* POWER_DOUBLE_SPELL_POWER */
+		0x10,/* POWER_INCREASE_COMMISSION */
+		0x20,/* POWER_CHEAPER_BOAT_RENTAL */
+		0x40,/* POWER_DOUBLE_MAX_SPELLS */
+		0x80,/* POWER_INCREASED_DAMAGE */
+	};
+	int num_names = 8;
+
+	byte *actions = malloc(sizeof(byte) * num);
+	if (actions == NULL) return NULL;
+
+	for (i = 0; i < num; i++) {
+		char *flag = KB_strlist_peek(types, i);
+		int found = 0;
+		for (j = 0; j < num_names; j++) {
+			if (!KB_strcasecmp(names[j], flag)) {
+
+				actions[i] = powers[j];
+
+				found = 1;
+				break;
+			}
+		}
+		if (!found) {
+			KB_errlog("Failed to parse `%s` artifact type\n", flag);
+		}
+	}
+	if (freesrc) {
+		free(types);
+	}
+	return actions;
+}
 
 int GNU_parse_troop(const char *line, byte *type, word *num, char *troop_names) {
 	char name[256];
@@ -202,7 +251,7 @@ word* GNU_army_downto_word(int first, int num, char **armies, int army_len, char
 
 char* GNU_string_ini(KBmodule *mod, const char *inifile, const char *module, const char *name, int first, int num, char *dst) {
 
-	int len = num * 32;
+	int len = num * 256;
 
 	KB_File *fd;
 	char *filename;
@@ -384,6 +433,24 @@ dword* GNU_extract_ini(KBmodule *mod, const char *inifile, const char *module, c
 
 	KB_fclose(fd);
 	free(filename);
+	return dst;
+}
+
+char* GNU_expand_newlines(char *src, int n, int freesrc)
+{
+	int i, j = 0;
+	char *dst = malloc(sizeof(char) * n);
+	if (dst == NULL) return NULL;
+	for (i = 0; i < n; i++) {
+		if (i + 1 < n && src[i] == '\\' && src[i + 1] == 'n') {
+			dst[j++] = '\n';
+			i++; /* Skip extra char */
+			continue;
+		}
+		dst[j++] = src[i];
+	}
+	dst[j] = 0xFF;
+	if (freesrc) free(src);
 	return dst;
 }
 
@@ -1027,6 +1094,20 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			return GNU_read_textfile(mod, "credits.txt", 0);
 		}
 		break;
+		case STRL_ADESCS:
+		{
+			char *desc = GNU_string_ini(mod, "artifacts.ini", "artifact%d", "description", 0, 8, NULL);
+			desc = GNU_expand_newlines(
+				desc,
+				KB_strlist_len(desc),
+				1
+			);
+			return KB_strdup(KB_strlist_peek(desc, sub_id));
+		}
+		case STRL_ANAMES:
+		{
+			return GNU_string_ini(mod, "artifacts.ini", "artifact%d", "name", 0, 8, NULL);
+		}
 		case STRL_VDESCS:	/* multiple lines of villain description */
 		{
 			char tmp[128];
@@ -1119,6 +1200,13 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 					GNU_extract_ini(mod, "spells.ini", "spell%d", "damage", 0, 14, NULL)
 					, 14, 1);
 			return damages;
+		}
+		break;
+		case DAT_APOWER:	/* [MAX_ARTIFACTS] artifcat power for specific artifcat; subId - undefined */ \
+		{
+			return GNU_artifact_downto_byte(
+				GNU_string_ini(mod, "artifacts.ini", "artifact%d", "power", 0, 8, NULL)
+				, 8, 1);
 		}
 		break;
 		case DAT_SPECIALX:

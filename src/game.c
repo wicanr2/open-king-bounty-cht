@@ -271,6 +271,7 @@ void refill_rules() {
 	byte *spell_action = KB_Resolve(DAT_SACTION, 0);
 	word *spell_power = KB_Resolve(WDAT_SDAMAGE, 0);
 	byte *spell_filter = KB_Resolve(DAT_SFILTER, 0);
+	byte *artifact_action = KB_Resolve(DAT_APOWER, 0);
 
 	byte *castle_x = KB_Resolve(DAT_CASTLEX, 0);
 	byte *castle_y = KB_Resolve(DAT_CASTLEY, 0);
@@ -346,6 +347,10 @@ void refill_rules() {
 		free(villains_needed);
 		free(leadership);
 		free(commission);
+	}
+
+	for (j = 0; j < MAX_ARTIFACTS; j++) {
+		if (artifact_action) artifact_powers[j] = artifact_action[j];
 	}
 
 	for (j = 0; j < MAX_SPELLS; j++) {
@@ -3272,7 +3277,7 @@ void take_artifact(KBgame *game, byte num) {
 
 	byte power = artifact_powers[id];
 
-	char *text = KB_Resolve(STRL_ADESCS, ordered_id);
+	char *text = KB_Resolve(STRL_ADESCS, id);
 
 	/* Mark as found */
 	game->artifact_found[id] = 1;
@@ -5042,6 +5047,23 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 		case 'o':
 			game->orb_found[game->continent] = 1;
 			msg = "+Orb to this continent";
+		break;
+		case 'c':
+		{
+			int k, j;
+			for (k = 0; k < MAX_CONTINENTS; k++)
+			for (j = 0; j < LEVEL_H; j++)
+			for (i = 0; i < LEVEL_W; i++) {
+				if (game->map[k][j][i] == TILE_ARTIFACT_1
+				||  game->map[k][j][i] == TILE_ARTIFACT_2) {
+					game->x = i;
+					game->y = j;
+					game->continent = k;
+					return 1;
+				}
+			}
+			msg = "No artifacts found";
+		}
 		break;
 		default:
 			msg = "No such command";
