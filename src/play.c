@@ -143,7 +143,7 @@ void bury_scepter(KBgame *game, int continent, word grass) {
 			|| game->map[continent][j][i] == 0x80) {
 				if (count == grass) {
 					game->scepter_x = i;
-					game->scepter_y = i;
+					game->scepter_y = j;
 					return;		
 				}
 				count++;
