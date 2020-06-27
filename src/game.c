@@ -4190,9 +4190,11 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 
 	Uint32 *colors = local.message_colors;
 
-	SDL_TextRect(sys->screen, &border, colors[COLOR_BACKGROUND], colors[COLOR_TEXT], 1);
+	SDL_TextRect(sys->screen, &border, colors[COLOR_FRAME], colors[COLOR_BACKGROUND], 1);
 
 	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+
+	incolor(colors[COLOR_TEXT], colors[COLOR_BACKGROUND]);
 
 	KB_iloc(border.x + fs->w, border.y + fs->h/2);
 	KB_iprint("              Spells\n\n");
@@ -4215,7 +4217,7 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 	}
 
 	KB_iloc(border.x + fs->w, border.y + fs->h * 13 + fs->h/4);
-	KB_iprintf("Cast which %s spell (A-%c)?", (mode ? "Adventure" : "Combat"), 'A' + half);
+	KB_iprintf("Cast which %s spell (A-%c)?", (mode ? "Adventure" : "Combat"), 'A' + half - 1);
 
 	word twirl_x, twirl_y;
 
