@@ -2231,7 +2231,7 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 				redraw = 1;
 
 				/* Calculate "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
-				max = army_leadership(game, home_troops[whom-1]) / troops [ home_troops[whom-1] ].hit_points;
+				max = army_max_troop_count(game, home_troops[whom-1]);
 			}
 			if (key == 6) {
 				twirl_pos++;
@@ -2259,7 +2259,7 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 				else if (result == 2) KB_BottomBox("", "No troop slots left!", MSG_PAUSE);//verify this one
 
 				/* Calculate new "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
-				max = army_leadership(game, home_troops[whom-1]) / troops [ home_troops[whom-1] ].hit_points;
+				max = army_max_troop_count(game, home_troops[whom-1]);
 			}
 
 			redraw = 1;
@@ -2970,7 +2970,7 @@ int visit_dwelling(KBgame *game, byte rtype) {
 	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
 
 	/* Calculate "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
-	max = army_leadership(game, troop_id) / troops [ troop_id ].hit_points;
+	max = army_max_troop_count(game, troop_id);
 
 	int done = 0;
 	int redraw = 1;
@@ -3027,7 +3027,7 @@ int visit_dwelling(KBgame *game, byte rtype) {
 			else if (result == 2) KB_BottomBox("", "No troop slots left!", 1);//verify this one
 
 			/* Calculate new "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
-			max = army_leadership(game, troop_id) / troops[ troop_id ].hit_points;
+			max = army_max_troop_count(game, troop_id);
 		}
 
 		redraw = 1;

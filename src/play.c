@@ -583,6 +583,12 @@ int army_leadership(KBgame *game, byte troop_id) {
 	return free_leadership;
 }
 
+/* Calculate and return "MAX YOU CAN HANDLE" troop count */
+int army_max_troop_count(KBgame *game, byte troop_id)
+{
+	return army_leadership(game, troop_id) / troops[troop_id].hit_points;
+}
+
 /* Calculate and return morale for troop */
 byte troop_morale(KBgame *game, byte slot) {
 	int j;
