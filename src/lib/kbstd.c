@@ -31,6 +31,8 @@
 
 #ifdef USE_WINAPI
 #include <windows.h>
+#else
+#define USE_ANSI_COLORS
 #endif
 
 #include "../../vendor/vendor.h" // For strlcat() and strlcpy().
@@ -97,7 +99,13 @@ void  KB_errlog(char *fmt, ...)
 	vsprintf(buffer, fmt, argptr);
 	MessageBox(NULL, buffer, "Critical Error", MB_ICONEXCLAMATION);
 #endif
+#ifdef USE_ANSI_COLORS
+	fprintf(_stderr, "%s", "\033[31m");
+#endif
 	vfprintf(_stderr, fmt, argptr);
+#ifdef USE_ANSI_COLORS
+	fprintf(_stderr, "%s", "\033[0m");
+#endif
 	va_end(argptr);
 }
 
