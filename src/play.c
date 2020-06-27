@@ -566,6 +566,26 @@ void fullfill_contract(KBgame *game, byte villain_id) {
 	game->max_contract++;
 }
 
+/* Find next contract slot */
+byte next_contract(KBgame *game) {
+	int i;
+	int slot = -1;
+
+	/* Traverse twice to handle both directions */
+	for (i = 0; i < 5; i++) {
+		if (game->contract_cycle[i] == 0xFF) continue;
+		if (game->last_contract == game->contract_cycle[i]) slot = i;
+		if (slot != -1 && slot != i) return game->contract_cycle[i];
+	}
+	for (i = 0; i < 5; i++) {
+		if (game->contract_cycle[i] == 0xFF) continue;
+		if (slot != i) return game->contract_cycle[i];
+	}
+
+	/* Nothing useful found. */
+	return 0xFF;
+}
+
 /* Calculate and return army leadership */
 int army_leadership(KBgame *game, byte troop_id) {
 	int free_leadership = game->leadership;

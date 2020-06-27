@@ -2708,22 +2708,22 @@ void visit_town(KBgame *game) {
 			
 			/** Get new contract **/
 			if (key == 1) {
-				printf("Choice: %d\n", key);
-				for (i = 0 ; i < 5; i++) {
-					printf("Contract cycle: %d = [ %02x] %d\n", i, game->contract_cycle[i], game->contract_cycle[i]);
+
+				byte villain_id = next_contract(game);
+
+				if (villain_id == 0xFF) {
+					/* No more villains. Not sure what happens here.
+					 * TODO: check DOS version... */
+					KB_MessageBox("The land is free from villains...", MSG_PAUSE);
+				} else {
+					/* set new contract */
+					game->last_contract = villain_id;
+					game->contract = game->last_contract;
+
+					/* show contract on screen */
+					draw_sidebar(game, 0);
+					view_contract(game);
 				}
-				printf("Last contract: %d\nMax contract: %d\n", game->last_contract, game->max_contract);
-
-				game->last_contract++;
-				if (game->last_contract > 4)
-					game->last_contract = 0;
-
-				game->contract = game->last_contract;
-
-				/* show contract on screen */
-				draw_sidebar(game, 0);
-				view_contract(game);
-
 				/* clear screen afterwards */
 				redraw_menu = 1;
 				redraw = 1;

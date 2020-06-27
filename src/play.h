@@ -63,6 +63,8 @@ extern word week_id(KBgame *game);
 
 extern void roll_creature(int difficulty, byte *id, word *number);
 
+extern byte next_contract(KBgame *game);
+
 /** Player actions **/
 
 extern void player_accept_rank(KBgame *game);
