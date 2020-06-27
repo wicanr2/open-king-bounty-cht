@@ -89,10 +89,20 @@ Uint32 ega_pallete_rgb[16] =
 	0x000000, // 00 // dark black
 	0x0000AA, // 01 // dark blue
 	0x00AA00, // 02 // dark green
-	0x00AAAA, // 03 // cyan	0xAA0000, // 04 // dark red
+	0x00AAAA, // 03 // cyan
+	0xAA0000, // 04 // dark red
 	0xAA00AA, // 05 // magenta
- 	0xAA5500, // 06 // brown
-	0xAAAAAA, // 07 // dark white / light gray 	0x555555, // 08 // dark gray / light black	0x5555FF, // 09 // light blue	0x55FF55, // 10 // light green	0x55FFFF, // 11 // light cyan	0xFF5555, // 12 // light red	0xFF55FF, // 13 // light magenta	0xFFFF55, // 14 // light yellow	0xFFFFFF, // 15 // bright white};
+	0xAA5500, // 06 // brown
+	0xAAAAAA, // 07 // dark white / light gray
+	0x555555, // 08 // dark gray / light black
+	0x5555FF, // 09 // light blue
+	0x55FF55, // 10 // light green
+	0x55FFFF, // 11 // light cyan
+	0xFF5555, // 12 // light red
+	0xFF55FF, // 13 // light magenta
+	0xFFFF55, // 14 // light yellow
+	0xFFFFFF, // 15 // bright white
+};
 
 void apply_pal(SDL_Surface *dest, Uint32 *pal, int pal_max, int mask_index)
 {
