@@ -1785,7 +1785,25 @@ void foe_closest_offset(KBgame *game, int foe_id, int position_x, int position_y
 
 }
 
+/** Helper functions **/
 
+int find_villain_castle(KBgame *game, byte villain_id) {
+	int i;
+	for (i = 0; i < MAX_CASTLES; i++) {
+		// if (game->castle_owner[j] == KBCASTLE_PLAYER
+		//  || game->castle_owner[j] == KBCASTLE_MONSTERS) continue;
+		if ((game->castle_owner[i] & 0x3f) == villain_id) {
+			return i;
+		}
+	}
+	return -1;
+}
+void save_castle_owner_knowledge(KBgame *game, int castle_id)
+{
+	if (game->castle_owner[castle_id] == KBCASTLE_PLAYER) return;
+	if (game->castle_owner[castle_id] == KBCASTLE_MONSTERS) return;
+	game->castle_owner[castle_id] |= KBCASTLE_KNOWN; /* Known */
+}
 
 /** Spell effects **/
 

@@ -100,6 +100,11 @@ extern void temp_death(KBgame *game);
 
 extern void foes_follow(KBgame *game);
 
+/** Helper functions **/
+
+extern int find_villain_castle(KBgame *game, byte villain_id);
+extern void save_castle_owner_knowledge(KBgame *game, int castle_id);
+
 /** Spell effects **/
 extern void time_stop(KBgame *game);
 extern void raise_control(KBgame *game);

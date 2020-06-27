@@ -240,6 +240,11 @@ extern const char *KBresid_names[];
 #define CS_CHROME	10
 #define CS_ENDING	11
 
+/* Components in coordinates array */
+#define COORD_CONTINENT	0
+#define COORD_X	1
+#define COORD_Y	2
+
 /* Color scheme for COL_TEXT: */
 enum {
 	COLOR_BACKGROUND,

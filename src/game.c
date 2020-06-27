@@ -1649,20 +1649,13 @@ void view_contract(KBgame *game) {
 
 		SDL_Surface *face = SDL_LoadRESOURCE(GR_VILLAIN, villain_id, 0);
 
-		int j, continent = -1, castle = -1;
+		int continent = -1, castle = -1;
 
 		char *text = KB_Resolve(STRL_VDESCS, villain_id);
 
-		/* Find his castle */
-		for (j = 0; j < MAX_CASTLES; j++) {
-			if (game->castle_owner[j] == KBCASTLE_PLAYER
-			 || game->castle_owner[j] == KBCASTLE_MONSTERS) continue;
-			continent = game->continent;
-			if (game->castle_owner[j] & KBCASTLE_KNOWN)
-				castle = j;
-			else
-				break; /* No point in continuing from here, castle has been found */
-		}
+		castle = find_villain_castle(game, villain_id);
+
+		if (castle != -1) continent = castle_coords[castle][COORD_CONTINENT];
 
 		/* Print description, along with known residence information */
 		KB_iloc(border.x + fs->w, border.y + fs->h);
@@ -2510,8 +2503,11 @@ int lay_siege(KBgame *game, int castle_id) {
 		KB_iprint(name);
 		KB_iprint(" and\narmy occupy this castle.");
 		KB_iprint("\n\n\n");
+		free(name);
+
+		save_castle_owner_knowledge(game, id);
 	}
-		KB_iloc(text->x, text->y + fs->h * 6);
+	KB_iloc(text->x, text->y + fs->h * 6);
 	KB_iprint("            Lay Siege (y/n)?");	
 	
 	//KB_BottomBox("Castle %s", "A) Recruit Soldiers\nB) Audience with the King\nC) \nD)\nE)",0);
@@ -2601,6 +2597,8 @@ void gather_information(KBgame *game, int id) {
 		char *name = STR_LoadRESOURCE(STRL_VNAMES, 0, game->castle_owner[id] & KBCASTLE_VILLAIN);
 		KB_iprintf("%s's rule.\n", name);
 		free(name);
+
+		save_castle_owner_knowledge(game, id);
 	}
 
 	/* Army */
