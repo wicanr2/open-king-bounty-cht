@@ -324,6 +324,9 @@ typedef struct KBcombat {
 #define SPELL_INSTANTARMY  11
 #define SPELL_RAISECONTROL 12
 
+/* Spell filters */
+#define SFILTER_NONE	0
+#define SFILTER_UNDEAD	1
 
 /* Data provided by bounty.c */
 extern KBtroop troops[MAX_TROOPS];

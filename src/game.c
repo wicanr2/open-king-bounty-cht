@@ -3975,7 +3975,7 @@ int resurrect_army(KBgame *game, KBcombat *war) {
 	return 0;
 }
 
-int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id) {
+int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id, byte undead) {
 
 	char msg[128];
 
@@ -3990,7 +3990,7 @@ int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id) {
 	x = u->x;
 	y = u->y;
 
-	ok = pick_target(war, &x, &y, 4);
+	ok = pick_target(war, &x, &y, 4 + undead);
 
 	return ok;
 } 
@@ -4260,13 +4260,13 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 						//lightning
 						damage_army(game, combat,
 							/*damage=*/spell_powers[spell_id],
-							spell_id);
+							spell_id, SFILTER_NONE);
 					break;
 					case SPELL_FREEZE:  	freeze_army(game, combat); break;
 					case SPELL_RESURRECT:	resurrect_army(game, combat); break;
 					case SPELL_TURNUNDEAD:
 						//turn undead
-						damage_army(game, combat, spell_powers[spell_id], spell_id);
+						damage_army(game, combat, spell_powers[spell_id], spell_id, SFILTER_UNDEAD);
 					break;
 					case SPELL_BRIDGE:	build_bridge(game); break;
 					case SPELL_TIMESTOP: time_stop(game); break;
@@ -5626,9 +5626,11 @@ int pick_target(KBcombat *war, int *x, int *y, int filter) {
 				if (war->umap[_y][_x]) {
 					int side = (war->umap[_y][_x] <= MAX_UNITS ? 0 : 1);
 					int out_of_control = war->units[side][war->umap[_y][_x] - side*5].out_of_control;
+					int is_undead = troops[war->units[side][war->umap[_y][_x] - side*5].troop_id].abilities & ABIL_UNDEAD;
 					if (filter == 3) accept = (side == 0 && !out_of_control ? 1 : 0);
-					else if (filter == 4) accept = (side == 1 || out_of_control ? 1 : 0);
+					else if (filter == 4 || filter == 5) accept = (side == 1 || out_of_control ? 1 : 0);
 					else accept = 1;
+					if (filter == 5 && accept && !is_undead) accept = 0;
 				}
 			}
 			/* We're done */
