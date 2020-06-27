@@ -114,7 +114,7 @@ for objgroup in root.findall("objectgroup"):
 			x = int(object.get("x")) / 48
 			y = int(object.get("y")) / 36 - 1
 			if (x >= 64 or x < 0 or y >= 64 or y < 0):
-				print("Signpost out of bounds, skipping")
+				print("%s object out of bounds, skipping" % type)
 				continue
 			y = 63 - y
 
@@ -214,7 +214,7 @@ for objgroup in root.findall("objectgroup"):
 			if is_home:
 				continue
 
-			#print(signpost)
+			#print(castle)
 			castles.append(castle)
 
 			num_castles[cont] = num_castles[cont] + 1
@@ -240,6 +240,9 @@ for objgroup in root.findall("objectgroup"):
 				if prop.get('name') == 'Text2':
 					signpost["line2"] = prop.get('value');
 
+			if not signpost["line1"] and not signpost["line1"]:
+				print("Warning! Signpost at CONT=%d X=%d tY=%d has no text" % (signpost["cont"], signpost["x"], 63-signpost["y"]))
+
 			signpost["order"] = signpost["cont"] * 1024 + signpost["y"] * 64 + signpost["x"];
 
 			#print(signpost)
@@ -251,7 +254,7 @@ for i in range(0,4):
 print("Total:")
 print("~) Castles: %d, Towns: %d, Hotspots: %d, Foes: %d" % (len(castles), len(towns), sum(hotspots), sum(num_foes)))
 print("Recommended:")
-print("~) Castles: 26, Towns: 26, Hotspots: %d(21x4)-241, Foes: 87" % (21 * 4))
+print("~) Castles: 26, Towns: 26, Hotspots: %d(21*4)-241, Foes: 87" % (21 * 4))
 
 castles = sorted(castles, key=lambda k: k['name'])
 towns = sorted(towns, key=lambda k: k['name'])

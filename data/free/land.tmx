@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="64" height="64" tilewidth="48" tileheight="36">
- <tileset firstgid="1" name="tileseta" tilewidth="48" tileheight="34">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="48" tileheight="36" infinite="0" nextobjectid="91">
+ <tileset firstgid="1" name="tileseta" tilewidth="48" tileheight="34" tilecount="36" columns="36">
   <image source="tileseta.png" trans="ffffff" width="1728" height="34"/>
  </tileset>
- <tileset firstgid="37" name="tilesetb" tilewidth="48" tileheight="34">
+ <tileset firstgid="37" name="tilesetb" tilewidth="48" tileheight="34" tilecount="36" columns="36">
   <image source="tilesetb.png" trans="ffffff" width="1728" height="34"/>
  </tileset>
  <layer name="Continent 0" width="64" height="64">
@@ -1900,7 +1900,7 @@
    <tile gid="1"/>
    <tile gid="59"/>
    <tile gid="59"/>
-   <tile gid="59"/>
+   <tile gid="1"/>
    <tile gid="59"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -4220,8 +4220,8 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
    <tile gid="33"/>
    <tile gid="33"/>
    <tile gid="33"/>
@@ -4256,8 +4256,6 @@
    <tile gid="1"/>
    <tile gid="33"/>
    <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -4285,6 +4283,8 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -4321,8 +4321,8 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="72"/>
@@ -5308,7 +5308,7 @@
    <tile gid="6"/>
    <tile gid="8"/>
    <tile gid="46"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="46"/>
@@ -5373,7 +5373,7 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="46"/>
+   <tile gid="1"/>
    <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
@@ -5579,7 +5579,7 @@
    <tile gid="1"/>
    <tile gid="72"/>
    <tile gid="72"/>
-   <tile gid="72"/>
+   <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="33"/>
    <tile gid="33"/>
@@ -6538,7 +6538,7 @@
    <tile gid="1"/>
    <tile gid="72"/>
    <tile gid="72"/>
-   <tile gid="72"/>
+   <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="33"/>
    <tile gid="33"/>
@@ -6723,7 +6723,7 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="46"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
@@ -6979,7 +6979,7 @@
    <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="46"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="12"/>
    <tile gid="46"/>
@@ -7043,7 +7043,7 @@
    <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="46"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="46"/>
@@ -7056,6 +7056,277 @@
    <tile gid="33"/>
    <tile gid="33"/>
    <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="18"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="18"/>
+   <tile gid="18"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="18"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="12"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="12"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="18"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="12"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="1"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="1"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
+   <tile gid="46"/>
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="46"/>
@@ -7073,277 +7344,6 @@
    <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="18"/>
-   <tile gid="18"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="18"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="12"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="12"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="18"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="12"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="33"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="18"/>
-   <tile gid="1"/>
-   <tile gid="1"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
-   <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
@@ -7912,7 +7912,7 @@
    <tile gid="1"/>
    <tile gid="1"/>
    <tile gid="1"/>
-   <tile gid="1"/>
+   <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
    <tile gid="46"/>
@@ -16409,277 +16409,325 @@
    <tile gid="33"/>
   </data>
  </layer>
- <objectgroup name="Signposts 0" width="64" height="64" visible="0">
+ <objectgroup name="Signposts 0">
   <properties>
    <property name="continent" value="0"/>
   </properties>
-  <object type="Signpost" gid="17" x="2784" y="1584">
+  <object id="1" type="Signpost" gid="17" x="2784" y="1584" width="48" height="34">
    <properties>
-    <property name="Text1" value=""/>
+    <property name="Text1" value="Kleptor's Shore"/>
     <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="288" y="720">
+  <object id="2" type="Signpost" gid="17" x="288" y="720" width="48" height="34">
    <properties>
-    <property name="1" value=""/>
-    <property name="2" value=""/>
+    <property name="Text1" value="Heart Island"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="960" y="2088">
+  <object id="3" type="Signpost" gid="17" x="960" y="2088" width="48" height="34">
    <properties>
     <property name="Text1" value="Explore further to claim"/>
     <property name="Text2" value="the riches of the land!"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="864" y="1872"/>
-  <object type="Signpost" gid="17" x="144" y="1728">
+  <object id="5" type="Signpost" gid="17" x="144" y="1728" width="48" height="34">
    <properties>
-    <property name="1" value=""/>
-    <property name="2" value=""/>
+    <property name="Text1" value="Arrow Island"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1440" y="2052">
+  <object id="6" type="Signpost" gid="17" x="1440" y="2052" width="48" height="34">
    <properties>
     <property name="Text1" value="Dead End"/>
     <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1488" y="1296">
+  <object id="7" type="Signpost" gid="17" x="1488" y="1296" width="48" height="34">
    <properties>
-    <property name="Text1" value=""/>
-    <property name="Text2" value=""/>
+    <property name="Text1" value="Time flies by"/>
+    <property name="Text2" value="in the desert."/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1056" y="720">
+  <object id="8" type="Signpost" gid="17" x="1056" y="720" width="48" height="34">
    <properties>
-    <property name="Text1" value=""/>
-    <property name="Text2" value=""/>
+    <property name="Text1" value="Fisherman's Shore."/>
+    <property name="Text2" value="Great catch below!"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="624" y="180">
+  <object id="9" type="Signpost" gid="17" x="624" y="180" width="48" height="34">
    <properties>
     <property name="Text1" value="Abandoned Castle"/>
     <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1536" y="540">
+  <object id="10" type="Signpost" gid="17" x="1536" y="540" width="48" height="34">
    <properties>
-    <property name="Text1" value="II"/>
-    <property name="Text2" value="Desert"/>
+    <property name="Text1" value="Desert Oasis"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1536" y="1152">
+  <object id="11" type="Signpost" gid="17" x="1536" y="1152" width="48" height="34">
    <properties>
     <property name="Text1" value="Castle in the"/>
     <property name="Text2" value="Desert"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="2352" y="288">
+  <object id="12" type="Signpost" gid="17" x="2352" y="288" width="48" height="34">
    <properties>
-    <property name="1" value=""/>
-    <property name="2" value=""/>
+    <property name="Text1" value="Janok - West"/>
+    <property name="Text2" value="Cattleton - East"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="2688" y="828"/>
-  <object type="Signpost" gid="17" x="2112" y="612"/>
-  <object type="Signpost" gid="17" x="1200" y="252">
+  <object id="13" type="Signpost" gid="17" x="2688" y="828" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Go Away!"/>
+    <property name="Text2" value=""/>
+   </properties>
+  </object>
+  <object id="14" type="Signpost" gid="17" x="2112" y="612" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Protect the"/>
+    <property name="Text2" value="forest!"/>
+   </properties>
+  </object>
+  <object id="15" type="Signpost" gid="17" x="1200" y="252" width="48" height="34">
    <properties>
     <property name="Text1" value="Sea of"/>
     <property name="Text2" value="Sand"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="720" y="576"/>
-  <object type="Signpost" gid="17" x="1344" y="900"/>
-  <object type="Signpost" gid="17" x="1824" y="1692"/>
-  <object type="Signpost" gid="17" x="1200" y="2232">
+  <object id="16" type="Signpost" gid="17" x="720" y="576" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Snarling Midpoint."/>
+    <property name="Text2" value=""/>
+   </properties>
+  </object>
+  <object id="17" type="Signpost" gid="17" x="1344" y="900" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Dried up oasis."/>
+    <property name="Text2" value="You're late."/>
+   </properties>
+  </object>
+  <object id="18" type="Signpost" gid="17" x="1824" y="1692" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Best metalworks"/>
+    <property name="Text2" value="in Na Sing Se!"/>
+   </properties>
+  </object>
+  <object id="19" type="Signpost" gid="17" x="1200" y="2232" width="48" height="34">
    <properties>
     <property name="Text1" value="Lonely Island"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="2928" y="2232"/>
-  <object type="Signpost" gid="17" x="2352" y="1260"/>
-  <object type="Signpost" gid="17" x="1872" y="1152">
+  <object id="20" type="Signpost" gid="17" x="2928" y="2232" width="48" height="34">
    <properties>
-    <property name="замок" value=""/>
-    <property name="пустыня" value=""/>
+    <property name="Text1" value="Trigger Island"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="2352" y="1944"/>
-  <object type="Signpost" gid="17" x="2544" y="468">
+  <object id="21" type="Signpost" gid="17" x="2352" y="1260" width="48" height="34">
    <properties>
-    <property name="замок" value=""/>
-    <property name="лес" value=""/>
+    <property name="Text1" value="Elora - North"/>
+    <property name="Text2" value="Canicumar - East"/>
+   </properties>
+  </object>
+  <object id="22" type="Signpost" gid="17" x="1872" y="1152" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Canicumar - North"/>
+    <property name="Text2" value="Akropos - South"/>
+   </properties>
+  </object>
+  <object id="23" type="Signpost" gid="17" x="2352" y="1944" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Safe passage ahead!"/>
+    <property name="Text2" value=""/>
+   </properties>
+  </object>
+  <object id="24" type="Signpost" gid="17" x="2544" y="468" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Don't get greedy!"/>
+    <property name="Text2" value=""/>
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="Signposts 1" width="64" height="64" visible="0">
+ <objectgroup name="Signposts 1" visible="0">
   <properties>
    <property name="continent" value="1"/>
   </properties>
-  <object type="Signpost" gid="17" x="1200" y="1044">
+  <object id="25" type="Signpost" gid="17" x="1200" y="1044" width="48" height="34">
    <properties>
     <property name="Text1" value="Haunted Crossroads"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="144" y="2160">
+  <object id="26" type="Signpost" gid="17" x="144" y="2160" width="48" height="34">
    <properties>
     <property name="Text1" value="Haunted Crossroads"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="2160" y="1296">
+  <object id="27" type="Signpost" gid="17" x="2160" y="1296" width="48" height="34">
    <properties>
     <property name="Text1" value="Haunted Crossroads"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="1968" y="1656">
+  <object id="28" type="Signpost" gid="17" x="1968" y="1656" width="48" height="34">
    <properties>
     <property name="Text1" value="Robin's Hideout"/>
    </properties>
   </object>
-  <object type="Signpost" gid="17" x="480" y="1368">
+  <object id="29" type="Signpost" gid="17" x="480" y="1368" width="48" height="34">
    <properties>
     <property name="Text1" value="Lake Lao Qai"/>
    </properties>
   </object>
+  <object id="4" type="Signpost" gid="17" x="816" y="1836" width="48" height="34">
+   <properties>
+    <property name="Text1" value="Neverend Forest"/>
+    <property name="Text2" value=""/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup name="Signposts 2" width="64" height="64" visible="0"/>
- <objectgroup name="Signposts 3" width="64" height="64" visible="0"/>
- <objectgroup name="Locations 0" width="64" height="64">
-  <object name="Home" type="Castle" gid="6" x="720" y="1944">
+ <objectgroup name="Signposts 2" visible="0"/>
+ <objectgroup name="Signposts 3" visible="0"/>
+ <objectgroup name="Locations 0">
+  <object id="30" name="Home" type="Castle" gid="6" x="720" y="1944" width="48" height="34">
    <properties>
     <property name="Home" value="yes"/>
    </properties>
   </object>
-  <object name="Bakta" type="Castle" gid="6" x="576" y="1188"/>
-  <object name="Dread" type="Castle" gid="6" x="1296" y="432"/>
-  <object name="Canicumar" type="Castle" gid="6" x="1728" y="1008"/>
-  <object name="Elora" type="Castle" gid="6" x="2640" y="612"/>
-  <object name="Akropos" type="Castle" gid="6" x="2112" y="1872"/>
-  <object name="Dead End" type="Town" gid="11" x="2688" y="1080">
+  <object id="31" name="Bakta" type="Castle" gid="6" x="576" y="1188" width="48" height="34"/>
+  <object id="32" name="Dread" type="Castle" gid="6" x="1296" y="432" width="48" height="34"/>
+  <object id="33" name="Canicumar" type="Castle" gid="6" x="1728" y="1008" width="48" height="34"/>
+  <object id="34" name="Elora" type="Castle" gid="6" x="2640" y="612" width="48" height="34"/>
+  <object id="35" name="Akropos" type="Castle" gid="6" x="2112" y="1872" width="48" height="34"/>
+  <object id="36" name="Dead End" type="Town" gid="11" x="2688" y="1080" width="48" height="34">
    <properties>
     <property name="Castle" value="Canicumar"/>
    </properties>
   </object>
-  <object name="Gnarl" type="Town" gid="11" x="1104" y="108"/>
-  <object name="Baytown" type="Town" gid="11" x="480" y="2196">
+  <object id="37" name="Gnarl" type="Town" gid="11" x="1104" y="108" width="48" height="34"/>
+  <object id="38" name="Baytown" type="Town" gid="11" x="480" y="2196" width="48" height="34">
    <properties>
     <property name="BoatX" value="1"/>
     <property name="BoatY" value="1"/>
     <property name="Castle" value="Fall"/>
+    <property name="GateX" type="int" value="1"/>
+    <property name="GateY" type="int" value="0"/>
    </properties>
   </object>
-  <object name="Magic Alcove" type="Alcove" gid="14" x="480" y="1368">
+  <object id="39" name="Magic Alcove" type="Alcove" gid="14" x="480" y="1368" width="48" height="34">
    <properties>
     <property name="Alcove" value="yes"/>
    </properties>
   </object>
-  <object type="Nav" gid="33" x="240" y="2160"/>
-  <object name="Kitty" type="Castle" gid="6" x="288" y="432"/>
-  <object name="Janok" type="Castle" gid="6" x="2064" y="324"/>
-  <object name="Na Sing Se" type="Castle" gid="6" x="1776" y="1620"/>
-  <object name="Fall" type="Castle" gid="6" x="144" y="1800"/>
-  <object name="Eiharl" type="Town" gid="11" x="336" y="540">
+  <object id="40" type="Nav" gid="33" x="240" y="2160" width="48" height="34"/>
+  <object id="41" name="Kitty" type="Castle" gid="6" x="288" y="432" width="48" height="34"/>
+  <object id="42" name="Janok" type="Castle" gid="6" x="2064" y="324" width="48" height="34"/>
+  <object id="43" name="Na Sing Se" type="Castle" gid="6" x="1776" y="1620" width="48" height="34"/>
+  <object id="44" name="Fall" type="Castle" gid="6" x="144" y="1800" width="48" height="34"/>
+  <object id="45" name="Eiharl" type="Town" gid="11" x="336" y="540" width="48" height="34">
    <properties>
     <property name="Castle" value="Kitty"/>
    </properties>
   </object>
-  <object name="Mullah" type="Town" gid="11" x="768" y="1044">
+  <object id="46" name="Mullah" type="Town" gid="11" x="768" y="1044" width="48" height="34">
    <properties>
     <property name="Castle" value="Bakta"/>
    </properties>
   </object>
-  <object name="Cattleton" type="Town" gid="11" x="2880" y="504">
+  <object id="47" name="Cattleton" type="Town" gid="11" x="2880" y="504" width="48" height="34">
    <properties>
     <property name="Castle" value="Elora"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="1968" y="72"/>
-  <object name="Orchid" type="Town" gid="11" x="1584" y="1512">
+  <object id="48" name="Zemin" type="Town" gid="11" x="1968" y="72" width="48" height="34"/>
+  <object id="49" name="Orchid" type="Town" gid="11" x="1584" y="1512" width="48" height="34">
    <properties>
     <property name="Castle" value="Na Sing Se"/>
    </properties>
   </object>
-  <object name="Akropos" type="Town" gid="11" x="2496" y="2124"/>
+  <object id="50" name="Amigale" type="Town" gid="11" x="2496" y="2124" width="48" height="34"/>
  </objectgroup>
- <objectgroup name="Locations 1" width="64" height="64" visible="0">
-  <object name="Vern" type="Castle" gid="6" x="1296" y="972"/>
-  <object type="Town" gid="11" x="240" y="108"/>
-  <object type="Nav" gid="33" x="48" y="2232"/>
-  <object type="Town" gid="11" x="2640" y="108"/>
-  <object type="Town" gid="11" x="1392" y="1044"/>
-  <object type="Town" gid="11" x="1872" y="972"/>
-  <object type="Town" gid="11" x="2256" y="540"/>
-  <object type="Town" gid="11" x="2496" y="1224"/>
-  <object name="Laketown" type="Town" gid="11" x="432" y="1332"/>
-  <object name="Gorth" type="Castle" gid="6" x="1776" y="1620"/>
-  <object name="Rableu" type="Castle" gid="6" x="1440" y="1332"/>
-  <object name="Harren" type="Castle" gid="6" x="2016" y="684"/>
-  <object name="Timill" type="Castle" gid="6" x="2880" y="144"/>
-  <object name="Lao Qiy" type="Castle" gid="6" x="624" y="1080"/>
-  <object name="Panook" type="Castle" gid="6" x="624" y="720"/>
+ <objectgroup name="Locations 1" visible="0">
+  <object id="51" name="Vern" type="Castle" gid="6" x="1296" y="972" width="48" height="34"/>
+  <object id="52" name="Kotor" type="Town" gid="11" x="240" y="108" width="48" height="34"/>
+  <object id="53" type="Nav" gid="33" x="48" y="2232" width="48" height="34"/>
+  <object id="54" name="Junction" type="Town" gid="11" x="2640" y="108" width="48" height="34"/>
+  <object id="55" name="Hippolyte" type="Town" gid="11" x="1392" y="1044" width="48" height="34"/>
+  <object id="56" name="Inola" type="Town" gid="11" x="1872" y="972" width="48" height="34"/>
+  <object id="57" name="Fondeu" type="Town" gid="11" x="2256" y="540" width="48" height="34"/>
+  <object id="58" name="Rosewood" type="Town" gid="11" x="2496" y="1224" width="48" height="34"/>
+  <object id="59" name="Laketown" type="Town" gid="11" x="432" y="1332" width="48" height="34"/>
+  <object id="60" name="Gorth" type="Castle" gid="6" x="1776" y="1620" width="48" height="34"/>
+  <object id="61" name="Rableu" type="Castle" gid="6" x="1440" y="1332" width="48" height="34"/>
+  <object id="62" name="Harren" type="Castle" gid="6" x="2016" y="684" width="48" height="34"/>
+  <object id="63" name="Timill" type="Castle" gid="6" x="2880" y="144" width="48" height="34"/>
+  <object id="64" name="Lao Qiy" type="Castle" gid="6" x="624" y="1080" width="48" height="34"/>
+  <object id="65" name="Panook" type="Castle" gid="6" x="624" y="720" width="48" height="34"/>
  </objectgroup>
- <objectgroup name="Locations 2" width="64" height="64" visible="0">
-  <object type="Nav" gid="33" x="672" y="2124"/>
-  <object name="Witch" type="Castle" gid="6" x="2736" y="1692"/>
-  <object name="Unami" type="Castle" gid="6" x="1728" y="2052"/>
-  <object name="Outpost" type="Castle" gid="6" x="1872" y="1440"/>
-  <object name="Ion" type="Castle" gid="6" x="624" y="576"/>
-  <object name="Qi Lin" type="Castle" gid="6" x="2544" y="252"/>
-  <object name="Seneer" type="Castle" gid="6" x="2784" y="900"/>
-  <object type="Town" gid="11" x="1584" y="1188">
+ <objectgroup name="Locations 2" visible="0">
+  <object id="66" type="Nav" gid="33" x="672" y="2124" width="48" height="34"/>
+  <object id="67" name="Witch" type="Castle" gid="6" x="2736" y="1692" width="48" height="34"/>
+  <object id="68" name="Unami" type="Castle" gid="6" x="1728" y="2052" width="48" height="34"/>
+  <object id="69" name="Outpost" type="Castle" gid="6" x="1872" y="1440" width="48" height="34"/>
+  <object id="70" name="Ion" type="Castle" gid="6" x="624" y="576" width="48" height="34"/>
+  <object id="71" name="Qi Lin" type="Castle" gid="6" x="2544" y="252" width="48" height="34"/>
+  <object id="72" name="Seneer" type="Castle" gid="6" x="2784" y="900" width="48" height="34"/>
+  <object id="73" name="Plywood" type="Town" gid="11" x="1584" y="1188" width="48" height="34">
    <properties>
     <property name="Castle" value="Outpost"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="1008" y="936">
+  <object id="74" name="Quarth" type="Town" gid="11" x="1008" y="936" width="48" height="34">
    <properties>
     <property name="Castle" value="Ion"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2736" y="1944">
+  <object id="75" name="Sisterton" type="Town" gid="11" x="2736" y="1944" width="48" height="34">
    <properties>
     <property name="Castle" value="Witch"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2400" y="540">
+  <object id="76" name="Usagi" type="Town" gid="11" x="2400" y="540" width="48" height="34">
    <properties>
     <property name="Castle" value="Qi Lin"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2544" y="1224">
+  <object id="77" name="Turiel" type="Town" gid="11" x="2544" y="1224" width="48" height="34">
    <properties>
     <property name="Castle" value="Seneer"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="1632" y="1764">
+  <object id="78" name="Nestrook" type="Town" gid="11" x="1632" y="1764" width="48" height="34">
    <properties>
     <property name="Castle" value="Unami"/>
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="Locations 3" width="64" height="64" visible="0">
-  <object type="Nav" gid="33" x="2832" y="108"/>
-  <object name="Zau Fu" type="Castle" gid="6" x="1392" y="1044"/>
-  <object name="Xia Quen" type="Castle" gid="6" x="1584" y="540"/>
-  <object name="Yin Fong" type="Castle" gid="6" x="768" y="648"/>
-  <object name="Misty" type="Castle" gid="6" x="2256" y="1944"/>
-  <object type="Town" gid="11" x="1488" y="1980">
+ <objectgroup name="Locations 3" visible="0">
+  <object id="79" type="Nav" gid="33" x="2832" y="108" width="48" height="34"/>
+  <object id="80" name="Zau Fu" type="Castle" gid="6" x="1392" y="1044" width="48" height="34"/>
+  <object id="81" name="Xia Quen" type="Castle" gid="6" x="1584" y="540" width="48" height="34"/>
+  <object id="82" name="Yin Fong" type="Castle" gid="6" x="768" y="648" width="48" height="34"/>
+  <object id="83" name="Misty" type="Castle" gid="6" x="2256" y="1944" width="48" height="34"/>
+  <object id="84" name="Xian" type="Town" gid="11" x="1488" y="1980" width="48" height="34">
    <properties>
     <property name="Castle" value="Zao Fu"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2448" y="1440">
+  <object id="85" name="Veer" type="Town" gid="11" x="2448" y="1440" width="48" height="34">
    <properties>
     <property name="Castle" value="Misty"/>
    </properties>
   </object>
-  <object type="Town" gid="11" x="2112" y="396">
+  <object id="86" name="Waston" type="Town" gid="11" x="2112" y="396" width="48" height="34">
    <properties>
     <property name="Castle" value="Xia Quen"/>
    </properties>
   </object>
-  <object gid="11" x="192" y="396"/>
-  <object type="Town" gid="11" x="192" y="396">
+  <object id="87" gid="11" x="192" y="396" width="48" height="34"/>
+  <object id="88" name="Yao Jin" type="Town" gid="11" x="192" y="396" width="48" height="34">
    <properties>
     <property name="Castle" value="Yin Fong"/>
    </properties>
