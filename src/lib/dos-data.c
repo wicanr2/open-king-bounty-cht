@@ -550,7 +550,7 @@ char* DOS_read_vdescs(KBmodule *mod, int off, int endoff, int skip_lines) {
 	};
 
 	int used = 0;
-	while(*ptr && line < skip_lines + 14) {
+	while (ptr - raw < endoff && line < skip_lines + 14) {
 		int mlen = 0;
 		mlen = strlen(ptr);
 
