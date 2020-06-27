@@ -1043,6 +1043,13 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 			/* A row of replacement tiles. */
 			image_name = "tilesalt";
 			image_suffix = _EXTN;
+			if (sub_id) {
+				image_cutout = 1;
+				image_cutout_rect.x = (sub_id-1) * 3 * TILE_W;
+				image_cutout_rect.y = 0;
+				image_cutout_rect.w = TILE_W * 3;
+				image_cutout_rect.h = TILE_H;
+			}
 		}
 		break;
 		case GR_ENDING:
