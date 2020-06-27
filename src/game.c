@@ -6329,6 +6329,7 @@ void adventure_loop(KBgame *game) {
 
 	KBsound *snd_walk = KB_Resolve(SN_TUNE, TUNE_WALK);
 	KBsound *snd_bump = KB_Resolve(SN_TUNE, TUNE_BUMP);
+	KBsound *snd_teleport = KB_Resolve(SN_TUNE, TUNE_TELEPORT);
 
 	int key = 0;
 	int done = 0;
@@ -6516,6 +6517,8 @@ void adventure_loop(KBgame *game) {
 			}
 
 			if (walk) {
+				if (m == TILE_TELECAVE) KB_play(sys, snd_teleport); else
+
 				KB_play(sys, snd_walk);
 
 				redraw = 1;
@@ -6640,6 +6643,7 @@ void adventure_loop(KBgame *game) {
 #undef KEY_ACT
 	free(snd_walk);
 	free(snd_bump);
+	free(snd_teleport);
 }
 
 int run_game(KBconfig *conf) {
