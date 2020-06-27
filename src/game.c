@@ -1772,7 +1772,7 @@ void view_character(KBgame *game) {
 
 	SDL_Rect item = { 0, 0, pos.w / 6, items->h };
 
-	SDL_FillRect(sys->screen, &inventory, 0xFFFF00) ;
+	SDL_FillRect(sys->screen, &inventory, SDL_RemapColor(sys->screen, 0xFFFF00));
 
 	int x = 0, y = 0;
 	for (i = 0; i < MAX_ARTIFACTS; i++) {
