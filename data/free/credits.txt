@@ -1,6 +1,7 @@
 King's Bounty Designed By:
   Jon Van Caneghem
 
+
 openkb Programmed By:
   driedfruit
 

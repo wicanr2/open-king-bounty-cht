@@ -67,17 +67,17 @@ byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
 
 	static const char *names[] = { /* Should map to spell action indexes defined as SPELL_* in bounty.h */
 		"magic_damage", //0
-		"clone",
-		"teleport",
-		"freeze",
-		"resurrect",
-		"turn_undead",
-		"bridge",
-		"time_stop",
-		"find_villain",
-		"castle_gate",
-		"town_gate",
-		"instant_army",
+		"clone",//1
+		"teleport",//2
+		"freeze",//3
+		"resurrect",//4
+		"holy_damage",//5
+		"bridge",//6
+		"time_stop",//7
+		"find_villain",//8
+		"castle_gate",//9
+		"town_gate",//10
+		"instant_army",//11
 		"raise_control"//12
 	};
 	int num_names = 13;
@@ -98,7 +98,7 @@ byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
 			}
 		}
 		if (!found) {
-			KB_errlog("Failed to parse %s spell type", flag);
+			KB_errlog("Failed to parse `%s` spell type\n", flag);
 		}
 	}
 	if (freesrc) {

@@ -1201,7 +1201,7 @@ void draw_map(KBgame *game, int tick) {
 	pos.w = tile->w;
 	pos.h = tile->h;
 
-	SDL_FillRect( screen , &local.map, 0xFF0000);
+	SDL_FillRect(screen , &local.map, 0xFF0000);
 
 	for (j = 0; j < perim_h; j++)
 	for (i = 0; i < perim_w; i++) {
@@ -2726,27 +2726,14 @@ void visit_town(KBgame *game) {
 						KB_BottomBox("\n\n\nYou don't have enough gold!", "", 0);
 						msg_hold = 1;
 					} else {
-						int i, j;
-
-						redraw_menu = 1;
-
 						game->gold -= boat_cost(game);
 
 						game->boat = game->continent;
-#if 0						
-						game->boat_x = game->x - 1;
-						game->boat_y = game->y;
-	
-						if (!IS_WATER(game->map[game->boat][game->boat_y][game->boat_x]))
-							game->boat_y--;
-						if (!IS_WATER(game->map[game->boat][game->boat_y][game->boat_x]))
-							game->boat_y+=2;
-						if (!IS_WATER(game->map[game->boat][game->boat_y][game->boat_x]))
-							game->boat_x+=2;
-#else
+
 						game->boat_x = boat_coords[id][1];
 						game->boat_y = boat_coords[id][2];
-#endif
+
+						redraw_menu = 1;
 					}
 				} else {
 					if (game->mount == KBMOUNT_SAIL) 
@@ -6191,9 +6178,9 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 
 				if (combat->units[combat->side][combat->unit_id]. out_of_control) {
 					combat_log("%s are out of control!",
-					troops[
-					combat->units[combat->side][combat->unit_id] . troop_id
-					].name
+						troops[
+							combat->units[combat->side][combat->unit_id].troop_id
+						].name
 					);
 				}
 
@@ -6369,10 +6356,6 @@ void adventure_loop(KBgame *game) {
 			view_army(game);
 		}
 
-		if (key == KEY_ACT(VIEW_CONTROLS)) {
-			//view_controls(game);
-		}
-
 		if (key == KEY_ACT(FLY) && game->mount == KBMOUNT_RIDE) {
 			if (player_can_fly(game)) {
 				game->mount = KBMOUNT_FLY;
@@ -6385,7 +6368,7 @@ void adventure_loop(KBgame *game) {
 				game->mount = KBMOUNT_RIDE;
 				redraw = 1;
 			} else {
-				//Play beep
+				KB_play(sys, snd_bump);
 			}
 		}
 
@@ -6526,7 +6509,6 @@ void adventure_loop(KBgame *game) {
 				clear_fog(game);
 
 				if (m == TILE_TELECAVE && !visit_telecave(game, 1)) {
-					printf("HUH %d %d\n", cursor_x, cursor_y);
 					m = game->map[game->continent][cursor_y][cursor_x];
 					walk = 0;
 				}

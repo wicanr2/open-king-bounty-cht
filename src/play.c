@@ -1874,12 +1874,10 @@ int instant_troop(KBgame *game, byte *w_troop_id) {
 int find_villain(KBgame *game) {
 	int i;
 	for (i = 0; i < MAX_CASTLES; i++) {
-
 		if ((game->castle_owner[i] & 0x3f) == game->last_contract) {
 			game->castle_owner[i] |= KBCASTLE_KNOWN; /* Known */
 			return i;
 		}
-
 	}
 	return -1;
 }
