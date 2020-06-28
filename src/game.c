@@ -2878,6 +2878,10 @@ int visit_alcove(KBgame *game) {
 		"               Accept (y/n)?", COST_ALCOVE
 	);
 
+	/* Hack -- adjust animation speed (make it slower). */
+	int old_resolution = yes_no_interactive.spots[3-1].resolution;
+	yes_no_interactive.spots[3-1].resolution = SOFT_WAIT;
+
 	int key;
 	int redraw = 1;
 	int done = 0;
@@ -2916,6 +2920,10 @@ int visit_alcove(KBgame *game) {
 			KB_flip(sys);
 		}
 	}
+
+	/* Restore regular delay (see above) */
+	yes_no_interactive.spots[3-1].resolution = old_resolution;
+
 	return done - 1;
 }
 
