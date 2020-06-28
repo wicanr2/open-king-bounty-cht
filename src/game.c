@@ -934,7 +934,7 @@ void display_logo() {
 
 			SDL_BlitSurface(title, NULL , screen, &pos);
 
-			SDL_Flip(screen);
+			KB_flip(sys);
 
 			SDL_FreeSurface(title);
 
@@ -974,7 +974,7 @@ void display_title() {
 
 			SDL_BlitSurface( title, NULL , screen, &pos );
 
-			SDL_Flip( screen );
+			KB_flip(sys);
 
 			SDL_FreeSurface(title);
 
@@ -1588,12 +1588,12 @@ void view_minimap(KBgame *game, int force_orb) {
 				}
 				/* DOS aestetics: */
 				/**/if (redraw == 1) {
-				/**/SDL_Flip(sys->screen);
+				/**/KB_flip(sys);
 				/**/SDL_Delay(10);
 				/**/}
 			}
 
-			SDL_Flip(sys->screen);
+			KB_flip(sys);
 			redraw = 0;
 		}
 
@@ -1637,7 +1637,7 @@ void view_contract(KBgame *game) {
 		SDL_Rect hsrc = { 8 * tile->w, 0, tile->w, sidebar->h };
 		SDL_BlitSurface( sidebar, &hsrc, screen, &hdst);
 
-		SDL_Flip(sys->screen);
+		KB_flip(sys);
 		
 		KB_Pause();
 
@@ -1685,7 +1685,7 @@ void view_contract(KBgame *game) {
 				SDL_Rect hsrc = { frame * tile->w, 0, tile->w, tile->h };
 				SDL_BlitSurface( face, &hsrc, screen, &hdst);
 
-				SDL_Flip(sys->screen);
+				KB_flip(sys);
 				redraw = 0;
 			}
 		}
@@ -1809,7 +1809,7 @@ void view_character(KBgame *game) {
 		}
 	}
 
-	SDL_Flip(sys->screen);
+	KB_flip(sys);
 
 	while (KB_event(&press_any_key) != 0xFF) 
 		{	}
