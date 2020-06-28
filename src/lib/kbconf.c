@@ -202,6 +202,7 @@ int read_file_config(struct KBconfig *conf, const char *path) {
 						conf->modules[mN].bpp = 1; /* Hercules */					
 					break;
 					case 9://md
+					case 10://sega
 						conf->modules[mN].kb_family = KBFAMILY_MD;
 						conf->modules[mN].bpp = 4; /* default? */
 					break;					
@@ -480,7 +481,7 @@ int find_config(struct KBconfig *conf) {
 	KB_stdlog("Looking for config at '%s'\n", config_file);
 	if (!test_config(config_file, 0))
 	{
-		strcpy(conf->config_file, config_file);
+		KB_strcpy(conf->config_file, config_file);
 		return 0;
 	}
 
