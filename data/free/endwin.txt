@@ -1,0 +1,21 @@
+Good job, soldier!
+You have tamed the
+beast and captured
+the villains. The
+order is restored
+accross the land.
+
+History will reme-
+mber the name of
+%s, the
+%s-who-
+saved us all.
+
+You keep all the
+castles and your
+commission is
+trippled.
+
+
+Final Score:
+%d
