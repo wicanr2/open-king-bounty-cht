@@ -1,6 +1,6 @@
 import sys
 import xml.etree.ElementTree as ET
-import numpy as np
+# import numpy as np
 import re
 import struct
 
@@ -14,7 +14,20 @@ outdir = sys.argv[2]
 tree = ET.parse(tmxfile)
 root = tree.getroot()
 
-map = np.zeros([4, 64, 64], int)
+def empty_int_array(c, h, w):
+	# yeah, we just need an `int map[4][64][64] = {0};` thingy
+	continents = []
+	for _ in range(c):
+		rows = []
+		for _ in range(h):
+			cols = []
+			for _ in range(w):
+				cols.append(0)
+			rows.append(cols)
+		continents.append(rows)
+	return continents
+
+map = empty_int_array(4, 64, 64) # np.zeros([4, 64, 64], int)
 
 continent_names = [ "C0", "C1", "C2", "C3" ]
 
@@ -120,8 +133,8 @@ for objgroup in root.findall("objectgroup"):
 		x = 0
 		y = 0
 		if type == "Town" or type == "Castle" or type == "Signpost" or type == "Nav" or type == "Alcove":
-			x = int(object.get("x")) / 48
-			y = int(object.get("y")) / 36 - 1
+			x = int(object.get("x")) // 48
+			y = int(object.get("y")) // 36 - 1
 			if (x >= 64 or x < 0 or y >= 64 or y < 0):
 				print("%s object out of bounds, skipping" % type)
 				continue
