@@ -1540,7 +1540,14 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id) {
 		KB_debuglog(0, "? FREE IMG FILE: %s\n", realname);
 
 #ifdef HAVE_LIBSDL_IMAGE
-		SDL_Surface *surf = IMG_Load(realname);
+		SDL_Surface *surf = NULL;
+		if (!strcasecmp(image_suffix, ".bmp")) {
+			/* HACK -- even if we have SDL_Image lib, it's better to load bmps via SDL_LoadBMP */
+			/* At least on MacOS, it otherwise loads a 32-bit image, even when we need 1-bit */
+			surf = SDL_LoadBMP(realname);
+		} else {
+			surf = IMG_Load(realname);
+		}
 		if (surf == NULL) KB_debuglog(0, "> FAILED TO OPEN, %s\n", IMG_GetError());
 #else
 		SDL_Surface *surf = SDL_LoadBMP(realname);
