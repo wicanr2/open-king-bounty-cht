@@ -636,6 +636,12 @@ void* DOS_Resolve(KBmodule *mod, int id, int sub_id);
 void* MD_Resolve(KBmodule *mod, int id, int sub_id);
 
 void* KB_Resolve(int id, int sub_id) {
+	/* By contract, things resolved by this function MUST be freed.
+	 * But, alas, sometimes this function returns things that CAN NOT be freed,
+	 * in particular, strings obtained via KB_strlist_peek().
+	 *
+	 * TODO: remove KB_strlist_peek calls from resolvers, either rethink this contract.
+	 */
 	int i, l;
 	void *ret = NULL;
 	i = conf->module;

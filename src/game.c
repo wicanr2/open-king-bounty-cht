@@ -2499,7 +2499,7 @@ int lay_siege(KBgame *game, int castle_id) {
 	if (game->castle_owner[id] == KBCASTLE_MONSTERS) {
 		KB_iprint("Various groups of monsters\noccupy this castle.");
 	} else {
-		char *name = KB_Resolve(STR_VNAME, game->castle_owner[id] & KBCASTLE_VILLAIN);
+		char *name = STR_LoadRESOURCE(STR_VNAME, 0, game->castle_owner[id] & KBCASTLE_VILLAIN);
 		KB_iprint(name);
 		KB_iprint(" and\narmy occupy this castle.");
 		KB_iprint("\n\n\n");
@@ -3369,7 +3369,7 @@ void draw_victory(KBgame *game, word spoils, int villain_id, int captured) {
 	"Spoils of War: %d gold", spoils);
 
 	if (villain_id != -1) {
-		char *name = KB_Resolve(STR_VNAME, (byte)villain_id);
+		char *name = STR_LoadRESOURCE(STRL_VNAMES, 0, (byte)villain_id);
 		KB_iprintf(
 		" and the\n"
 		"capture of %s\n"
