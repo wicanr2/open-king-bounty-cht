@@ -31,3 +31,17 @@ mkinstalldirs
 install-sh
 ltmain.sh
 .DS_Store
+
+# --- open-king-bounty-cht 中文化專案 ---
+# 版權素材:原版遊戲資料與官方手冊,絕不入庫
+original_kb/
+*.CC
+KB.EXE
+KB!.COM
+# build 產物 / 字型 atlas (由 build-font.sh 產生)
+build/
+AppDir/
+release/
+data/fonts/*.bin
+*.AppImage
+*.dmg
