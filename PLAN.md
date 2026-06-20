@@ -99,9 +99,9 @@
 | **P2 CJK 渲染 ✅** | `cjkfont.h/c` atlas + draw-list;**`inprint()`** 加 UTF-8 解碼 (主文字路徑);`env-sdl` 合成層 640×400 疊 24×24 漢字 + 黑外框;`build-font.sh` 烤 Noto CJK TC | ✅ 中文已在遊戲內渲染 (`docs/baseline/cjk-credits.png`) | 見 §4.9 (cache 座標待 P5 全面驗證) |
 | **P3 資料翻譯** | 翻 `data/free/*.ini` + `*.txt`;譯名對照官方手冊;troop 引用一致性處理 | 全資料中文化 | troop 名引用需一致 |
 | **P4 原始碼字串** | 翻 `game.c`/`ui.c`/`bounty.c` 寫死英文;UI 標籤對齊新字寬 | 全 UI 中文化 | 標籤對齊欄寬 |
-| **P5 驗證** | headless 確定性回歸 + 正常玩家路徑可玩性 (rule:debug hook 會遮真 bug) | 可破關驗證 | soft-lock |
-| **P6 打包** | Win (mingw) / AppImage / macOS (CI) / Android (SDL2 NDK + 觸控) | 4 平台安裝檔 | Android 觸控 UI |
-| **P7 文件** | 玩家向 README (雜誌風) + 工程文件 + 繁中攻略 | repo 文件 | |
+| **P5 驗證 ✅** | headless 確定性回歸 + 正常玩家路徑可玩性 (rule:debug hook 會遮真 bug) | 可破關驗證 | soft-lock |
+| **P6 打包 ✅** | Win (mingw) / AppImage / macOS (CI) / Android (SDL2 NDK + 觸控) | 4 平台安裝檔 | Android 觸控 UI |
+| **P7 文件 ✅** | 玩家向 README (雜誌風) + 工程文件 + 繁中攻略 | repo 文件 | |
 
 ---
 
