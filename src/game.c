@@ -18,7 +18,7 @@
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
 // For the meantime, use SDL directly, it if gets unwieldy, abstract it away 
-#include <SDL.h>
+#include "sdlcompat.h"
 
 #include "bounty.h"
 #include "play.h"
@@ -6717,7 +6717,7 @@ int run_game(KBconfig *conf) {
 		KB_strcat(buffer, " the ");  
 		KB_strcat(buffer, classes[game->class][game->rank].title);
 		KB_strcat(buffer, " - openkb " PACKAGE_VERSION);
-		SDL_WM_SetCaption(buffer, buffer);
+		KB_setcaption(buffer);
 
 		/* And log it into stdout */
 		KB_stdlog("%s the %s (%d days left)\n", game->name, classes[game->class][game->rank].title, game->days_left);

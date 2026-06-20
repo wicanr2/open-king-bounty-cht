@@ -20,7 +20,7 @@
 #ifndef _OPENKB_UI_H
 #define _OPENKB_UI_H
 
-#include <SDL.h>
+#include "sdlcompat.h"
 #include "lib/kbstd.h" 
  
 #define MAX_HOTSPOTS	64

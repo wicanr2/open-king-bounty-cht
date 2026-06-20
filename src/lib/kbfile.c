@@ -320,19 +320,19 @@ int KB_fcloseBUF(KB_File *stream)
 
 #ifdef HAVE_LIBSDL
 #include <SDL.h>
-/* SDL_RWops interface */
-int KBRW_seek( SDL_RWops *ctx, int offset, int whence ) {
-	int r = KB_fseek( (KB_File*)ctx->hidden.unknown.data1, offset, whence );
+/* SDL_RWops interface (SDL 2 簽名:Sint64 / size_t) */
+Sint64 KBRW_seek( SDL_RWops *ctx, Sint64 offset, int whence ) {
+	int r = KB_fseek( (KB_File*)ctx->hidden.unknown.data1, (int)offset, whence );
 	if (!r) return KB_ftell( (KB_File*)ctx->hidden.unknown.data1 ) ;
 	return -1;
 }
 
-int KBRW_read( SDL_RWops *ctx, void *ptr, int size, int maxnum) {
+size_t KBRW_read( SDL_RWops *ctx, void *ptr, size_t size, size_t maxnum) {
 	return KB_fread( ptr, size, maxnum, (KB_File*)ctx->hidden.unknown.data1 );
 }
 
-int KBRW_write( SDL_RWops *ctx, const void *ptr, int size, int num) {
-	return -1;
+size_t KBRW_write( SDL_RWops *ctx, const void *ptr, size_t size, size_t num) {
+	return 0;
 }
 
 int KBRW_close( SDL_RWops *ctx) {

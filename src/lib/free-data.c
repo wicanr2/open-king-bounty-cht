@@ -24,7 +24,7 @@
 #include "kbauto.h"	/* KB_fopen_with */
 #include "kbsound.h"/* KBsound */
 
-#include <SDL.h>  	/* SDL data types */
+#include "../sdlcompat.h"  	/* SDL data types */
 #ifdef HAVE_LIBSDL_IMAGE
 #include <SDL_image.h>	/* PNG support */
 #else

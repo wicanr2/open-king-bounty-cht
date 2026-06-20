@@ -95,7 +95,7 @@
 | 階段 | 內容 | 產出 | 風險 |
 |---|---|---|---|
 | **P0 環境 ✅** | Docker build 環境 (SDL1.2 + autotools);free 模組跑出英文原版 | ✅ `docker/` 腳本 + `docs/baseline/` 截圖 | 已解 (見 §4.7) |
-| **P1 SDL2** | `env-sdl.c` 移植 SDL1.2→SDL2 (`SDL_SetVideoMode`→`CreateWindow/Renderer/Texture`,`SDL_Flip`→`RenderPresent`);建三層 texture (paletted→ARGB→composite) | 4 平台統一基礎 | 隔離在單檔,風險可控 |
+| **P1 SDL2 ✅** | `env-sdl.c` 移植 SDL1.2→SDL2 + compat shim;邏輯 320×200 + renderer 縮放 | ✅ 編譯通過、渲染像素正確 (`docs/baseline/sdl2/`) | 已解 (見 §4.8) |
 | **P2 CJK 渲染** | 複製 1oom `cjkfont.h/c`;`KB_print` 加 UTF-8 解碼 + draw-list;`KB_flip` 接 composite + drawlist_flip;前進寬度 glyph/2 逐字累加;`build-font.sh` 烤 Noto Sans CJK TC → `cjk24.bin` | 能畫出中文的引擎 | 字寬對齊欄位、glyph cache 容量 |
 | **P3 資料翻譯** | 翻 `data/free/*.ini` + `*.txt`;譯名對照官方手冊;troop 引用一致性處理 | 全資料中文化 | troop 名引用需一致 |
 | **P4 原始碼字串** | 翻 `game.c`/`ui.c`/`bounty.c` 寫死英文;UI 標籤對齊新字寬 | 全 UI 中文化 | 標籤對齊欄寬 |
@@ -121,6 +121,16 @@
 - **模組選單一律互動** (`select_module` 連單模組也要按 Enter,game.c:805)。headless 截圖用 xdotool 送 Return 推進。
 - 內部視窗 `filter=normal2x` → 640×400。已截到片頭 (Royal Reward)、製作名單、角色選擇,美術 + 8×8 字型渲染正常。
 - 一鍵重現:`docker build -t openkb-build -f docker/Dockerfile .` → `docker run ... openkb-build sh docker/build.sh`。
+
+### 4.8 P1 實作紀錄 (已驗證)
+
+- **SDL2 環境**:`docker/Dockerfile.sdl2` (libsdl2-dev / SDL2_image / SDL2_net)。`configure.ac` 改 sdl2-config + SDL2 系列;`Makefile.in` 改 -lSDL2_net。
+- **compat shim** `src/sdlcompat.h` 收斂散落的 SDL1.2 名稱:`SDL_keysym`→`SDL_Keysym`、`SDL_SetColors`→`SDL_SetPaletteColors`、`SDL_SetPalette`/`SDL_LOGPAL`、`SDLK_LSUPER`→`SDLK_LGUI`、`SDL_SWSURFACE`/`SDL_SRCCOLORKEY` 等旗標。各檔 `#include <SDL.h>` 改指 shim。
+- **env-sdl.c 視訊核心重寫**:`SDL_SetVideoMode`→`CreateWindow`+`CreateRenderer`+串流 `Texture`;`SDL_Flip`→`UpdateTexture`+`RenderCopy`+`RenderPresent`;`WM_SetCaption/SetIcon`→`SetWindowTitle/Icon` (+ `KB_setcaption()`)。
+- **邏輯畫布固定 320×200,zoom=1**:`conf->filter` 轉成 render scale quality 後歸零,讓資源層的軟體預放大全失效,改由 renderer `RenderSetLogicalSize` 等比縮放 (對齊 1oom 模型,P2 合成層的前置)。
+- **kbd_state 改 scancode 索引** (`ui.c`):避免 SDL2 特殊鍵 keysym `0x40000000|scancode` 巨值溢位 `kbd_state[512]` —— 本 codebase SDL2 化的頭號雷。
+- **kbfile.c 自訂 SDL_RWops** 簽名改 SDL2 (`Sint64`/`size_t`);**combat.c** 兩處 `SDL_Flip(screen)`→`KB_flip(sys)`。
+- 驗證:headless 跑出製作名單畫面,色彩/文字/縮放正確,與 SDL1.2 baseline 一致。
 6. **1oom 踩雷 (照搬模式時一併避開)**:① 邏輯座標 vs 視覺座標別混 (前進寬度用 glyph/2,別用 24px);② 滑鼠 hit-test 座標要從合成層反演回邏輯座標;③ 非整數縮放會出現像素不均 → 優先乾淨 2× (640×400);④ glyph cache 滿會 silent drop,需監控/擴容;⑤ paletted→ARGB 轉色用 SDL2 `LockTexture` 而非手寫迴圈。
 
 ---

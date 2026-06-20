@@ -65,7 +65,7 @@
 #include "lib/kbconf.h"
 #include "lib/kbstd.h"
 
-#include "SDL.h"
+#include "sdlcompat.h"
 #include "SDL_net.h" 
 
 struct KBconfig KBconf;
@@ -641,7 +641,7 @@ inprint(screen, (youare_ready ? "You are READY" : "You are not ready! Press F1!"
 			dest.y += dest.h;
 		}
 
-		SDL_Flip(screen);		
+		KB_flip(sys);		
 
 		SDL_Delay(10);
 
@@ -1058,7 +1058,7 @@ int run_match(KBcombat *war) {
 			}
 		}
 
-		SDL_Flip(screen);
+		KB_flip(sys);
 
 		SDL_Delay(10);	
 	}

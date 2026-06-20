@@ -13,6 +13,15 @@
 - **KB_print** — 引擎核心文字渲染函式 (`src/env-sdl.c`)。CJK 改動的主要落點。
 - **CJK 渲染路徑** — 為漢字新增的 UTF-8 解碼 + TTF glyph 渲染流程。
 
+## 官方譯名 (摘自手冊 OCR,完整見 `docs/translation/glossary-draft.md`)
+
+高信心 (官方手冊已列,可直接採用):
+- **御封戰將** — King's Bounty (遊戲標題)。
+- 職業:**武士** (Knight)、**遊俠** (Paladin)、**女巫師** (Sorceress)、**蠻俠** (Barbarian)。
+- 14 法術、25 兵種、8 工藝品譯名已配出 (手冊以「中文(English)」並列,信心高);細節見草表。
+
+待確認 (手冊未逐一給譯名,需另定或暫留英文):17 名 Boss、26 城鎮、26 城堡、大陸名 (Flandria…)、職業專有人名 (Sir Crimsaun…)。
+
 ## 待釐清 (Flagged ambiguities)
 
 - 「系統中文字型」= 向量字型渲染 (TTF) vs 使用者機器已安裝字型 → 傾向前者 + 綁定 Noto Sans CJK TC,待確認。

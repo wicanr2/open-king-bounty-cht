@@ -315,7 +315,7 @@ extern char* DOS_location_names[];
 
 #ifdef HAVE_LIBSDL
 /* SDL flavor. */
-#include <SDL.h>
+#include "../sdlcompat.h"
 #include "kbdir.h" // for KB_DIR
 #include "kbconf.h" // for KBresolve_cb
 

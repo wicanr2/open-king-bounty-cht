@@ -12,7 +12,9 @@ git config --global url."https://github.com/".insteadOf "git://github.com/" 2>/d
 if [ ! -f inprint.c ]; then
   rm -rf SDL_inprint
   git clone --depth 1 https://github.com/driedfruit/SDL_inprint.git >/dev/null 2>&1
-  sed 's/inline_font\.h/..\/src\/font.h/' SDL_inprint/inprint.c > inprint.c
+  # 注入 SDL1.2→SDL2 shim,並把字型來源改指 openkb 的 font.h
+  printf '#include "../src/sdlcompat.h"\n' > inprint.c
+  sed 's/inline_font\.h/..\/src\/font.h/' SDL_inprint/inprint.c >> inprint.c
 fi
 
 # 2. SDL_SavePNG (截圖) — upstream 來源仍可用,包 HAVE_LIBPNG

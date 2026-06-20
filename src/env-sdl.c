@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <SDL.h>
+#include "sdlcompat.h"
 
 #include "lib/kbconf.h"
 #include "lib/kbres.h"
@@ -41,11 +41,27 @@ void KBenv_audio_callback(void *userdata, Uint8 *stream, int len);
 KBconfig *conf = NULL;
 
 /*
+ * SDL2 視訊管線 (file-static,如同上方的 conf)。
+ * 邏輯畫布固定 320x200;視窗放大與縮放交給 renderer (對齊 1oom CJK 模型)。
+ */
+#define KB_LOGICAL_W 320
+#define KB_LOGICAL_H 200
+static SDL_Window   *g_window   = NULL;
+static SDL_Renderer *g_renderer = NULL;
+static SDL_Texture  *g_texture  = NULL;
+
+/* 供 game.c 改視窗標題 (取代 SDL_WM_SetCaption) */
+void KB_setcaption(const char *title) {
+	if (g_window) SDL_SetWindowTitle(g_window, title);
+}
+
+/*
  * Start/Stop the "environment"
  */
 KBenv *KB_startENV(KBconfig *conf) {
 
-	Uint32 width, height, flags, iflags;
+	Uint32 iflags, winflags;
+	int win_w, win_h;
 
 	SDL_AudioSpec desired;
 
@@ -71,36 +87,60 @@ KBenv *KB_startENV(KBconfig *conf) {
 		return NULL;
 	}
 
-	width = 320;
-	height = 200;
-	flags = SDL_SWSURFACE;
+	/* 邏輯畫布永遠 320x200,zoom=1:所有繪圖在原生解析度進行,
+	 * 放大由 SDL2 renderer 處理 (取代舊的軟體 filter/scale2x 預放大路徑)。
+	 * 把 conf->filter 轉成縮放品質提示後歸零,讓資源層的 (filter?2:1) 一律得 1。 */
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, conf->filter == 1 ? "linear" : "nearest");
+	conf->filter = 0;
 
 	nsys->pan = 0;
 	nsys->zoom = 1;
 
-	if (conf->filter) {
-		width = 640;
-		height = 400;
-		nsys->zoom = 2;
-	}
+	/* 預設視窗為邏輯畫布的 2x (640x400);renderer 的 logical size 負責等比縮放 */
+	win_w = KB_LOGICAL_W * 2;
+	win_h = KB_LOGICAL_H * 2;
+	winflags = SDL_WINDOW_RESIZABLE;
+	if (conf->fullscreen) winflags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
-	if (conf->fullscreen) {
-		flags |= SDL_FULLSCREEN;
-		if (height == 400) {
-			nsys->pan = 40;
-			height = 480;
-		}
-	}
-
-	nsys->screen = SDL_SetVideoMode( width, height, 32, flags );
-
-	if (nsys->screen == NULL) {
-		KB_errlog("Couldn't create output screen: %s\n", SDL_GetError());
+	g_window = SDL_CreateWindow("openkb " PACKAGE_VERSION,
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		win_w, win_h, winflags);
+	if (g_window == NULL) {
+		KB_errlog("Couldn't create window: %s\n", SDL_GetError());
 		free(nsys);
 		return NULL;
 	}
 
-	SDL_WM_SetCaption("openkb " PACKAGE_VERSION, "openkb " PACKAGE_VERSION);
+	g_renderer = SDL_CreateRenderer(g_window, -1,
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (g_renderer == NULL) /* 退回軟體 renderer */
+		g_renderer = SDL_CreateRenderer(g_window, -1, SDL_RENDERER_SOFTWARE);
+	if (g_renderer == NULL) {
+		KB_errlog("Couldn't create renderer: %s\n", SDL_GetError());
+		free(nsys);
+		return NULL;
+	}
+
+	/* 等比縮放 + 黑邊 letterbox (取代舊的 fullscreen pan hack) */
+	SDL_RenderSetLogicalSize(g_renderer, KB_LOGICAL_W, KB_LOGICAL_H);
+
+	/* 串流 texture:每 frame 由 nsys->screen (軟體 surface) 上傳 */
+	g_texture = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING, KB_LOGICAL_W, KB_LOGICAL_H);
+	if (g_texture == NULL) {
+		KB_errlog("Couldn't create texture: %s\n", SDL_GetError());
+		free(nsys);
+		return NULL;
+	}
+
+	/* 遊戲全程繪製目標:32-bit ARGB8888 軟體 surface,與 texture 同格式 */
+	nsys->screen = SDL_CreateRGBSurface(0, KB_LOGICAL_W, KB_LOGICAL_H, 32,
+		0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+	if (nsys->screen == NULL) {
+		KB_errlog("Couldn't create screen surface: %s\n", SDL_GetError());
+		free(nsys);
+		return NULL;
+	}
 
 	/* Set window icon */
 	iconfile = KB_fastpath(conf->install_dir, "/", "icon_32x32"
@@ -119,7 +159,7 @@ KBenv *KB_startENV(KBconfig *conf) {
 	if (!nsys->icon) {
 		KB_errlog("Couldn't open icon file: %s\n", iconfile);
 	} else {
-		SDL_WM_SetIcon(nsys->icon, NULL);
+		SDL_SetWindowIcon(g_window, nsys->icon);
 	}
 	free(iconfile);
 
@@ -176,13 +216,22 @@ void KB_stopENV(KBenv *env) {
 
 	SDL_FreeCachedSurfaces();
 
+	if (env->screen) SDL_FreeSurface(env->screen);
+	if (g_texture)  { SDL_DestroyTexture(g_texture);   g_texture = NULL; }
+	if (g_renderer) { SDL_DestroyRenderer(g_renderer); g_renderer = NULL; }
+	if (g_window)   { SDL_DestroyWindow(g_window);     g_window = NULL; }
+
 	free(env);
 
 	SDL_Quit();
 }
 
+/* 把軟體 surface 上傳 texture 並呈現到視窗 (取代 SDL1.2 SDL_Flip) */
 void KB_flip(KBenv *env) {
-	SDL_Flip(env->screen);
+	SDL_UpdateTexture(g_texture, NULL, env->screen->pixels, env->screen->pitch);
+	SDL_RenderClear(g_renderer);
+	SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
+	SDL_RenderPresent(g_renderer);
 }
 
 
@@ -439,7 +488,7 @@ SDL_Surface *SDL_LoadRESOURCE(int id, int sub_id, int flip) {
 			KB_stdlog("Warning: A %d-bpp image\n", surf->format->BitsPerPixel);
 		}
 
-		if (surf->flags & SDL_SRCCOLORKEY) { /* Use same colorkey */
+		if (SDL_HasColorKey(surf)) { /* Use same colorkey */
 			SDL_SetColorKey(bigsurf, SDL_SRCCOLORKEY, 0xFF);
 		}
 

@@ -1,0 +1,14 @@
+# openkb 中文化:SDL2 build / 執行環境 (P1 之後)
+FROM debian:bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
+      build-essential autoconf automake pkg-config git ca-certificates wget curl \
+      libsdl2-dev libsdl2-image-dev libsdl2-net-dev libpng-dev \
+      xvfb imagemagick xdotool \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git config --global url."https://github.com/".insteadOf "git://github.com/"
+
+WORKDIR /src

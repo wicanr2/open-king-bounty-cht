@@ -23,7 +23,7 @@ GAME_RES_OBJECTS=
 GAME_WIN_VERSION=
 MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw32)
 ifneq ("$(MSYS_TEST)","")
-	CFLAGS+=-I/mingw/include/SDL -DUSE_WINAPI
+	CFLAGS+=-I/mingw/include/SDL2 -DUSE_WINAPI
 	GAME_RESOURCES+=dist/win/openkb.rc
 	GAME_RES_OBJECTS+=dist/win/openkb.rc.o
 	GAME_WIN_VERSION=$(shell echo @VERSION@ | tr . ,),0
@@ -88,7 +88,7 @@ $(GAME_BINARY): $(CONFIG_HEADER) $(GAME_OBJECTS) $(LIB_BINARY) $(VEND_OBJECTS)
 	$(CC) $(GAME_OBJECTS) $(VEND_OBJECTS) $(LIB_BINARY) $(LDFLAGS) -o $@
 
 $(GAME2_BINARY): $(CONFIG_HEADER) $(GAME2_OBJECTS) $(LIB_BINARY) $(VEND_OBJECTS)
-	$(CC) $(GAME2_OBJECTS) $(VEND_OBJECTS) $(LIB_BINARY) $(LDFLAGS) -lSDL_net -o $@
+	$(CC) $(GAME2_OBJECTS) $(VEND_OBJECTS) $(LIB_BINARY) $(LDFLAGS) -lSDL2_net -o $@
 
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@

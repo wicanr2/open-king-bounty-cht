@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include "../sdlcompat.h"
 
 #include "kbfile.h"
 #include "kbres.h"

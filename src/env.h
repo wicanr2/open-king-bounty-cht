@@ -20,7 +20,7 @@
 #ifndef _OPENKB_ENV
 #define _OPENKB_ENV
 
-#include <SDL.h>
+#include "sdlcompat.h"
 
 #include "lib/kbsys.h"
 #include "lib/kbconf.h"
@@ -88,6 +88,7 @@ extern KBenv *KB_startENV(KBconfig *conf);
 extern void KB_stopENV(KBenv *env);
 
 extern void KB_flip(KBenv *env);
+extern void KB_setcaption(const char *title);
 
 extern void KB_play(KBenv *env, KBsound *snd);
 

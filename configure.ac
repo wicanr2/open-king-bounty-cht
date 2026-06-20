@@ -13,24 +13,21 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_PROG_CC
 AC_PROG_INSTALL
 
-# Searches for *-config
-AC_PATH_PROG(SDL_CONFIG, sdl-config)
+# Searches for *-config (SDL 2)
+AC_PATH_PROG(SDL_CONFIG, sdl2-config)
 #AC_PATH_PROG(PKG_CONFIG, pkg-config)
 
+# Pull SDL2 cflags/libs up-front so subsequent link tests can see SDL2.
+AS_IF([test -n "$SDL_CONFIG"], [
+	LIBS="$LIBS `$SDL_CONFIG --libs`"
+	CFLAGS="$CFLAGS `$SDL_CONFIG --cflags`"
+	AC_DEFINE([HAVE_LIBSDL], [1], [Define to 1 if you have the SDL2 library])
+], [AC_MSG_ERROR([cannot find `sdl2-config' tool, SDL2 is a mandatory dependancy])])
+
 # Checks for libraries.
-AC_CHECK_LIB([SDL], [SDL_Init], [
-
-	if test -n "$SDL_CONFIG"; then
-		LIBS="$LIBS `$SDL_CONFIG --libs`"
-		CFLAGS="$CFLAGS `$SDL_CONFIG --cflags`"
-		AC_DEFINE([HAVE_LIBSDL], [1], [Define to 1 if you have the `SDL' library (-lSDL)])
-	else
-		AC_MSG_ERROR(cannot find `sdl-config' tool)
-	fi
-
-	], [AC_MSG_ERROR([cannot find `SDL' library, a mandatory dependancy])])
-AC_CHECK_LIB([SDL_image], [IMG_Load], [ ])
-AC_CHECK_LIB([SDL_net], [SDLNet_Init])
+AC_CHECK_LIB([SDL2], [SDL_Init], [ ], [AC_MSG_ERROR([cannot find `SDL2' library, a mandatory dependancy])])
+AC_CHECK_LIB([SDL2_image], [IMG_Load], [ ])
+AC_CHECK_LIB([SDL2_net], [SDLNet_Init])
 AC_CHECK_LIB([png], [png_create_write_struct], [ ])
 
 # Optional libraries.
@@ -39,7 +36,7 @@ AC_ARG_WITH([sdl_image], AS_HELP_STRING([--without-sdl_image], [Build without SD
 
 # Enables/Disables features based on CHECK_LIB tests.
 AS_IF([test "$ac_cv_lib_png_png_create_write_struct" = yes], [HAVE_LIBPNG=1], [HAVE_LIBPNG=0])
-AS_IF([test "$ac_cv_lib_SDL_image_IMG_Load" = yes], [HAVE_LIBSDL_IMAGE=1], [HAVE_LIBSDL_IMAGE=0])
+AS_IF([test "$ac_cv_lib_SDL2_image_IMG_Load" = yes], [HAVE_LIBSDL_IMAGE=1], [HAVE_LIBSDL_IMAGE=0])
 
 # Enables/Disables features based on ARG_WITH variables.
 AS_IF([test "$with_png" != no], [], [HAVE_LIBPNG=0])
@@ -56,7 +53,7 @@ AS_IF([test "$HAVE_LIBPNG" = 1], [
 ])
 AS_IF([test "$HAVE_LIBSDL_IMAGE" = 1], [
 	AC_DEFINE(HAVE_LIBSDL_IMAGE, [], "SDL_image is present")
-	LIBS="$LIBS -lSDL_image"
+	LIBS="$LIBS -lSDL2_image"
 ])
 
 # Checks for header files.

@@ -18,7 +18,7 @@
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL.h>
+#include "sdlcompat.h"
 #include "lib/kbstd.h" 
 #include "lib/kbres.h"
 #include "env.h"
@@ -285,8 +285,10 @@ int KB_event(KBgamestate *state) {
 		if (sp->passed >= sp->resolution) {
 			sp->passed -= sp->passed;
 
-			/* For "timed keys", also ensure the key is being pressed */
-			if (sp->flag & KFLAG_TIMEKEY && !kbd_state[sp->hot_key]) continue;
+			/* For "timed keys", also ensure the key is being pressed.
+			 * kbd_state 以 scancode (0..511) 為索引,避免 SDL2 特殊鍵 keysym
+			 * (0x40000000|scancode) 巨值溢位 kbd_state[512]。 */
+			if (sp->flag & KFLAG_TIMEKEY && !kbd_state[SDL_GetScancodeFromKey(sp->hot_key)]) continue;
 
 			eve = i + 1; /* !!! */
 			if (sp->flag & KFLAG_RETKEY) eve = sp->hot_key;
@@ -332,12 +334,12 @@ int KB_event(KBgamestate *state) {
 
 		if (event.type == SDL_KEYUP) {
 			SDL_keysym *kbd = &event.key.keysym;
-			kbd_state[kbd->sym] = 0;
+			kbd_state[kbd->scancode] = 0;
 		}
 
 		if (event.type == SDL_KEYDOWN) {
 			SDL_keysym *kbd = &event.key.keysym;
-			kbd_state[kbd->sym] = 1;
+			kbd_state[kbd->scancode] = 1;
 			for (i = 0; i < state->max_spots; i++) {
 				KBhotspot *sp = &state->spots[i];
 				if ((sp->flag & KFLAG_ANYKEY) || 
