@@ -52,11 +52,16 @@ key Return 1.5; shot named
 key Return 1.5; shot difficulty
 key Return 2.5; shot game-start
 shot world-map
-key Return 1;   shot turn1
+# 移動探索 (走向北方建築),嘗試觸發進城/戰鬥
+key Up 0.6; key Up 0.6; key Up 0.6; shot move-up
+key Up 0.6; key Up 0.6; shot move-up2
+key Left 0.6; key Right 0.6; shot move-side
+# 各種選單/互動鍵
 key c 1;        shot key-c
-key Escape 1;   shot after-esc
-key v 1;        shot army-view
-key Escape 1;   shot after-esc2
+key Escape 0.6; key v 1;        shot army-view
+key Escape 0.6; key m 1;        shot view-army-menu
+key Escape 0.6; key Return 1;   shot interact
+key Escape 0.6; shot after-esc
 
 kill $GPID $XVFB 2>/dev/null
 wait 2>/dev/null
