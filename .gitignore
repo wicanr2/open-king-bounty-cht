@@ -60,3 +60,4 @@ vendor/hfs.h
 vendor/rsrc.h
 vendor/*.tar.gz
 vendor/*.tgz
+data/cjk24.bin

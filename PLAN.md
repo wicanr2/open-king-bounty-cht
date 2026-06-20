@@ -96,7 +96,7 @@
 |---|---|---|---|
 | **P0 環境 ✅** | Docker build 環境 (SDL1.2 + autotools);free 模組跑出英文原版 | ✅ `docker/` 腳本 + `docs/baseline/` 截圖 | 已解 (見 §4.7) |
 | **P1 SDL2 ✅** | `env-sdl.c` 移植 SDL1.2→SDL2 + compat shim;邏輯 320×200 + renderer 縮放 | ✅ 編譯通過、渲染像素正確 (`docs/baseline/sdl2/`) | 已解 (見 §4.8) |
-| **P2 CJK 渲染** | 複製 1oom `cjkfont.h/c`;`KB_print` 加 UTF-8 解碼 + draw-list;`KB_flip` 接 composite + drawlist_flip;前進寬度 glyph/2 逐字累加;`build-font.sh` 烤 Noto Sans CJK TC → `cjk24.bin` | 能畫出中文的引擎 | 字寬對齊欄位、glyph cache 容量 |
+| **P2 CJK 渲染 ✅** | `cjkfont.h/c` atlas + draw-list;**`inprint()`** 加 UTF-8 解碼 (主文字路徑);`env-sdl` 合成層 640×400 疊 24×24 漢字 + 黑外框;`build-font.sh` 烤 Noto CJK TC | ✅ 中文已在遊戲內渲染 (`docs/baseline/cjk-credits.png`) | 見 §4.9 (cache 座標待 P5 全面驗證) |
 | **P3 資料翻譯** | 翻 `data/free/*.ini` + `*.txt`;譯名對照官方手冊;troop 引用一致性處理 | 全資料中文化 | troop 名引用需一致 |
 | **P4 原始碼字串** | 翻 `game.c`/`ui.c`/`bounty.c` 寫死英文;UI 標籤對齊新字寬 | 全 UI 中文化 | 標籤對齊欄寬 |
 | **P5 驗證** | headless 確定性回歸 + 正常玩家路徑可玩性 (rule:debug hook 會遮真 bug) | 可破關驗證 | soft-lock |
@@ -131,6 +131,14 @@
 - **kbd_state 改 scancode 索引** (`ui.c`):避免 SDL2 特殊鍵 keysym `0x40000000|scancode` 巨值溢位 `kbd_state[512]` —— 本 codebase SDL2 化的頭號雷。
 - **kbfile.c 自訂 SDL_RWops** 簽名改 SDL2 (`Sint64`/`size_t`);**combat.c** 兩處 `SDL_Flip(screen)`→`KB_flip(sys)`。
 - 驗證:headless 跑出製作名單畫面,色彩/文字/縮放正確,與 SDL1.2 baseline 一致。
+
+### 4.9 P2 實作紀錄 (已驗證)
+
+- **真正的文字路徑是 `inprint()`** (原 vendor/SDL_inprint),非 `KB_print`。openkb UI 文字 188+ 處走 `KB_iprintf`→`inprint()`。已把 inprint 收為 `src/inprint.c` (openkb 自有) 並加 CJK:遇 atlas 內 3-byte UTF-8 → 記進 draw-list、佔 2 格寬;`incolor()` 擷取前景色供上色。
+- **合成層** (`env-sdl.c`):`KB_flip` 先 `cjk_drawlist_flip` (pending→front,讓「畫一次就等待」的選單當次就顯示),有 CJK 時渲染到 640×400 composite (底圖 2× nearest + 24×24 glyph + 8 方位黑外框 + 亮度保底),再縮放呈現。
+- **字型**:`tools/build_cjk_font.py` + `docker/build-font.sh` 用 Noto Sans CJK TC 烤 `data/cjk24.bin` (magic OKBCJK,24×24,碼點取自 data/free 譯文 + 譯名表)。glyph texture hash cache (2048)。
+- **驗證**:`御封戰將 設計者：` 在製作名單畫面正確渲染 (白字黑框,與英文並存)。
+- **待 P5 驗證**:文字若繪到 offscreen cache 而非 `sys->screen`,draw-list 的邏輯座標可能偏移;製作名單 (KB_MessageBox) 走 screen 正常,其他畫面待 game-test 全面確認。
 6. **1oom 踩雷 (照搬模式時一併避開)**:① 邏輯座標 vs 視覺座標別混 (前進寬度用 glyph/2,別用 24px);② 滑鼠 hit-test 座標要從合成層反演回邏輯座標;③ 非整數縮放會出現像素不均 → 優先乾淨 2× (640×400);④ glyph cache 滿會 silent drop,需監控/擴容;⑤ paletted→ARGB 轉色用 SDL2 `LockTexture` 而非手寫迴圈。
 
 ---

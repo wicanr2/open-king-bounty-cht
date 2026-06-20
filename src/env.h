@@ -46,6 +46,8 @@ typedef struct KBenv {
 	
 	SDL_Rect font_size;
 
+	Uint32 text_rgb;	/* 目前前景字色 (0x00RRGGBB),供 CJK glyph 上色 */
+
 	Uint32 pan;
 	int width;
 	int height;

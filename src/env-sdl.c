@@ -25,6 +25,7 @@
 
 #include "../vendor/vendor.h"
 #include "env.h"
+#include "cjkfont.h"
 
 #ifdef HAVE_LIBSDL_IMAGE
 #include <SDL_image.h>
@@ -53,6 +54,109 @@ static SDL_Texture  *g_texture  = NULL;
 /* 供 game.c 改視窗標題 (取代 SDL_WM_SetCaption) */
 void KB_setcaption(const char *title) {
 	if (g_window) SDL_SetWindowTitle(g_window, title);
+}
+
+/* ===== CJK 渲染 (移植自 1oom;見 docs/adr/0001、rules/81) =====
+ * 邏輯畫布 320x200,合成層 2x (640x400)。CJK 不畫進 screen surface,而是經
+ * draw-list 在合成層以 atlas glyph + 黑外框疊上,確保彩色背景上可讀。 */
+#define CJK_SCALE   2
+#define CJK_CACHE_N 2048
+
+static struct {
+	SDL_Texture *composite;   /* 640x400 render target */
+	int cw, ch;
+	int gw, gh;               /* 目前 glyph cache 對應的 atlas 尺寸 */
+	struct { uint32_t cp; SDL_Texture *tex; } cache[CJK_CACHE_N];
+} cjkv = { 0 };
+
+/* 取得 (或建立並快取) 某碼點的白色 glyph texture (alpha 來自 atlas) */
+static SDL_Texture *cjk_glyph_tex(uint32_t cp) {
+	int gw = cjkfont_glyph_w(), gh = cjkfont_glyph_h();
+	unsigned h0, i;
+	if (gw <= 0 || gh <= 0) return NULL;
+	if (cjkv.gw != gw || cjkv.gh != gh) { /* atlas 尺寸變了,清快取 */
+		int k;
+		for (k = 0; k < CJK_CACHE_N; k++)
+			if (cjkv.cache[k].tex) SDL_DestroyTexture(cjkv.cache[k].tex);
+		memset(cjkv.cache, 0, sizeof(cjkv.cache));
+		cjkv.gw = gw; cjkv.gh = gh;
+	}
+	h0 = (cp * 2654435761u) & (CJK_CACHE_N - 1);
+	for (i = 0; i < CJK_CACHE_N; i++) {
+		unsigned idx = (h0 + i) & (CJK_CACHE_N - 1);
+		if (cjkv.cache[idx].tex) {
+			if (cjkv.cache[idx].cp == cp) return cjkv.cache[idx].tex;
+			continue;
+		} else {
+			const uint8_t *a = cjkfont_get(cp, NULL, NULL);
+			SDL_Texture *t;
+			Uint32 *px;
+			int p;
+			if (!a) return NULL;
+			t = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
+				SDL_TEXTUREACCESS_STATIC, gw, gh);
+			if (!t) return NULL;
+			px = malloc(gw * gh * 4);
+			if (!px) { SDL_DestroyTexture(t); return NULL; }
+			for (p = 0; p < gw * gh; p++)
+				px[p] = ((Uint32)a[p] << 24) | 0x00FFFFFFu; /* 白 + atlas alpha */
+			SDL_UpdateTexture(t, NULL, px, gw * 4);
+			free(px);
+			SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
+			cjkv.cache[idx].cp = cp;
+			cjkv.cache[idx].tex = t;
+			return t;
+		}
+	}
+	return NULL; /* cache 滿 (2048 槽,實務上夠) */
+}
+
+static int cjk_ensure_composite(void) {
+	int cw = KB_LOGICAL_W * CJK_SCALE;
+	int ch = KB_LOGICAL_H * CJK_SCALE;
+	if (cjkv.composite && (cjkv.cw != cw || cjkv.ch != ch)) {
+		SDL_DestroyTexture(cjkv.composite);
+		cjkv.composite = NULL;
+	}
+	if (!cjkv.composite) {
+		cjkv.composite = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_TARGET, cw, ch);
+		if (!cjkv.composite) return 0;
+		cjkv.cw = cw; cjkv.ch = ch;
+	}
+	return 1;
+}
+
+/* render target 須已是 composite。把 drawlist 的 CJK 畫上 (黑外框 + 字色)。 */
+static void cjk_draw_overlay(void) {
+	static const int ox[8] = { -1, 1, 0, 0, -1, 1, -1, 1 };
+	static const int oy[8] = {  0, 0,-1, 1, -1,-1,  1, 1 };
+	int n = cjk_drawlist_count();
+	int i, k;
+	for (i = 0; i < n; i++) {
+		const cjk_draw_t *d = cjk_drawlist_get(i);
+		SDL_Texture *t = cjk_glyph_tex(d->cp);
+		int sz, lum;
+		Uint8 r, g, b;
+		SDL_Rect dst;
+		if (!t) continue;
+		sz = cjkfont_glyph_h();           /* 24px composite,1:1 atlas */
+		dst.w = sz; dst.h = sz;
+		dst.x = d->x * CJK_SCALE;
+		dst.y = (d->y + d->fonth) * CJK_SCALE - sz; /* 貼齊文字行底 */
+		/* 8 方位黑外框 */
+		SDL_SetTextureColorMod(t, 0, 0, 0);
+		for (k = 0; k < 8; k++) {
+			SDL_Rect o = dst; o.x += ox[k]; o.y += oy[k];
+			SDL_RenderCopy(g_renderer, t, NULL, &o);
+		}
+		/* 字色 (太暗自動提亮,確保任何背景可讀) */
+		r = (d->rgb >> 16) & 0xFF; g = (d->rgb >> 8) & 0xFF; b = d->rgb & 0xFF;
+		lum = (r * 30 + g * 59 + b * 11) / 100;
+		if (lum < 110) { r = g = b = 235; }
+		SDL_SetTextureColorMod(t, r, g, b);
+		SDL_RenderCopy(g_renderer, t, NULL, &dst);
+	}
 }
 
 /*
@@ -201,8 +305,19 @@ KBenv *KB_startENV(KBconfig *conf) {
 	nsys->font_size.h = 8;
 	KB_setfont(nsys, get_inline_font());
 
+	nsys->text_rgb = 0xFFFFFF; /* 預設前景白 (CJK 字色) */
 
-	//TODO: default font color
+	/* 載入 CJK atlas (cjk24.bin):先試 install_dir,再試 data_dir;找不到不致命 */
+	{
+		char *cjkpath = KB_fastpath(conf->install_dir, "/", "cjk24.bin");
+		if (!cjkfont_init(cjkpath)) {
+			free(cjkpath);
+			cjkpath = KB_fastpath(conf->data_dir, "/", "cjk24.bin");
+			if (!cjkfont_init(cjkpath))
+				KB_stdlog("CJK: no cjk24.bin (英文模式);中文需先 build-font\n");
+		}
+		free(cjkpath);
+	}
 
 	return nsys;
 }
@@ -216,6 +331,15 @@ void KB_stopENV(KBenv *env) {
 
 	SDL_FreeCachedSurfaces();
 
+	cjkfont_shutdown();
+	cjk_drawlist_clear();
+	{
+		int k;
+		for (k = 0; k < CJK_CACHE_N; k++)
+			if (cjkv.cache[k].tex) { SDL_DestroyTexture(cjkv.cache[k].tex); cjkv.cache[k].tex = NULL; }
+	}
+	if (cjkv.composite) { SDL_DestroyTexture(cjkv.composite); cjkv.composite = NULL; }
+
 	if (env->screen) SDL_FreeSurface(env->screen);
 	if (g_texture)  { SDL_DestroyTexture(g_texture);   g_texture = NULL; }
 	if (g_renderer) { SDL_DestroyRenderer(g_renderer); g_renderer = NULL; }
@@ -226,11 +350,26 @@ void KB_stopENV(KBenv *env) {
 	SDL_Quit();
 }
 
-/* 把軟體 surface 上傳 texture 並呈現到視窗 (取代 SDL1.2 SDL_Flip) */
+/* 把軟體 surface 上傳 texture 並呈現到視窗 (取代 SDL1.2 SDL_Flip)。
+ * 有 CJK 時走合成層:底圖 2x + 漢字疊圖;否則直接縮放呈現。 */
 void KB_flip(KBenv *env) {
 	SDL_UpdateTexture(g_texture, NULL, env->screen->pixels, env->screen->pitch);
-	SDL_RenderClear(g_renderer);
-	SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
+
+	/* 先把本 frame 累積的 pending 換成 front,讓「畫一次就等待」的選單/對話
+	 * 在這一次 flip 就把剛加入的 CJK glyph 畫出來 (openkb 多為 redraw-then-flip)。 */
+	cjk_drawlist_flip();
+
+	if (cjk_drawlist_count() > 0 && cjk_ensure_composite()) {
+		SDL_SetRenderTarget(g_renderer, cjkv.composite);
+		SDL_RenderCopy(g_renderer, g_texture, NULL, NULL); /* 320x200 -> 640x400 nearest */
+		cjk_draw_overlay();
+		SDL_SetRenderTarget(g_renderer, NULL);
+		SDL_RenderClear(g_renderer);
+		SDL_RenderCopy(g_renderer, cjkv.composite, NULL, NULL);
+	} else {
+		SDL_RenderClear(g_renderer);
+		SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
+	}
 	SDL_RenderPresent(g_renderer);
 }
 
@@ -275,9 +414,21 @@ void KB_setcolor(KBenv *env, Uint32* colors) /* Colors must be in 0x00RRGGBB for
 		pal[i].b = (Uint8)((colors[i] & 0x000000FF));
 	}
 	SDL_SetColors(env->font, pal, 0, 4);
+
+	env->text_rgb = colors[0] & 0x00FFFFFF; /* 前景色,供 CJK glyph 上色 */
 }
 
-void KB_print(KBenv *env, const char *str) { 
+/* 解 3-byte UTF-8 (0xE0-0xEF 前導,涵蓋 U+0800..U+FFFF,含 CJK)。
+ * 回傳碼點;非 3-byte 序列回 0。 */
+static uint32_t kb_utf8_decode3(const unsigned char *s) {
+	if (s[0] < 0xE0 || s[0] > 0xEF) return 0;
+	if ((s[1] & 0xC0) != 0x80 || (s[2] & 0xC0) != 0x80) return 0;
+	return ((uint32_t)(s[0] & 0x0F) << 12)
+	     | ((uint32_t)(s[1] & 0x3F) << 6)
+	     |  (uint32_t)(s[2] & 0x3F);
+}
+
+void KB_print(KBenv *env, const char *str) {
 	SDL_Rect dest = { 0 }, letter = { 0 };
 	int i, len;
 
@@ -286,14 +437,31 @@ void KB_print(KBenv *env, const char *str) {
 
 	len = strlen(str);
 	for (i = 0; i < len; i++) {
-		int id = (char)str[i];
-		int row = id / 16;
-		int col = id - (row * 16);
+		int id = (unsigned char)str[i];
+		int row, col;
+
 		if (str[i] == '\n') {
 			env->cursor_x = 0;
 			env->cursor_y++;
 			continue;
 		}
+
+		/* CJK:3-byte UTF-8 且在 atlas 內 → 記進 draw-list (合成層畫),
+		 * 佔 2 個 ASCII 格寬;否則走原 ASCII 路徑。 */
+		if (id >= 0xE0 && id <= 0xEF && i + 2 < len) {
+			uint32_t cp = kb_utf8_decode3((const unsigned char *)&str[i]);
+			if (cp && cjkfont_has(cp)) {
+				word px, py;
+				KB_getpos(env, &px, &py);
+				cjk_drawlist_add(px, py, cp, env->text_rgb, env->font_size.h);
+				env->cursor_x += 2;
+				i += 2; /* 跳過 2 個延續位元組 (迴圈尾 i++ 吃前導) */
+				continue;
+			}
+		}
+
+		row = id / 16;
+		col = id - (row * 16);
 		letter.x = col * letter.w;
 		letter.y = row * letter.h;
 		KB_getpos(env, &dest.x, &dest.y);
