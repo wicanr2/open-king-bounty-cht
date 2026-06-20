@@ -94,7 +94,7 @@
 
 | 階段 | 內容 | 產出 | 風險 |
 |---|---|---|---|
-| **P0 環境** | Docker build 環境 (SDL + autotools);確認 free 模組能跑出英文原版 | 可重現 build;baseline 截圖 | autotools 在容器內的相依 |
+| **P0 環境 ✅** | Docker build 環境 (SDL1.2 + autotools);free 模組跑出英文原版 | ✅ `docker/` 腳本 + `docs/baseline/` 截圖 | 已解 (見 §4.7) |
 | **P1 SDL2** | `env-sdl.c` 移植 SDL1.2→SDL2 (`SDL_SetVideoMode`→`CreateWindow/Renderer/Texture`,`SDL_Flip`→`RenderPresent`);建三層 texture (paletted→ARGB→composite) | 4 平台統一基礎 | 隔離在單檔,風險可控 |
 | **P2 CJK 渲染** | 複製 1oom `cjkfont.h/c`;`KB_print` 加 UTF-8 解碼 + draw-list;`KB_flip` 接 composite + drawlist_flip;前進寬度 glyph/2 逐字累加;`build-font.sh` 烤 Noto Sans CJK TC → `cjk24.bin` | 能畫出中文的引擎 | 字寬對齊欄位、glyph cache 容量 |
 | **P3 資料翻譯** | 翻 `data/free/*.ini` + `*.txt`;譯名對照官方手冊;troop 引用一致性處理 | 全資料中文化 | troop 名引用需一致 |
@@ -112,6 +112,15 @@
 3. **debug hook 遮 bug** (rule):回歸測試另驗「無 debug 正常玩家路徑」,用 flood-fill 檢查落點/城鎮連通性。
 4. **版權分離**:`original_kb/` 的原版資料、官方手冊 PDF 一律 gitignore,不入公開 repo;公開包只給引擎 + free 自由資產 + 開源字型。
 5. **全程 Docker build**,Python 用 docker uv.venv。
+6. **1oom 踩雷** (見原 §4.6,移此後仍適用):邏輯/視覺座標分離、滑鼠 hit-test 反演、乾淨 2× 避免像素不均、glyph cache 容量、paletted→ARGB 用 LockTexture。
+
+### 4.7 P0 實作紀錄 (已驗證)
+
+- **vendor 相依** upstream `drop.sh` 的 URL 多已失效:`git://` GitHub 已停用 (改 https);scale2x sourceforge 死 (改 amadvance GitHub 鏡像);sha2 來源死但**無任何 .c 引用,可略過**。已收斂進 `docker/fetch-vendor.sh`。
+- **free 模組不能靠 autodiscover** (kbauto.c 對 free DIR 模組的標記偵測未實作)。必須用**顯式 config**:`[module] / type=free / path=<abs>/data/free/`。
+- **模組選單一律互動** (`select_module` 連單模組也要按 Enter,game.c:805)。headless 截圖用 xdotool 送 Return 推進。
+- 內部視窗 `filter=normal2x` → 640×400。已截到片頭 (Royal Reward)、製作名單、角色選擇,美術 + 8×8 字型渲染正常。
+- 一鍵重現:`docker build -t openkb-build -f docker/Dockerfile .` → `docker run ... openkb-build sh docker/build.sh`。
 6. **1oom 踩雷 (照搬模式時一併避開)**:① 邏輯座標 vs 視覺座標別混 (前進寬度用 glyph/2,別用 24px);② 滑鼠 hit-test 座標要從合成層反演回邏輯座標;③ 非整數縮放會出現像素不均 → 優先乾淨 2× (640×400);④ glyph cache 滿會 silent drop,需監控/擴容;⑤ paletted→ARGB 轉色用 SDL2 `LockTexture` 而非手寫迴圈。
 
 ---

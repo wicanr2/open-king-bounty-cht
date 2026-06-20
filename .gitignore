@@ -45,3 +45,18 @@ release/
 data/fonts/*.bin
 *.AppImage
 *.dmg
+
+# autotools 生成檔
+/Makefile
+configure~
+src/config.h
+src/config.h.in~
+# vendored 第三方 (由 docker/fetch-vendor.sh 重抓,不入庫)
+vendor/inprint.c
+vendor/savepng.c
+vendor/savepng.h
+vendor/scale2x.c
+vendor/hfs.h
+vendor/rsrc.h
+vendor/*.tar.gz
+vendor/*.tgz
