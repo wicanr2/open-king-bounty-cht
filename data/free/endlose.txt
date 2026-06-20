@@ -1,21 +1,19 @@
-%s they
-call the %s,
-you have doomed us
-all.
+%s,人稱
+%s,
+你害了我們所有
+人。
 
-The land is in
-disarray without
-it's king. All
-hope is lost.
+沒了國王,這片
+土地陷入一片
+混亂。一切希望
+都已破滅。
 
-The villains are
-unpunished and the
-beast roams free.
-The peasants are
-terrified and your
-army has abandoned
-your cause.
+惡棍逍遙法外,
+猛獸四處橫行。
+農夫們驚恐不安,
+你的大軍也棄你
+而去。
 
-All because you
-wasted your time
-so carelessly.
+這一切,都因你
+如此輕率地虛擲
+了光陰。

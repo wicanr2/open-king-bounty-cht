@@ -1,14 +1,14 @@
-       Name: Mahogany Klaw
-       Alias: Sheepstealer
-       Reward: 25,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Gigantic stature, crooked teeth
-  and a singular eye, with a nasty
-  gaze.
-Crimes: Stealing sheep from villa-
-  gers, leading Giants and Ogres
-  against King's armies, disho-
-  noring territorial treaties.
-  No farm is safe with him around.
+       姓名:紅木利爪
+       別號:盜羊賊
+       懸賞:25,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  身軀巨大,牙齒歪斜,
+  獨眼一隻,目光惡毒。
+罪行:他偷走村民的羊
+  群,率領巨人與食人
+  怪對抗國王的軍隊,
+  踐踏領土協定。有他
+  在,沒有一座農莊是
+  安全的。

@@ -1,14 +1,14 @@
-       Name: Scarecrow
-       Alias: None
-       Reward: 20,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Bones barely holding together
-  by rotting flesh, an undead
-  corpse with an evil purpose.
-Crimes: Executed on King's orders
-  this abomination has been 
-  brough back to life to serve as
-  one of the Solidus minions. Its
-  whole existance is a crime.
+       姓名:稻草人
+       別號:無
+       懸賞:20,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  腐肉勉強將骨架黏合
+  在一起,一具懷著邪
+  惡目的的不死屍骸。
+罪行:這頭依國王之命
+  處決的怪物,被重新
+  喚回人間,成為索利
+  度斯的爪牙之一。牠
+  的存在本身就是罪。

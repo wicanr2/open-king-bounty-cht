@@ -1,21 +1,18 @@
-Good job, soldier!
-You have tamed the
-beast and captured
-the villains. The
-order is restored
-accross the land.
+幹得好,戰士!
+你已馴服了那頭
+猛獸,擒下了所
+有惡棍。秩序重
+新降臨這片大地。
 
-History will reme-
-mber the name of
-%s, the
-%s-who-
-saved us all.
+青史將永遠銘記
+%s 的英名,
+那位拯救了我們
+所有人的%s。
 
-You keep all the
-castles and your
-commission is
-trippled.
+你保有所有城堡,
+你的俸祿也增加
+為三倍。
 
 
-Final Score:
+最終得分:
 %d

@@ -410,7 +410,7 @@ int KB_chat(SDL_keysym *kbd) {
 		{
 			send_data(PKT_CHAT, console.your);
 			char buffer[80];
-			snprintf(buffer, 80, "[%s] %s", "Player1", console.your);
+			snprintf(buffer, 80, "[%s] %s", "玩家一", console.your);
 			add_message(buffer);
 		}
 		console.pos = 0;
@@ -579,7 +579,7 @@ KBcombat* prepare_for_combat() {
 			SDL_BlitSurface(dwell[i], NULL, screen, &rect); 
 		}
 
-		inprint(screen, "PGUP/PGDN to change dwelling.", 200, 32);
+		inprint(screen, "PGUP/PGDN 切換據點。", 200, 32);
 
 		src.y = src.h;
 		for (i = 0; i < 5; i++) {
@@ -604,16 +604,16 @@ KBcombat* prepare_for_combat() {
 
 		incolor(0,0x4664B4); 
 		if (!in_dwelling)
-		inprint(screen, "UP/DOWN - select slot   RIGHT - choose troop    ENTER - dismiss troop", 10, 250);
+		inprint(screen, "UP/DOWN - 選擇欄位   RIGHT - 挑選兵種    ENTER - 解散部隊", 10, 250);
 		else
-		inprint(screen, "UP/DOWN - select troop   LEFT - choose slot    ENTER - accept troop", 10, 250);
-		
-inprint(screen, "T - to chat    F1 - when ready to play    ESC - quit game", 10, 260);
-		
-		incolor(0xFFFFFF,0x000000); 
+		inprint(screen, "UP/DOWN - 選擇兵種   LEFT - 挑選欄位    ENTER - 接受部隊", 10, 250);
 
-inprint(screen, (opponent_ready ? "Your opponent IS READY" : "Your opponent is not ready"), 10, 280);
-inprint(screen, (youare_ready ? "You are READY" : "You are not ready! Press F1!"), 10, 290);
+inprint(screen, "T - 聊天    F1 - 準備就緒開戰    ESC - 離開遊戲", 10, 260);
+
+		incolor(0xFFFFFF,0x000000);
+
+inprint(screen, (opponent_ready ? "對手已就緒" : "對手尚未就緒"), 10, 280);
+inprint(screen, (youare_ready ? "你已就緒" : "你尚未就緒！請按 F1！"), 10, 290);
 				
 		
 		src.y = 0;
@@ -773,17 +773,17 @@ int actually_move_unit(int whos, int id, int ox, int oy) {
 	if (base.umap[ny][nx] >= 6
 	&& base.umap[ny][nx] <= 10) {
 
-		send_data(PKT_CHAT, "ATTACK!");
-		add_message("ATTACK!");
-		
+		send_data(PKT_CHAT, "攻擊！");
+		add_message("攻擊！");
+
 		return 1;
 	} }
 	if (whos == 1) {
 	if (base.umap[ny][nx] >= 1
 	&& base.umap[ny][nx] <= 5) {
 
-		send_data(PKT_CHAT, "ATTACK!");
-		add_message("ATTACK!");
+		send_data(PKT_CHAT, "攻擊！");
+		add_message("攻擊！");
 		
 		return 1;
 	} }
@@ -1073,7 +1073,7 @@ int run_match(KBcombat *war) {
 int chat_callback(const char *data) {
 
 	char buffer[80];
-	snprintf(buffer, 80, "[%s] %s", "Player2", data);
+	snprintf(buffer, 80, "[%s] %s", "玩家二", data);
 	add_message(buffer);
 
 	return 0;
@@ -1156,7 +1156,7 @@ int wait_for_connection(int port) {
 		return -1;
 	}
 
-	KB_iprint("Waiting for a connection on port %d\n", port);
+	KB_iprint("正在連接埠 %d 等待連線\n", port);
 
 	/* Wait for a connection */ 
 	while (!done) { 
@@ -1164,7 +1164,7 @@ int wait_for_connection(int port) {
 		 { 
 			if ((remoteIP = SDLNet_TCP_GetPeerAddress(rsd)))
 			{ 
-				KB_iprint("Client connected: %x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
+				KB_iprint("用戶端已連線：%x %d\n", SDLNet_Read32(&remoteIP->host), SDLNet_Read16(&remoteIP->port));
 				done = 1;
 			}
 			else KB_errlog("SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError()); 
@@ -1185,7 +1185,7 @@ int connect_to_host(const char *remote_host, int remote_port) {
  		return -1;
  	}
 
-	KB_iprint("Connecting to %s:%d\n", remote_host, remote_port);
+	KB_iprint("正在連線至 %s:%d\n", remote_host, remote_port);
 
 	/* Open a connection with the IP provided (listen on the host's port) */ 
 	if (!(rsd = SDLNet_TCP_Open(&ip))) { 
@@ -1193,7 +1193,7 @@ int connect_to_host(const char *remote_host, int remote_port) {
  		return -1;
  	}
 
- 	KB_iprint("Connected!\n");
+ 	KB_iprint("已連線！\n");
 
 	send_data(PKT_HELLO, "Hello", PACKAGE_VERSION);
 	return 0;

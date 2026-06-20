@@ -50,7 +50,9 @@ void KB_SetAudioSpec(SDL_AudioSpec *spec)
 
 SDL_Surface* SDL_CreatePALSurface(Uint32 width, Uint32 height)
 {
-	return SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 8, 0xFF, 0xFF, 0xFF, 0x00);
+	/* SDL2:8-bit paletted surface 的 masks 必須為 0 (SDL1.2 容忍非零 mask,
+	 * SDL2 會回 NULL → 後續 GR_PURSE 等資源 NULL 而崩潰)。改用 0 masks 建 INDEX8。 */
+	return SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
 }
 
 void SDL_ClonePalette(SDL_Surface *dst, SDL_Surface *src)

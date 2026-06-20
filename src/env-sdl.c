@@ -103,6 +103,7 @@ static SDL_Texture *cjk_glyph_tex(uint32_t cp) {
 			SDL_UpdateTexture(t, NULL, px, gw * 4);
 			free(px);
 			SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND);
+			SDL_SetTextureScaleMode(t, SDL_ScaleModeLinear); /* 24→16 平滑縮小 */
 			cjkv.cache[idx].cp = cp;
 			cjkv.cache[idx].tex = t;
 			return t;
@@ -140,7 +141,9 @@ static void cjk_draw_overlay(void) {
 		Uint8 r, g, b;
 		SDL_Rect dst;
 		if (!t) continue;
-		sz = cjkfont_glyph_h();           /* 24px composite,1:1 atlas */
+		/* 依原版字高選 CJK 尺寸,使其 ≤ 行距避免密集面板垂直重疊。
+		 * openkb 字高 8 → 16px composite (= 8px 邏輯 = 一行高),24-atlas 由 SDL 平滑縮小。 */
+		sz = (d->fonth >= 10) ? 24 : (d->fonth >= 8) ? 16 : 14;
 		dst.w = sz; dst.h = sz;
 		dst.x = d->x * CJK_SCALE;
 		dst.y = (d->y + d->fonth) * CJK_SCALE - sz; /* 貼齊文字行底 */
@@ -454,7 +457,8 @@ void KB_print(KBenv *env, const char *str) {
 				word px, py;
 				KB_getpos(env, &px, &py);
 				cjk_drawlist_add(px, py, cp, env->text_rgb, env->font_size.h);
-				env->cursor_x += 2;
+				/* CJK glyph 合成層約 16px (=8px 邏輯=1 格);前進 1 格使漢字相鄰緊湊 */
+				env->cursor_x += 1;
 				i += 2; /* 跳過 2 個延續位元組 (迴圈尾 i++ 吃前導) */
 				continue;
 			}

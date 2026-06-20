@@ -99,7 +99,8 @@ void inprint(SDL_Surface *dst, const char *str, Uint32 x, Uint32 y)
 			if (cp && cjkfont_has(cp))
 			{
 				cjk_drawlist_add(d_rect.x, d_rect.y, cp, inprint_fg, (Uint8)s_rect.h);
-				d_rect.x += s_rect.w * 2;
+				/* CJK glyph 在合成層約 16px (= 8px 邏輯 = 1 格),前進 1 格使漢字相鄰緊湊 */
+				d_rect.x += s_rect.w;
 				str += 3;
 				continue;
 			}

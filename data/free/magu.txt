@@ -1,14 +1,14 @@
-       Name: Solidus the Wise
-       Alias: None
-       Reward: 40,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Has an otherworldy gaze, and a
-  beard. Wears purple robes and
-  a golden amulet.
-Crimes: Solidus practices 
-  forbidden magics and has 
-  resurrected several of the 
-  King's foes for his own 
-  nefarious purposes.
+       姓名:智者索利度斯
+       別號:無
+       懸賞:40,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  一雙超凡脫俗的眼神,
+  蓄著鬍鬚。身穿紫色
+  長袍,佩戴一只金色
+  護身符。
+罪行:索利度斯施行禁
+  忌的魔法,為了自己
+  邪惡的圖謀,復活了
+  數名國王的宿敵。

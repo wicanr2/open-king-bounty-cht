@@ -22,6 +22,7 @@ uv pip install -q pillow
 python3 tools/build_cjk_font.py \
     --font "$FONT" --index 0 --size 24 --mode gray \
     --text data/free/*.txt data/free/*.ini docs/translation/glossary-draft.md \
+           src/game.c src/bounty.c src/combat.c src/ui.c src/inprint.c \
     --out data/cjk24.bin --preview build/cjk24_preview.png
 
 echo "=== cjk24.bin 完成 ==="

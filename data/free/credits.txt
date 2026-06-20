@@ -2,10 +2,10 @@
   Jon Van Caneghem
 
 
-openkb Programmed By:
+openkb 程式開發：
   driedfruit
 
-free Graphics By:
+free 美術設計：
   missandei, Santiago Iborra
 
      GNU GPL3+ CC-BY-SA

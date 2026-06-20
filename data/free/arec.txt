@@ -1,14 +1,14 @@
-       Name: Uwar Drakaris
-       Alias: The Beast
-       Reward: 50,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Lizard scales, dragonbreath,
-  sharp claws and deadly teeth.
-  Hates burgulars.
-Crimes: Directly responsible for
-  the curse that is spreading over
-  the land. Personal nemesis of
-  the King. Rumored to hoard map
-  pieces for several artifacts.
+       姓名:烏瓦·龍焰
+       別號:猛獸
+       懸賞:50,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  蜥蜴般的鱗片,口噴
+  龍焰,利爪尖牙致命。
+  痛恨竊賊。
+罪行:這片土地上蔓延
+  的詛咒,正是由牠直
+  接造成。乃國王的死
+  敵。傳聞牠囤積了數
+  件神器的地圖碎片。

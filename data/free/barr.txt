@@ -1,14 +1,14 @@
-       Name: Sebastian Black
-       Alias: The Monk
-       Reward: 14,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Haircut of a cleric, despite
-  his proclaimed hate for all
-  things holy.
-Crimes: Maurice is wanted for
-  pillaging the sacred shrines,
-  where he obtained forbidden
-  scrolls, items of power
-  as well as a piece of a map.
+       姓名:黑修士塞巴斯汀
+       別號:修士
+       懸賞:14,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  一頭僧侶般的髮型,
+  儘管他公然憎恨一切
+  神聖之物。
+罪行:他因洗劫神聖殿
+  堂而遭通緝,並在那
+  裡取得了禁忌的卷
+  軸、強大的法器,以
+  及一塊地圖碎片。

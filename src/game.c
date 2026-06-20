@@ -496,22 +496,22 @@ KBgame *create_game(int pclass) {
 
 			KB_icolor(colors);
 			KB_iloc(menu.x + fs->w, menu.y + fs->h);	
-			KB_iprintf(" %-9s Name: ", classes[pclass][0].title);
+			KB_iprintf(" %-9s 姓名：", classes[pclass][0].title);
 
 			if (has_name) KB_iprint(name);
 
 			KB_iloc(menu.x + fs->w, menu.y + fs->h * 3);
-			KB_iprint ("   Difficulty   Days  Score\n");
+			KB_iprint ("   難度         天數  倍率\n");
 			KB_iprint ("\n");
-			KB_iprintf("   Easy         %3d    x.5 \n", days_per_difficulty[0]);
-			KB_iprintf("   Normal       %3d     x1 \n", days_per_difficulty[1]);
-			KB_iprintf("   Hard         %3d     x2 \n", days_per_difficulty[2]);
-			KB_iprintf("   Impossible?  %3d     x4 \n", days_per_difficulty[3]);
+			KB_iprintf("   簡單         %3d    x.5 \n", days_per_difficulty[0]);
+			KB_iprintf("   普通         %3d     x1 \n", days_per_difficulty[1]);
+			KB_iprintf("   困難         %3d     x2 \n", days_per_difficulty[2]);
+			KB_iprintf("   不可能？     %3d     x4 \n", days_per_difficulty[3]);
 
 			if (has_name) {
 				int i;
 				KB_iloc(menu.x + fs->w, menu.y + fs->h * 10);
-				KB_iprint("\x18\x19 to select   Ent to Accept");		
+				KB_iprint("\x18\x19 選擇   Ent 確認");
 
 				KB_iloc(menu.x + fs->w, menu.y + fs->h * 5);
 				for (i = 0; i < 4; i++) 
@@ -582,7 +582,7 @@ KBgame *load_game() {
 	KB_closedir(d);
 
 	if (num_files == 0) {
-		KB_MessageBox("This disk has no characters on it. Try creating a new\ncharacter or copy one from another disk.", 0);
+		KB_MessageBox("此磁碟上沒有任何角色。請建立新角色\n或從其他磁碟複製一個。", 0);
 		return NULL;
 	}
 
@@ -659,9 +659,9 @@ KBgame *load_game() {
 
 			KB_icolor(colors);
 			KB_iloc(menu.x + fs->w, menu.y + fs->h - fs->h/2);
-			KB_iprint(" Select game:"); 
+			KB_iprint(" 選擇遊戲：");
 			KB_iloc(menu.x + fs->w, menu.y + fs->h*2);
-			KB_iprint("   Overlord  "); 
+			KB_iprint("   霸主      ");
 			KB_iloc(menu.x + fs->w, menu.y + fs->h*4 - fs->h/2);
 			KB_iprint("             ");
 
@@ -679,7 +679,7 @@ KBgame *load_game() {
 
 			KB_icolor(local.status_colors);
 			KB_iloc(local.status.x, local.status.y);
-			KB_iprint(" 'ESC' to exit \x18\x19 Return to Select  ");
+			KB_iprint(" 'ESC' 離開 \x18\x19 Return 選擇  ");
 
 			KB_flip(sys);
 			redraw = 0;
@@ -760,7 +760,7 @@ KBgame *select_game(KBconfig *conf) {
 			if (!credits) {
 				KB_iloc(local.status.x, local.status.y);
 				KB_icolor(local.status_colors);
-				KB_iprint("Select Char A-D or L-Load saved game");
+				KB_iprint("選角 A-D 或 L-讀取存檔");
 			}
 
 			KB_flip(sys);
@@ -793,8 +793,8 @@ KBgame *select_game(KBconfig *conf) {
 	}
 
 	if (game) {
-		if (done == 1) KB_MessageBox("%s the %s,\n\nA new game is being created. Please wait while I perform godlike actions to make this game playable.",  0);
-		if (done == 2) KB_MessageBox("%s the %s,\n\nPlease wait while I prepare a suitable environment for your bountying enjoyment!",  0);
+		if (done == 1) KB_MessageBox("%s the %s,\n\n正在建立新遊戲。\n請稍候，待我施展神力\n讓這場遊戲得以開始。",  0);
+		if (done == 2) KB_MessageBox("%s the %s,\n\n請稍候，待我為你備妥\n適合的環境，盡情享受\n這趟懸賞之旅！",  0);
 	}
 
 	SDL_FreeSurface(title);
@@ -1345,7 +1345,7 @@ void draw_damage(KBcombat *war, KBunit *u) {
  * Puzzle map screen.
  *
  * DOS aesthetics:
- *  first, "Press 'ESC' to exit" is displayed.
+ *  first, "按 'ESC' 離開" is displayed.
  *  then, whole puzzle map is shown
  *  then, it gets cleared piece by piece from top left corner
  *  artifacts actually go first, then villains
@@ -1377,7 +1377,7 @@ void view_puzzle(KBgame *game) {
 	RECT_Pos(&pos, &local.map); 
 
 	/* Display this as soon as possible: */
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 	KB_flip(sys);
 
 	/* Now, load all the villain faces */
@@ -1535,7 +1535,7 @@ void view_minimap(KBgame *game, int force_orb) {
 	KB_iprintf("   % -15s", continent_names[game->continent]);
 
 	KB_iloc(border.x + fs->w, border.y + map.h + (fs->h*2) - fs->h/2);
-	KB_iprintf("X=%2d Position Y=%2d", game->x, game->y);
+	KB_iprintf("X=%2d 座標 Y=%2d", game->x, game->y);
 
 	int done = 0;
 	int redraw = 1;
@@ -1560,11 +1560,11 @@ void view_minimap(KBgame *game, int force_orb) {
 			int j;
 
 			if (!game->orb_found[game->continent] || force_orb)
-				KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+				KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 			else if (!orb)
-				KB_TopBox(MSG_CENTERED, "'ESC' to exit / 'SPC' whole map");
+				KB_TopBox(MSG_CENTERED, "'ESC' 離開 / 'SPC' 全圖");
 			else
-				KB_TopBox(MSG_CENTERED, "'ESC' to exit / 'SPC' your map");
+				KB_TopBox(MSG_CENTERED, "'ESC' 離開 / 'SPC' 你的地圖");
 
 			for (j = 0; j < LEVEL_H; j++) {
 				for (i = 0; i < LEVEL_W; i++) {
@@ -1630,7 +1630,7 @@ void view_contract(KBgame *game) {
 		SDL_Surface *sidebar = SDL_LoadRESOURCE(GR_UI, 0, 0);
 
 		KB_iloc(border.x + fs->w, border.y + fs->h);
-		KB_iprint("\n\n\n\n\n\n      You have no Contract!");
+		KB_iprint("\n\n\n\n\n\n      你目前沒有懸賞契約！");
 
 		/* And a face */
 		/* Empty Contract */
@@ -1660,8 +1660,8 @@ void view_contract(KBgame *game) {
 		/* Print description, along with known residence information */
 		KB_iloc(border.x + fs->w, border.y + fs->h);
 		KB_iprintf(text,
-			(continent == -1 ? "Unknown" : continent_names[continent]),
-			(   castle == -1 ? "Unknown" : castle_names[castle])
+			(continent == -1 ? "未知" : continent_names[continent]),
+			(   castle == -1 ? "未知" : castle_names[castle])
 		);
 
 		int done = 0;
@@ -1729,35 +1729,35 @@ void view_character(KBgame *game) {
 
 	KB_iloc(stats.x, stats.y);
 	KB_ilh(fs->h + sys->zoom);
-	KB_iprintf("%s the %s\n", game->name, classes[game->class][game->rank].title);
-	KB_iprintf("Leadership         %5d\n", game->leadership);
+	KB_iprintf("%s，%s\n", game->name, classes[game->class][game->rank].title);
+	KB_iprintf("領導力           %5d\n", game->leadership);
 	line.y = sys->cursor_y * fs->h + sys->base_y + fs->h / 8;
 	SDL_FillRect(sys->screen, &line, colors[COLOR_FRAME]);
 
 	KB_iloc(stats.x, stats.y + (fs->h + sys->zoom) * 2 + (fs->h/8));
-	KB_iprintf("Commission/Week    %5d\n", player_commission(game));
-	KB_iprintf("Gold               %5d\n", game->gold);
+	KB_iprintf("每週佣金         %5d\n", player_commission(game));
+	KB_iprintf("金幣             %5d\n", game->gold);
 	line.y = sys->cursor_y * fs->h + sys->base_y;
 	SDL_FillRect(sys->screen, &line, colors[COLOR_FRAME]);
 
 	KB_iloc(stats.x, stats.y + (fs->h + sys->zoom) * 4 + (fs->h/8));
-	KB_iprintf("Spell power        %5d\n", game->spell_power);
-	KB_iprintf("Max # of spells    %5d\n", game->max_spells);
+	KB_iprintf("法術威力         %5d\n", game->spell_power);
+	KB_iprintf("法術上限         %5d\n", game->max_spells);
 	line.y = sys->cursor_y * fs->h + sys->base_y;
 	SDL_FillRect(sys->screen, &line, colors[COLOR_FRAME]);
 
 	KB_iloc(stats.x, stats.y + (fs->h + sys->zoom) * 6 + (fs->h/8));
-	KB_iprintf("Villains caught    %5d\n", player_captured(game));
-	KB_iprintf("Artifacts found    %5d\n", player_num_artifacts(game));
+	KB_iprintf("捕獲惡棍         %5d\n", player_captured(game));
+	KB_iprintf("尋得寶物         %5d\n", player_num_artifacts(game));
 	line.y = sys->cursor_y * fs->h + sys->base_y;
 	SDL_FillRect(sys->screen, &line, colors[COLOR_FRAME]);
 
 	KB_iloc(stats.x, stats.y + (fs->h + sys->zoom) * 8 + (fs->h/8));
-	KB_iprintf("Castles garrisoned %5d\n", player_castles(game));
-	KB_iprintf("Followers killed   %5d\n", game->followers_killed);
-	KB_iprintf("Current score      %5d\n", player_score(game));
+	KB_iprintf("駐守城堡         %5d\n", player_castles(game));
+	KB_iprintf("陣亡部眾         %5d\n", game->followers_killed);
+	KB_iprintf("目前分數         %5d\n", player_score(game));
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	/* Draw artifacts (and maps) */
 	int i;
@@ -1894,18 +1894,18 @@ void view_army(KBgame *game) {
 				KB_iprintf(" SL:%2d MV:%2d\n", troops[ troop_id ].skill_level, troops[ troop_id ].move_rate);
 
 				if (army_leadership(game, troop_id) <= 0)
-					KB_iprint(" Out of Control");
+					KB_iprint(" 失控");
 				else
-					KB_iprintf(" Morale:%s\n", morale_names[ troop_morals[i] ]);
+					KB_iprintf(" 士氣:%s\n", morale_names[ troop_morals[i] ]);
 
 				KB_iloc(tbox.x + fs->w * 16, tbox.y + fs->h / 2 - fs->h / 8);
 				KB_ilh(fs->h + 4);
-				KB_iprintf("HitPts:%d\n", troops[ troop_id ].hit_points * game->player_numbers[i]);
-				KB_iprintf("Damage:%d-%d\n", troops[ troop_id ].melee_min * game->player_numbers[i], troops[ troop_id ].melee_max * game->player_numbers[i]);
-				KB_iprintf("G-Cost:%d\n", troops[ troop_id ].recruit_cost / 10 * game->player_numbers[i]);
+				KB_iprintf("生命:%d\n", troops[ troop_id ].hit_points * game->player_numbers[i]);
+				KB_iprintf("傷害:%d-%d\n", troops[ troop_id ].melee_min * game->player_numbers[i], troops[ troop_id ].melee_max * game->player_numbers[i]);
+				KB_iprintf("造價:%d\n", troops[ troop_id ].recruit_cost / 10 * game->player_numbers[i]);
 			}
 
-			KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+			KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 			KB_flip(sys);
 			redraw = 0;
@@ -1938,7 +1938,7 @@ int navigate_continent(KBgame *game) {
 
 	SDL_Rect *fs = &sys->font_size;
 
-	SDL_Rect *text = KB_BottomBox("\n Go to which continent?", "", 0);
+	SDL_Rect *text = KB_BottomBox("\n 前往哪一洲？", "", 0);
 
 	KB_iloc(text->x, text->y + fs->h / 2 + fs->h / 8);
 	//KB_ilh(fs->h + fs->h / 8);
@@ -1994,7 +1994,7 @@ void dismiss_army(KBgame *game) {
 
 	SDL_Rect *fs = &sys->font_size;
 
-	SDL_Rect *text = KB_BottomBox("Dismiss which army", "", 0);
+	SDL_Rect *text = KB_BottomBox("解散哪一支部隊", "", 0);
 
 	KB_iloc(text->x, text->y + fs->h + fs->h / 2);
 	KB_ilh(fs->h + fs->h / 8);
@@ -2036,10 +2036,10 @@ void dismiss_army(KBgame *game) {
 				KB_iloc(text->x, text->y + fs->h * 3 - fs->h / 4);
 				KB_ilh(fs->h + fs->h / 8);
 				KB_iprint(
-					"If you Dismiss your last\n"
-					"army, you will be sent back\n"
-					"to the King in disgrace.\n"
-					"Dismiss last army (y/n)?");
+					"若解散最後一支部隊，\n"
+					"你將蒙羞被遣送回\n"
+					"國王身邊。\n"
+					"確定解散最後部隊 (y/n)？");
 
 				KB_flip(sys);
 
@@ -2104,11 +2104,11 @@ void audience_with_king(KBgame *game) {
 	needed = classes[game->class][game->rank + 1].villains_needed - captured;
 
 	KB_BottomBox(NULL, 
-		"Trumpets announce your\n"
-		"arrival with regal fanfare.\n\n"
-		"King Maximus rises from his\n"
-		"throne to greet you and\n"
-		"proclaims:           (space)", MSG_PAUSE);
+		"號角以皇家樂聲\n"
+		"宣告你的到來。\n\n"
+		"馬克馬斯國王自王座\n"
+		"起身迎接你，並\n"
+		"宣示：             (空白鍵)", MSG_PAUSE);
 
 	if (needed <= 0) {
 
@@ -2117,25 +2117,25 @@ void audience_with_king(KBgame *game) {
 			promote_player(game);
 
 			sprintf(message, "\n\n"
-				"Congratulations %s,\n\n"
-				"I now promote you to\n"
-				"%s.\n",
+				"恭喜你，%s，\n\n"
+				"朕現在晉升你為\n"
+				"%s。\n",
 			game->name, classes[game->class][game->rank].title);
 		}
 		else {
 			sprintf(message, "\n\n"
-				"%s the %s,\n\n"
-				"Hurry and recover my Scepter\n"
-				"of Order or all will be\n"
-				"lost!",
+				"%s，%s，\n\n"
+				"快去尋回朕的秩序權杖，\n"
+				"否則一切都將\n"
+				"毀於一旦！",
 			game->name, classes[game->class][game->rank].title);
 		}
 	} else {
 		sprintf(message, "\n\n"
-			"My dear %s,\n\n"
-			"I can aid you better after\n"
-			"you've captured %d more\n"
-			"villains.",
+			"親愛的 %s，\n\n"
+			"待你再捕獲 %d 名惡棍\n"
+			"之後，朕便能\n"
+			"更好地助你一臂之力。",
 		game->name, needed);
 	}
 
@@ -2165,7 +2165,7 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 	SDL_Rect *text = KB_BottomFrame();
 
 	/* Status bar */
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	int done = 0;
 	int redraw = 1;
@@ -2182,7 +2182,7 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 			/** Left side **/
 			/* Header (few pixels up) */
 			KB_iloc(text->x, text->y - fs->h/4);
-			KB_iprint("Recruit Soldiers\n");
+			KB_iprint("招募士兵\n");
 
 			/* Message */
 			KB_iloc(text->x, text->y + fs->h/4);
@@ -2210,8 +2210,8 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 				KB_iprint("        \n        \n        ");
 			} else {
 				KB_iprintf("%c\n", 'A' + whom - 1);
-				KB_iprintf("Max=%d\n", max);
-				KB_iprint("How Many\n");
+				KB_iprintf("上限=%d\n", max);
+				KB_iprint("數量\n");
 				KB_iprint("        ");
 			}
 
@@ -2255,8 +2255,8 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 				result = buy_troop(game, home_troops[whom-1], number);
 
 				/* Display error if any */
-				if (result == 1) KB_BottomBox("\n\n\nYou don't have enough gold!", "", MSG_PAUSE);
-				else if (result == 2) KB_BottomBox("", "No troop slots left!", MSG_PAUSE);//verify this one
+				if (result == 1) KB_BottomBox("\n\n\n你的金幣不足！", "", MSG_PAUSE);
+				else if (result == 2) KB_BottomBox("", "沒有空的部隊欄位了！", MSG_PAUSE);//verify this one
 
 				/* Calculate new "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
 				max = army_max_troop_count(game, home_troops[whom-1]);
@@ -2285,7 +2285,7 @@ void visit_home_castle(KBgame *game) {
 	SDL_Rect *fs = &sys->font_size;
 
 	/* Status bar */
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	int random_troop = home_troops[ rand() % 5 ];
 
@@ -2316,16 +2316,16 @@ void visit_home_castle(KBgame *game) {
 
 				/* Header (few pixels up) */	
 				KB_iloc(text->x, text->y - fs->h/4);
-				KB_iprintf("Castle %s\n", castle_names[id]);
+				KB_iprintf("城堡 %s\n", castle_names[id]);
 
 				/* Menu */
 				KB_iloc(text->x, text->y );
 				KB_ilh(fs->h + fs->h/8);
 				KB_iprint("\n\n");
 				KB_imenu(&throne_room_or_barracks, 0, 25);
-				KB_iprint("A) Recruit Soldiers      \n");
+				KB_iprint("A) 招募士兵              \n");
 				KB_imenu(&throne_room_or_barracks, 1, 25);
-				KB_iprint("B) Audience with the King\n");
+				KB_iprint("B) 晉見國王\n");
 			}
 
 			if (redraw) {
@@ -2346,8 +2346,8 @@ void visit_own_castle(KBgame *game, int castle_id) {
 		MODE_REMOVE,
 	} mode = MODE_REMOVE;
 	const char *actions[] = {
-		"Garrison",
-		"Remove"
+		"駐防",
+		"撤離"
 	};
 
 	int home_troops[5];
@@ -2362,7 +2362,7 @@ void visit_own_castle(KBgame *game, int castle_id) {
 	SDL_Rect *fs = &sys->font_size;
 
 	/* Status bar */
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	int random_troop = home_troops[ rand() % 5 ];
 
@@ -2393,8 +2393,8 @@ void visit_own_castle(KBgame *game, int castle_id) {
 			}
 
 			/* Display error if any */
-			if (result == 2) KB_BottomBox(""," You cannot garrison your\n        last army!", MSG_PAUSE); /* Note: this is one pixel too low :( */
-			else if (result == 1) KB_BottomBox("", "No troop slots left!", MSG_PAUSE);//verify this one
+			if (result == 2) KB_BottomBox(""," 你不能駐防你的\n        最後一支部隊！", MSG_PAUSE); /* Note: this is one pixel too low :( */
+			else if (result == 1) KB_BottomBox("", "沒有空的部隊欄位了！", MSG_PAUSE);//verify this one
 
 			max = 0;
 			redraw_menu = 1;
@@ -2431,7 +2431,7 @@ void visit_own_castle(KBgame *game, int castle_id) {
 				/** Left side **/
 				/* Header (few pixels up) */
 				KB_iloc(text->x, text->y - fs->h/4 - fs->h/8);
-				KB_iprintf("Castle %s\n", castle_names[castle_id]);
+				KB_iprintf("城堡 %s\n", castle_names[castle_id]);
 
 				/* Menu */
 				KB_iloc(text->x, text->y - fs->h/2 + fs->h * 2);
@@ -2439,7 +2439,7 @@ void visit_own_castle(KBgame *game, int castle_id) {
 				for (i = 0; i < 5; i++) {
 					KB_imenu(&five_choices_and_space, i, 16);
 					if (troops_src[i] == 0xFF || numbers_src[i] == 0) { 
-						KB_iprintf("%c) %-10s %s\n", 'A' + i, "Empty", "n/a");
+						KB_iprintf("%c) %-10s %s\n", 'A' + i, "空", "無");
 					} else {
 						KB_iprintf("%c) %-10s %d\n", 'A' + i, troops[troops_src[i]].name, numbers_src[i]);
 						max = i + 1;
@@ -2459,7 +2459,7 @@ void visit_own_castle(KBgame *game, int castle_id) {
 				KB_iprintf("(%c-%c)", 'A', 'A' + max - 1);
 
 				KB_iprintf(" %c", twirl[twirl_pos]);
-				KB_iprint("\n\nSpace to\n");
+				KB_iprint("\n\n空白鍵\n");
 				KB_imenu(&five_choices_and_space, 5, 8);
 				five_choices_and_space.spots[5].coords.h *= 2;
 				KB_iprintf("%s", actions[1-mode]);
@@ -2491,24 +2491,24 @@ int lay_siege(KBgame *game, int castle_id) {
 	/* Header (few pixels up) */	
 	KB_iloc(text->x, text->y - fs->h/4 - fs->h/8);
 	//KB_iprint(header);
-	KB_iprintf("Castle %s\n", castle_names[id]);
+	KB_iprintf("城堡 %s\n", castle_names[id]);
 
 	/* Message */
 	KB_iloc(text->x, text->y + fs->h/4);
 	KB_iprint("\n\n");
 	if (game->castle_owner[id] == KBCASTLE_MONSTERS) {
-		KB_iprint("Various groups of monsters\noccupy this castle.");
+		KB_iprint("各路怪物群\n佔據著這座城堡。");
 	} else {
 		char *name = STR_LoadRESOURCE(STR_VNAME, 0, game->castle_owner[id] & KBCASTLE_VILLAIN);
 		KB_iprint(name);
-		KB_iprint(" and\narmy occupy this castle.");
+		KB_iprint(" 與其\n軍隊佔據著這座城堡。");
 		KB_iprint("\n\n\n");
 		free(name);
 
 		save_castle_owner_knowledge(game, id);
 	}
 	KB_iloc(text->x, text->y + fs->h * 6);
-	KB_iprint("            Lay Siege (y/n)?");	
+	KB_iprint("            是否圍攻 (y/n)？");
 	
 	//KB_BottomBox("Castle %s", "A) Recruit Soldiers\nB) Audience with the King\nC) \nD)\nE)",0);
 	KB_flip(sys);
@@ -2594,12 +2594,12 @@ void gather_information(KBgame *game, int id) {
 	/* Header (few pixels up) */	
 	KB_iloc(text->x, text->y - fs->h/4 - fs->h / 8);
 	KB_ilh(fs->h + fs->h/8);
-	KB_iprintf("Castle %s is under\n", castle_names[id]);
+	KB_iprintf("城堡 %s 目前\n", castle_names[id]);
 	if (game->castle_owner[id] == KBCASTLE_MONSTERS) {
-		KB_iprint("no one's rule.\n");
+		KB_iprint("無人統治。\n");
 	} else {
 		char *name = STR_LoadRESOURCE(STRL_VNAMES, 0, game->castle_owner[id] & KBCASTLE_VILLAIN);
-		KB_iprintf("%s's rule.\n", name);
+		KB_iprintf("由 %s 統治。\n", name);
 		free(name);
 
 		save_castle_owner_knowledge(game, id);
@@ -2637,7 +2637,7 @@ void visit_town(KBgame *game) {
 
 	int random_troop = rand() % MAX_TROOPS;
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	int done = 0;
 	int frame = 0;
@@ -2656,25 +2656,25 @@ void visit_town(KBgame *game) {
 			/* Header (few pixels up) */	
 			KB_iloc(text->x, text->y - fs->h/4 - fs->h/8);
 			//KB_iprint(header);
-			KB_iprintf("Town of %s\n", town_names[id]);
+			KB_iprintf("%s 鄉鎮\n", town_names[id]);
 			KB_iprintf("                    GP=%dK\n", game->gold / 1000);
 		
 			/* Message */
 			//KB_iloc(text->x, text->y + fs->h/4);
 			//KB_iprint("\n\n");	
 			KB_imenu(&five_choices, 0, 30);
-			KB_iprint("A) Get New Contract\n");
+			KB_iprint("A) 領取新契約\n");
 			KB_imenu(&five_choices, 1, 30);
 			if (game->boat == 0xFF)
-				KB_iprintf("B) Rent boat (%d week) \n", boat_cost(game));
+				KB_iprintf("B) 租船 (%d 週) \n", boat_cost(game));
 			else
-				KB_iprint("B) Cancel boat rental\n");
+				KB_iprint("B) 取消租船\n");
 			KB_imenu(&five_choices, 2, 30);
-			KB_iprint("C) Gather information\n");
+			KB_iprint("C) 蒐集情報\n");
 			KB_imenu(&five_choices, 3, 30);
-			KB_iprintf("D) %s spell (%d)\n", spell_names[ game->town_spell[id] ], spell_costs[ game->town_spell[id] ]);
+			KB_iprintf("D) 學習 %s (%d)\n", spell_names[ game->town_spell[id] ], spell_costs[ game->town_spell[id] ]);
 			KB_imenu(&five_choices, 4, 30);
-			KB_iprintf("E) Buy seige weapons (%d)\n", COST_SIEGE_WEAPONS);
+			KB_iprintf("E) 購買攻城武器 (%d)\n", COST_SIEGE_WEAPONS);
 		}
 
 		if (redraw) {
@@ -2714,7 +2714,7 @@ void visit_town(KBgame *game) {
 				if (villain_id == 0xFF) {
 					/* No more villains. Not sure what happens here.
 					 * TODO: check DOS version... */
-					KB_MessageBox("The land is free from villains...", MSG_PAUSE);
+					KB_MessageBox("這片土地已無惡棍作亂……", MSG_PAUSE);
 				} else {
 					/* set new contract */
 					game->last_contract = villain_id;
@@ -2732,7 +2732,7 @@ void visit_town(KBgame *game) {
 			if (key == 2) {
 				if (game->boat == 0xFF) {
 					if (game->gold <= boat_cost(game)) {
-						KB_BottomBox("\n\n\nYou don't have enough gold!", "", 0);
+						KB_BottomBox("\n\n\n你的金幣不足！", "", 0);
 						msg_hold = 1;
 					} else {
 						game->gold -= boat_cost(game);
@@ -2747,7 +2747,7 @@ void visit_town(KBgame *game) {
 				} else {
 					if (game->mount == KBMOUNT_SAIL) 
 					{
-						KB_BottomBox(NULL, "\n\nPlease vacate the boat first", 0);
+						KB_BottomBox(NULL, "\n\n請先離開船隻", 0);
 						msg_hold = 1;
 					} else {				
 						game->boat = 0xFF;
@@ -2764,10 +2764,10 @@ void visit_town(KBgame *game) {
 			if (key == 4) {
 				int known = known_spells(game);
 				if (known >= game->max_spells) {
-					KB_BottomBox(NULL, "\n\n   You have learned your\n  maximum number of spells.", 0);
+					KB_BottomBox(NULL, "\n\n   你已學會\n  上限數量的法術。", 0);
 					msg_hold = 1;
 				} else 	if (game->gold <= spell_costs[ game->town_spell[id] ]) {
-					KB_BottomBox("\n\n\nYou don't have enough gold!", "", 0);
+					KB_BottomBox("\n\n\n你的金幣不足！", "", 0);
 					msg_hold = 1;
 				} else {
 					char buf[128];
@@ -2777,7 +2777,7 @@ void visit_town(KBgame *game) {
 					game->gold -= spell_costs[ game->town_spell[id] ];
 
 					left = (game->max_spells - known - 1);
-					sprintf(buf, "\n\n\nYou can learn %d more spell%s.", left, (left == 1 ? "" : "s")); 
+					sprintf(buf, "\n\n\n你還可以再學習 %d 個法術。", left);
 					KB_BottomBox(buf, "", 0);
 					msg_hold = 1;
 				}
@@ -2786,10 +2786,10 @@ void visit_town(KBgame *game) {
 			/** Buy siege weapons **/
 			if (key == 5) {
 				if (game->siege_weapons) {
-					KB_BottomBox("\n\n\n   You have siege weapons!", "", 0);
+					KB_BottomBox("\n\n\n   你已擁有攻城武器！", "", 0);
 					msg_hold = 1;
 				} else if (game->gold <= COST_SIEGE_WEAPONS) {
-					KB_BottomBox("\n\n\nYou don't have enough gold!", "", 0);
+					KB_BottomBox("\n\n\n你的金幣不足！", "", 0);
 					msg_hold = 1;
 				} else {				
 					game->siege_weapons = 1;
@@ -2814,11 +2814,11 @@ void nogold_banner(KBgame *game, byte loc_id, byte troop_id) {
 	KB_iloc(text->x, text->y + fs->h / 8);
 	KB_ilh(fs->h + 2);
 	KB_iprintf(
-		"The sign said %d gold! Why\n"
-		"waste my valuable time when\n"
-		"you know you don't have the\n"
-		"required amount of gold?\n"
-		"Begone until you do!", COST_ALCOVE
+		"告示寫的是 %d 金幣！\n"
+		"既然你明知金幣不足，\n"
+		"又何必浪費我寶貴的\n"
+		"時間？\n"
+		"湊夠了再來！", COST_ALCOVE
 	);
 
 	int key;
@@ -2870,12 +2870,12 @@ int visit_alcove(KBgame *game) {
 	KB_iloc(text->x, text->y + fs->h / 8);
 	KB_ilh(fs->h + 2);
 	KB_iprintf(
-		"The venerable Archmage,\n"
-		"Aurange, will teach you the\n"
-		"secrets of spell casting for\n"
-		"%d gold.\n"
+		"德高望重的大法師\n"
+		"Aurange，將以 %d 金幣\n"
+		"傳授你施法的奧秘。\n"
 		"\n"
-		"               Accept (y/n)?", COST_ALCOVE
+		"\n"
+		"               接受 (y/n)？", COST_ALCOVE
 	);
 
 	/* Hack -- adjust animation speed (make it slower). */
@@ -2981,7 +2981,7 @@ int visit_dwelling(KBgame *game, byte rtype) {
 	SDL_Rect *text = KB_BottomFrame();
 
 	/* Status bar */
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	/* Calculate "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
 	max = army_max_troop_count(game, troop_id);
@@ -3012,10 +3012,10 @@ int visit_dwelling(KBgame *game, byte rtype) {
 			/* Message */
 			KB_iloc(text->x, text->y - fs->h/4);
 			KB_iprint("\n\n\n");
-			KB_iprintf("%d %s are available\n", game->dwelling_population[game->continent][id], troops[ troop_id ].name);
-			KB_iprintf("Cost=% 3d each.      GP=%dK\n", troops[ troop_id ].recruit_cost, game->gold / 1000);
-			KB_iprintf("You may recruit up to %d\n", max);
-			KB_iprint ("Recruit how many        ");
+			KB_iprintf("可招募 %d 名%s\n", game->dwelling_population[game->continent][id], troops[ troop_id ].name);
+			KB_iprintf("每名造價=% 3d      GP=%dK\n", troops[ troop_id ].recruit_cost, game->gold / 1000);
+			KB_iprintf("你最多可招募 %d 名\n", max);
+			KB_iprint ("招募數量        ");
 
 			KB_flip(sys);
 			redraw = 0;
@@ -3037,8 +3037,8 @@ int visit_dwelling(KBgame *game, byte rtype) {
 				game->dwelling_population[game->continent][id] -= number;
 
 			/* Display error if any */
-			else if (result == 1) KB_BottomBox("\n\n\nYou don't have enough gold!", "", MSG_PAUSE);
-			else if (result == 2) KB_BottomBox("", "No troop slots left!", 1);//verify this one
+			else if (result == 1) KB_BottomBox("\n\n\n你的金幣不足！", "", MSG_PAUSE);
+			else if (result == 2) KB_BottomBox("", "沒有空的部隊欄位了！", 1);//verify this one
 
 			/* Calculate new "MAX YOU CAN HANDLE" number based on leadership (and troop hp?) */
 			max = army_max_troop_count(game, troop_id);
@@ -3079,7 +3079,7 @@ void read_signpost(KBgame *game) {
 
 	KB_stdlog("Read sign post [%d] at %d, %d { %s }\n", id, game->x, game->y, sign);
 
-	KB_BottomBox("A sign reads:", sign, MSG_PAUSE);
+	KB_BottomBox("告示寫著：", sign, MSG_PAUSE);
 
 	KB_reset(NULL);
 }
@@ -3106,13 +3106,13 @@ int gold_or_leadership(KBgame *game, int gold, int leadership) {
 		if (redraw) {
 			char buf[256];
 			sprintf(buf,
-				"After scouring the area,\n"
-				"you fall upon a hidden\n"
-				"treasure cache. You may:\n"
-				"A) Take the %d gold.\n"
-				"B) Distribute the gold to\n"
-				"the peasants, increasing\n"
-				"your leadership by %d.",  gold, leadership);
+				"在搜遍這片區域之後，\n"
+				"你發現了一處隱藏的\n"
+				"寶藏。你可以：\n"
+				"A) 取走這 %d 金幣。\n"
+				"B) 把金幣分給農民，\n"
+				"使你的領導力\n"
+				"提升 %d。",  gold, leadership);
 			KB_BottomBox(buf, "", 0);
 			KB_flip(sys);
 			redraw = 0;
@@ -3137,10 +3137,10 @@ void take_chest(KBgame *game) {
 			game->continent_found[game->continent + 1] = 1;
 
 			sprintf(msg,
-				"Hidden within an ancient\n"
-				"chest, you find maps and\n"
-				"charts describing passage to\n"
-				"%s.", continent_names[game->continent + 1]);
+				"在一只古老的箱子裡，\n"
+				"你找到了描繪通往\n"
+				"%s\n"
+				"航路的地圖與海圖。", continent_names[game->continent + 1]);
 			KB_BottomBox(msg, "", MSG_PAUSE);
 
 			KB_stdlog("Found map for %s\n", continent_names[game->continent + 1]);
@@ -3151,10 +3151,10 @@ void take_chest(KBgame *game) {
 			game->orb_found[game->continent] = 1;
 
 			sprintf(msg,
-				"Peering through a magical\n"
-				"orb you are able to view the\n"
-				"entire continent. Your map\n"
-				"of this area is complete.");
+				"透過一顆魔法寶珠，\n"
+				"你得以俯瞰整片大陸。\n"
+				"你這片區域的地圖\n"
+				"已經完整。");
 			KB_BottomBox(msg, "", MSG_WAIT);
 
 			view_minimap(game, 1);
@@ -3195,13 +3195,13 @@ void take_chest(KBgame *game) {
 			game->commission += points;
 
 			sprintf(msg,
-				"After surveying the area,\n"
-				"you discover that it is\n"
-				"rich in mineral deposits.\n"
+				"勘查這片區域後，\n"
+				"你發現此地蘊藏\n"
+				"豐富的礦產。\n"
 				"\n"
-				"The King rewards you for\n"
-				"your find by increasing\n"
-				"your weekly income by %d", points);
+				"國王為了表彰你的\n"
+				"發現，將你的每週\n"
+				"收入提升了 %d", points);
 			KB_BottomBox(msg, "", MSG_PAUSE);
 
 			KB_stdlog("Weekly commission increased by %d\n", points);
@@ -3214,13 +3214,13 @@ void take_chest(KBgame *game) {
 			game->spell_power += points;
 
 			sprintf(msg,
-				"Traversing the area, you\n"
-				"stumble upon a time worn\n"
-				"cannister. Curious, you un-\n"
-				"stop the bottle, releasing\n"
-				"a powerful genie who raises\n"
-				"your Spell Power by %d and\n"
-				"vanishes.", points);
+				"穿越這片區域時，你\n"
+				"偶然發現一只歲月\n"
+				"斑駁的瓶子。出於\n"
+				"好奇你拔開瓶塞，\n"
+				"放出一名強大的精靈，\n"
+				"祂將你的法術威力\n"
+				"提升 %d 後便消失了。", points);
 			KB_BottomBox(msg, "", MSG_PAUSE);
 
 			KB_stdlog("Spell power increased by %d\n", points);
@@ -3235,13 +3235,13 @@ void take_chest(KBgame *game) {
 			game->max_spells += points;
 
 			sprintf(msg,
-				"A tribe of nomads greet you\n"
-				"and your army warmly. Their\n"
-				"shaman, in awe of your\n" 
-				"prowess, teaches you the\n" 
-				"secret of his tribe's magic.\n"
-				"Your maximum spell capacity\n"
-				"is increased by %d", points);
+				"一支流浪者部族熱情\n"
+				"地迎接你與你的軍隊。\n"
+				"他們的薩滿敬佩你的\n"
+				"武勇，傳授你部族\n"
+				"的魔法奧秘。\n"
+				"你的法術上限\n"
+				"提升了 %d", points);
 			KB_BottomBox(msg, "", MSG_PAUSE);
 
 			KB_stdlog("Max # of spells increased by %d\n", points);
@@ -3255,13 +3255,13 @@ void take_chest(KBgame *game) {
 			game->spells[spell_type] += spell_num;
 
 			sprintf(msg,
-				"You have captured a\n"
-				"mischevious imp which has\n"
-				"been terrorizing the\n"
-				"region. In exchange for\n"
-				"its release, you receive:\n"
+				"你捕獲了一隻在這\n"
+				"地區四處作亂的\n"
+				"頑皮小惡魔。為了\n"
+				"換取牠的自由，\n"
+				"你獲得：\n"
 				"\n"
-   				"   %d %s spell.", spell_num, spell_names[spell_type]); 
+   				"   %d 個 %s。", spell_num, spell_names[spell_type]);
 			KB_BottomBox(msg, "", MSG_PAUSE);
 
 			KB_stdlog("Found spell '%s' x %d\n", spell_names[spell_type], spell_num);
@@ -3270,7 +3270,7 @@ void take_chest(KBgame *game) {
 		else {
 			//Hack -- openkb-specific -- instead of empty BottomBox 
 			//(what DOS version did), pretend it's not a bug...
-			KB_BottomBox("", "The chest was empty!", MSG_PAUSE);
+			KB_BottomBox("", "這只箱子是空的！", MSG_PAUSE);
 
 			KB_errlog("Chance tables for treasure are impossible!");
 		}
@@ -3313,8 +3313,8 @@ void take_artifact(KBgame *game, byte num) {
 	draw_sidebar(game, 1);	/* Note: we use "tick 1", DOS version used "next tick" */
 
 	KB_BottomBox(text,
-		"...and a piece of the map to\n"
-		"the stolen scepter.", MSG_PADDED | MSG_PAUSE);
+		"……以及一片通往\n"
+		"失竊權杖的地圖。", MSG_PADDED | MSG_PAUSE);
 
 	/* Remove artifact tile from the map */
 	game->map[game->continent][game->y][game->x] = 0;
@@ -3346,7 +3346,7 @@ void draw_victory(KBgame *game, word spoils, int villain_id, int captured) {
 	KB_iloc(border.x + fs->w, border.y + fs->h / 2);
 	KB_ilh(fs->h + fs->h/8);
 	KB_iprintf(
-	"             Victory!");
+	"             勝利！");
 	/* NOTE: here we deviate from the DOS version.
 	 * In it, "yet another foe." is displayed after a 1em
 	 * line-break, while the previous 2 phrases have +1px line-break
@@ -3359,40 +3359,40 @@ void draw_victory(KBgame *game, word spoils, int villain_id, int captured) {
 	KB_iloc(border.x + fs->w, border.y + fs->h * 3 - fs->h / 2);
 	KB_ilh(fs->h + fs->h/8);
 	KB_iprintf(
-	"Well done %s the %s,\n"
-	"you have successfully vanquished\n"
-	"yet another foe.\n",
+	"做得好，%s，%s，\n"
+	"你又成功擊潰了\n"
+	"一個敵人。\n",
 	game->name, classes[game->class][game->rank].title, spoils);
 	KB_iloc(border.x + fs->w, border.y + fs->h * 7 - fs->h / 2);
 	KB_ilh(fs->h + fs->h/8);
 	KB_iprintf(
-	"Spoils of War: %d gold", spoils);
+	"戰利品：%d 金幣", spoils);
 
 	if (villain_id != -1) {
 		char *name = STR_LoadRESOURCE(STRL_VNAMES, 0, (byte)villain_id);
 		KB_iprintf(
-		" and the\n"
-		"capture of %s\n"
+		"，並\n"
+		"捕獲了 %s\n"
 		"\n", name);
 		KB_iloc(border.x + fs->w, border.y + fs->h * 10);
 		KB_ilh(fs->h + fs->h/8);
 		if (!captured) {
 			KB_iprint(
-			"Since you did not have the proper\n"
-			"contract, the Lord has been set\n"
-			"free.");
+			"由於你沒有相符的\n"
+			"契約，這名首領\n"
+			"已被釋放。");
 		} else {
 			KB_iprintf(
-			"For fulfilling your contract you\n"
-			"receive an additional %d gold\n"
-			"as bounty... and a piece of the\n"
-			"map to the stolen scepter.", villain_rewards[villain_id]);
+			"由於你完成了契約，\n"
+			"你額外獲得 %d 金幣\n"
+			"作為懸賞……以及一片\n"
+			"通往失竊權杖的地圖。", villain_rewards[villain_id]);
 		}
 		free(name);
 	}
 
 	KB_iloc(border.x + border.w - fs->w * 8, border.y + border.h - fs->h - fs->h / 2 + fs->h / 8);
-	KB_iprint("(space)");
+	KB_iprint("(空白鍵)");
 
 	KB_flip(sys);
 	KB_Pause();
@@ -3411,13 +3411,12 @@ void draw_defeat(KBgame *game) {
 
 	KB_ilh(9);
 	KB_BottomBox(
-		"After being disgraced on the\n"
-		"field of battle, King\n"
-		"Maximus summons you to his\n"
-		"castle. After a lesson in\n"
-		"tactics, he reluctantly re-\n"
-		"issues your commission and\n"
-		"sends you on your way.", "", MSG_HARDCODED | MSG_PAUSE);
+		"在戰場上蒙羞之後，\n"
+		"馬克馬斯國王將你\n"
+		"召回他的城堡。在一番\n"
+		"戰術訓誡之後，他\n"
+		"勉強重新授予你委任，\n"
+		"並讓你重新上路。", "", MSG_HARDCODED | MSG_PAUSE);
 
 	free(snd_defeat);
 }
@@ -3439,7 +3438,7 @@ void hit_unit(KBcombat *war, int a_side, int a_id, int t_side, int t_id) {
 	/* Attack */
 	kills = unit_hit_unit(war, a_side, a_id, t_side, t_id);
 	draw_damage(war, t);
-	combat_log("%s vs %s, %d die", troops[u->troop_id].name, troops[t->troop_id].name, kills);
+	combat_log("%s 對 %s，%d 名陣亡", troops[u->troop_id].name, troops[t->troop_id].name, kills);
 
 	if (t->retaliated == 0) {
 		t->retaliated = 1;
@@ -3448,7 +3447,7 @@ void hit_unit(KBcombat *war, int a_side, int a_id, int t_side, int t_id) {
 		kills = unit_hit_unit(war, t_side, t_id, a_side, a_id);
 		draw_combat(war);//refresh screen
 		draw_damage(war, u);
-		combat_log("%s retaliate, killing %d", troops[t->troop_id].name, kills);
+		combat_log("%s 反擊，殲滅 %d 名", troops[t->troop_id].name, kills);
 	}
 
 	u->turn_count = u->count;
@@ -3515,7 +3514,7 @@ int fly_unit(KBcombat *war, int side, int id, int nx, int ny) {
 	if (!u->flights) u->acted = 1;
 
 	draw_combat(war);
-	combat_log("%s fly", t->name);
+	combat_log("%s 飛行", t->name);
 
 	return 1;
 }
@@ -3615,7 +3614,7 @@ int accept_foe(KBgame *game, int foe_id) {
 
 	roll_creature(game->continent, &troop_id, &troop_count);
 
-	sprintf(header, "%s %s,", number_name(troop_count), troops[troop_id].name);
+	sprintf(header, "%s%s，", number_name(troop_count), troops[troop_id].name);
 
 	//KB_BottomBox(header, "with desires of greater\nglory wish to join you\n\n               Accept (y/n)?", 0);
 
@@ -3625,10 +3624,10 @@ int accept_foe(KBgame *game, int foe_id) {
 	if (!player_army_slots(game)) {
 		KB_iloc(rect->x, rect->y + fs->h * 2 + fs->h / 4);
 		KB_ilh(fs->h + fs->h/8);
-		KB_iprintf("flee in terror at the sight\nyour vast army.");
+		KB_iprintf("見到你龐大的軍隊，\n驚恐地四散逃竄。");
 
 		KB_iloc(rect->x, rect->y + fs->h * 6 - fs->h / 4);
-		KB_iprint("                     (space)\n");
+		KB_iprint("                     (空白鍵)\n");
 
 		KB_flip(sys);
 		KB_Pause();
@@ -3637,10 +3636,10 @@ int accept_foe(KBgame *game, int foe_id) {
 
 	KB_iloc(rect->x, rect->y + fs->h * 2 + fs->h / 4);
 	KB_ilh(fs->h + fs->h/8);
-	KB_iprintf("with desires of greater\nglory, wish to join you");
+	KB_iprintf("渴望更大的榮耀，\n希望加入你的麾下");
 
 	KB_iloc(rect->x, rect->y + fs->h * 6 - fs->h / 4);
-	KB_iprint("               Accept (y/n)?\n");
+	KB_iprint("               接受 (y/n)？\n");
 
 	KB_flip(sys);
 
@@ -3677,7 +3676,7 @@ int attack_foe(KBgame *game) {
 
 	}
 
-	SDL_Rect *rect = KB_BottomBox("Your scouts have sighted:", "", 0);
+	SDL_Rect *rect = KB_BottomBox("你的斥候發現了：", "", 0);
 	SDL_Rect *fs = &sys->font_size;
 
 	KB_iloc(rect->x, rect->y + fs->h * 2 - fs->h / 8);
@@ -3691,7 +3690,7 @@ int attack_foe(KBgame *game) {
 		KB_iprintf("  %s %s\n", number_name(troop_count), troops[troop_id].name);
 	}
 	KB_iloc(rect->x, rect->y + fs->h * 6 - fs->h / 4);
-	KB_iprint("               Attack (y/n)?\n");
+	KB_iprint("               攻擊 (y/n)？\n");
 
 	KB_flip(sys);
 
@@ -3730,11 +3729,11 @@ void end_of_week(KBgame *game, int num) {
 
 	KB_iloc(text->x, text->y - fs->h / 4);
 	KB_iprintf(
-		"Week #%d\n\n"
-		"Astrologers proclaim:\n"
-		"Week of the %s\n\n"
-		"All %s dwellings are\n"
-		"repopulated.         (space)", week_num, troops[creature].name, troops[creature].name);
+		"第 %d 週\n\n"
+		"占星師宣告：\n"
+		"本週為 %s 之週\n\n"
+		"所有 %s 據點\n"
+		"已重新補滿。         (空白鍵)", week_num, troops[creature].name, troops[creature].name);
 
 	KB_flip(sys);
 	key = 0;
@@ -3744,7 +3743,7 @@ void end_of_week(KBgame *game, int num) {
 	KB_BottomFrame(); /* CLS */
 
 	KB_iloc(text->x, text->y - fs->h / 4);
-	KB_iprintf("Week #%-3d             Budget\n\n", week_num);
+	KB_iprintf("第 %-3d 週            收支\n\n", week_num);
 
 	army_cost = 0;
 	for (i = 0; i < 5; i++) {
@@ -3757,15 +3756,15 @@ void end_of_week(KBgame *game, int num) {
 	}
 
 	KB_icurs(0, 2);
-	KB_iprintf("On Hand% 6d", on_hand);
+	KB_iprintf("現有% 6d", on_hand);
 	KB_icurs(0, 3);
-	KB_iprintf("Payment% 6d", game->commission);
+	KB_iprintf("佣金% 6d", game->commission);
 	KB_icurs(0, 4);
-	KB_iprintf("Boat   % 6d", player_has_boat(game) ? boat_cost(game) : 0);
+	KB_iprintf("船隻% 6d", player_has_boat(game) ? boat_cost(game) : 0);
 	KB_icurs(0, 5);
-	KB_iprintf("Army   % 6d", army_cost);
+	KB_iprintf("軍隊% 6d", army_cost);
 	KB_icurs(0, 6);
-	KB_iprintf("Balance% 6d", game->gold);
+	KB_iprintf("結餘% 6d", game->gold);
 
 	KB_flip(sys);
 	KB_Pause();
@@ -3782,11 +3781,11 @@ void no_spell_banner() {
 	/* Adjust position */
 	KB_iloc(text->x, text->y + fs->h - fs->h/2);
 	KB_iprintf(
-		"You have not been trained in\n"
-		"the art of spellcasting yet.\n"
-		"Visit the Archmage Aurange\n"
-		"in %s at %2d,%2d for\n"
-		"this ability.", continent_names[ALCOVE_CONTINENT], ALCOVE_X, ALCOVE_Y);
+		"你尚未習得\n"
+		"施法的技藝。\n"
+		"請前往 %s 的\n"
+		"%2d,%2d 拜訪大法師\n"
+		"Aurange 以習得此能力。", continent_names[ALCOVE_CONTINENT], ALCOVE_X, ALCOVE_Y);
 
 	KB_flip(sys);
 	KB_Pause();
@@ -3827,7 +3826,7 @@ int build_bridge(KBgame *game) {
 	draw_player(game, 0);
 	draw_sidebar(game, 0);
 
-	KB_TopBox(0, "Build bridge in which direction " "\x1A" "\x18" "\x19" "\x1B");
+	KB_TopBox(0, "往哪個方向造橋 " "\x1A" "\x18" "\x19" "\x1B");
 	KB_flip(sys);
 
 	int done = 0;
@@ -3870,11 +3869,11 @@ int build_bridge(KBgame *game) {
 	}
 
 	if (!built) {
-		KB_TopBox(0, "Not a suitable location for a bridge");
+		KB_TopBox(0, "這裡不適合造橋");
 		KB_flip(sys);
 		KB_Pause();
 
-		KB_TopBox(0, "What a waste of a good spell!");
+		KB_TopBox(0, "白白浪費了一個好法術！");
 		KB_flip(sys);
 		KB_Pause();
 	}
@@ -3890,15 +3889,15 @@ int instant_army(KBgame *game) {
 	if (!spawned) {
 		KB_BottomBox(
 			"\n\n\n"
-			"   There are no open slots\n"
-			"  or any of this army type!", "", MSG_PAUSE);
+			"   沒有空的欄位，\n"
+			"  也沒有此類型的部隊！", "", MSG_PAUSE);
 		return 1;
 	}
 
 	sprintf(msg,
-		"%s %s"	/* A few Sprites */
+		"%s%s"	/* A few Sprites */
 		"\n\n\n"
-		"have joined to your army.", number_name(spawned), troops[troop_id].name);
+		"已加入你的軍隊。", number_name(spawned), troops[troop_id].name);
 	KB_BottomBox(msg, "", MSG_PAUSE);
 	return 0;
 }
@@ -3909,7 +3908,7 @@ int clone_army(KBgame *game, KBcombat *war) {
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
-	KB_TopBox(MSG_CENTERED, "Select your army to Clone");
+	KB_TopBox(MSG_CENTERED, "選擇要複製的我方部隊");
 
 	x = u->x;
 	y = u->y;
@@ -3924,7 +3923,7 @@ int clone_army(KBgame *game, KBcombat *war) {
 
 		u = &war->units[war->side][unit_id];
 
-		combat_log("%d %s cloned", clones, troops[u->troop_id].name);
+		combat_log("複製出 %d 名 %s", clones, troops[u->troop_id].name);
 
 	}
 
@@ -3937,7 +3936,7 @@ int freeze_army(KBgame *game, KBcombat *war) {
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
-	KB_TopBox(MSG_CENTERED, "Select enemy army to Freeze");
+	KB_TopBox(MSG_CENTERED, "選擇要凍結的敵方部隊");
 
 	x = u->x;
 	y = u->y;
@@ -3953,13 +3952,13 @@ int freeze_army(KBgame *game, KBcombat *war) {
 		turns = freeze_troop(game, war, side, unit_id);
 
 		if (turns == -1) {
-			combat_log("The spell seems to have no effect!", 0);
+			combat_log("這個法術似乎沒有效果！", 0);
 			return 0;
 		}
 
 		u = &war->units[side][unit_id];
 
-		combat_log("%s are frozen", troops[u->troop_id].name);
+		combat_log("%s 被凍結", troops[u->troop_id].name);
 
 	}
 
@@ -3973,7 +3972,7 @@ int resurrect_army(KBgame *game, KBcombat *war) {
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
-	KB_TopBox(MSG_CENTERED, "Select army to Resurrect");
+	KB_TopBox(MSG_CENTERED, "選擇要復活的部隊");
 
 	x = u->x;
 	y = u->y;
@@ -3991,7 +3990,7 @@ int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id, by
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
-	sprintf(msg, "Select enemy army to %s", spell_names[spell_id]);
+	sprintf(msg, "選擇施放 %s 的敵方部隊", spell_names[spell_id]);
 
 	KB_TopBox(MSG_CENTERED, msg);
 
@@ -4009,7 +4008,7 @@ int teleport_army(KBgame *game, KBcombat *war) {
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
-	KB_TopBox(MSG_CENTERED, "Select army to Teleport");
+	KB_TopBox(MSG_CENTERED, "選擇要傳送的部隊");
 
 	x = u->x;
 	y = u->y;
@@ -4022,7 +4021,7 @@ int teleport_army(KBgame *game, KBcombat *war) {
 		unit_id = war->umap[y][x] - 1;
 		if (unit_id > 4) { side = 1; unit_id -= 5; }
 
-		KB_TopBox(MSG_CENTERED, "Select new location");
+		KB_TopBox(MSG_CENTERED, "選擇新位置");
 
 		ok = pick_target(war, &x, &y, 1);
 
@@ -4049,9 +4048,9 @@ int select_gate(KBgame *game, int mode) {
 	int i;
 	int print_coma = 0;
 	
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
-	text = KB_BottomBox(mode ? "Towns you have been to:" : "Castles you have been to:", "", 0);
+	text = KB_BottomBox(mode ? "你造訪過的鄉鎮：" : "你造訪過的城堡：", "", 0);
 
 	KB_iloc(text->x, text->y + fs->h * 2  );
 
@@ -4084,7 +4083,7 @@ int select_gate(KBgame *game, int mode) {
 	}
 
 	KB_iloc(text->x, text->y + fs->h * 6 - fs->h / 4 - fs->h / 8);
-	KB_iprint(mode ? "Revisit which town? " : "Revisit which castle? ");
+	KB_iprint(mode ? "重訪哪個鄉鎮？ " : "重訪哪座城堡？ ");
 
 	word gate_x, gate_y, gate_continent;
 
@@ -4182,7 +4181,7 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 
 	if (combat && combat->spells)
 	{
-		KB_TopBox(MSG_CENTERED, "Only 1 spell per round!");
+		KB_TopBox(MSG_CENTERED, "每回合只能施放 1 個法術！");
 		KB_flip(sys);
 		KB_Wait();
 		return -2;
@@ -4197,13 +4196,13 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 
 	SDL_TextRect(sys->screen, &border, colors[COLOR_FRAME], colors[COLOR_BACKGROUND], 1);
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	incolor(colors[COLOR_TEXT], colors[COLOR_BACKGROUND]);
 
 	KB_iloc(border.x + fs->w, border.y + fs->h/2);
-	KB_iprint("              Spells\n\n");
-	KB_iprint("     Combat         Adventuring  \n");
+	KB_iprint("              法術\n\n");
+	KB_iprint("     戰鬥           冒險        \n");
 
 	KB_iloc(border.x + fs->w, border.y + fs->h*5 - fs->h/2);
 
@@ -4222,7 +4221,7 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 	}
 
 	KB_iloc(border.x + fs->w, border.y + fs->h * 13 + fs->h/4);
-	KB_iprintf("Cast which %s spell (A-%c)?", (mode ? "Adventure" : "Combat"), 'A' + half - 1);
+	KB_iprintf("施放哪個%s法術 (A-%c)？", (mode ? "冒險" : "戰鬥"), 'A' + half - 1);
 
 	word twirl_x, twirl_y;
 
@@ -4254,7 +4253,7 @@ int choose_spell(KBgame *game, KBcombat *combat) {
 				KB_iloc(twirl_x, twirl_y);
 				KB_iprintf("%c", 'A' + key - 1);
 
-				KB_TopBox(MSG_CENTERED, "You don't know that spell!");
+				KB_TopBox(MSG_CENTERED, "你還不會這個法術！");
 				KB_flip(sys);
 				KB_Pause();
 
@@ -4471,7 +4470,7 @@ void win_game(KBgame *game) {
 	RECT_Right(&pos, &full);
 	pos.x += full.x;
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	SDL_BlitSurface( image, NULL, sys->screen, &pos );
 
@@ -4532,7 +4531,7 @@ void lose_game(KBgame *game) {
 	RECT_Right(&pos, &full);
 	pos.x += full.x;
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	SDL_BlitSurface( image, NULL, sys->screen, &pos );
 
@@ -4555,15 +4554,15 @@ int ask_giveup(KBgame *game) {
 	SDL_Rect *fs = &sys->font_size;
 	SDL_Rect *text = KB_BottomFrame();
 
-	KB_TopBox(MSG_CENTERED, "Press 'ESC' to exit");
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
 
 	KB_iloc(text->x, text->y + fs->h + fs->h/2 + fs->h/8);
 	KB_ilh(fs->h + fs->h/8);
 	KB_icolor(colors);
 	KB_iprint(
-		"Giving up will forfeit your\n"
-		"armies and send you back to\n"
-		"the King. Give up (y/n)?"
+		"放棄將失去你所有的\n"
+		"軍隊，並把你遣送回\n"
+		"國王身邊。放棄 (y/n)？"
 	);
 
 	KB_flip(sys);
@@ -4582,15 +4581,15 @@ int ask_search(KBgame *game, int *weekend) {
 
 	int days = 10;
 
-	SDL_Rect *rect = KB_BottomBox("Search...", "", 0);
+	SDL_Rect *rect = KB_BottomBox("搜索……", "", 0);
 	SDL_Rect *fs = &sys->font_size;
 
 	KB_iloc(rect->x, rect->y + fs->h * 2 );
 	KB_ilh(fs->h + fs->h/8);
-	KB_iprintf("It will take %d days to do a\nsearch of this area.", days);
+	KB_iprintf("搜索這片區域\n將花費 %d 天。", days);
 
 	KB_iloc(rect->x, rect->y + fs->h * 6 - fs->h / 4);
-	KB_iprint("               Search (y/n)?\n");
+	KB_iprint("               搜索 (y/n)？\n");
 
 	KB_flip(sys);
 
@@ -4609,7 +4608,7 @@ int ask_search(KBgame *game, int *weekend) {
 		return 0;
 
 	} else {
-		KB_BottomBox(NULL, "\n\nYour search of this area has\nrevealed nothing.", MSG_PAUSE);
+		KB_BottomBox(NULL, "\n\n你搜索這片區域\n一無所獲。", MSG_PAUSE);
 		*weekend = spend_days(game, days);
 	}
 
@@ -5093,24 +5092,24 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 int combat_options_menu(KBgame *game) {
 
 	char* item_names[] = {
-		"Move Down",
-		"Move Left",
-		"Move Right",
-		"Move Up",
-		"Down Left",
-		"Down Right",
-		"Up Left",
-		"Up Right",
-		
-		"View Army",
-		"Controls",
-		"Fly",
-		"Give Up",
-		"Shoot",
-		"Use Magic",
-		"View Char",
-		"Wait",
-		"Pass",
+		"向下移動",
+		"向左移動",
+		"向右移動",
+		"向上移動",
+		"左下",
+		"右下",
+		"左上",
+		"右上",
+
+		"檢視軍隊",
+		"操作說明",
+		"飛行",
+		"投降",
+		"射擊",
+		"施法",
+		"檢視角色",
+		"待命",
+		"略過",
 		"\0",
 	};
 
@@ -5122,7 +5121,7 @@ int combat_options_menu(KBgame *game) {
 
 	KB_icolor(local.status_colors + COLOR_SELECTION);
 	KB_iloc(local.status.x, local.status.y + sys->font_size.h / 8);
-	KB_iprintf(" Options ");
+	KB_iprintf(" 選項 ");
 
 	KB_reset(&combat_state);
 
@@ -5198,29 +5197,29 @@ int combat_options_menu(KBgame *game) {
 int options_menu(KBgame *game) {
 
 	char* item_names[] = {
-		"Move Down",
-		"Move Left",
-		"Move Right",
-		"Move Up",
+		"向下移動",
+		"向左移動",
+		"向右移動",
+		"向上移動",
 		/* "Rest", */
-		"Down Left",
-		"Down Right",
-		"Up Left",
-		"Up Right",
-		
-		"View Army",
-		"Controls",
-		"Fly",
-		"Land",
-		"New Continent",
-		"Contract Info",
-		"Auto-mapping",
-		"Puzzle Solve",
-		"Search Area",
-		"Use Magic",
-		"View Character",
-		"Wait End Week",
-		"Quit and Save",
+		"左下",
+		"右下",
+		"左上",
+		"右上",
+
+		"檢視軍隊",
+		"操作說明",
+		"飛行",
+		"降落",
+		"前往新洲",
+		"契約資訊",
+		"自動地圖",
+		"解開謎圖",
+		"搜索區域",
+		"施法",
+		"檢視角色",
+		"等待週末",
+		"離開並存檔",
 		"\0",
 	};
 
@@ -5232,7 +5231,7 @@ int options_menu(KBgame *game) {
 
 	KB_icolor(local.status_colors + COLOR_SELECTION);
 	KB_iloc(local.status.x, local.status.y + sys->font_size.h / 8);
-	KB_iprintf(" Options ");
+	KB_iprintf(" 選項 ");
 
 	KB_reset(&adventure_state);
 	reset_adventure_dropdown_hotspots();
@@ -5343,11 +5342,11 @@ int controls_menu(KBgame *game, int combat) {
 		CTRL_NUMERIC8,  /* CGA Palette */
 	};
 	char* item_names[] = {
-		"Delay",
-		"Sounds",
-		"Walk Beep",
-		"Animation",
-		"Army Size",
+		"延遲",
+		"音效",
+		"移動嗶聲",
+		"動畫",
+		"軍隊數量",
 		"CGA",
 		"\0",
 	};
@@ -5375,7 +5374,7 @@ int controls_menu(KBgame *game, int combat) {
 
 	KB_icolor(local.status_colors + COLOR_SELECTION);
 	KB_icurs(10, 0);
-	KB_iprint(" Controls ");
+	KB_iprint(" 操作說明 ");
 
 	int i;
 	for (i = 0; i < max_items; i++) {
@@ -5446,7 +5445,7 @@ printf("Drawing item %d, which is item %d, %s\n", i, j, item_names[j]);
 						KB_icolor(colors + COLOR_SELECTION);
 					else
 						KB_icolor(colors);
-					KB_iprint("On");
+					KB_iprint("開");
 
 					KB_icolor(colors);
 					KB_iprint("/");
@@ -5455,7 +5454,7 @@ printf("Drawing item %d, which is item %d, %s\n", i, j, item_names[j]);
 						KB_icolor(colors + COLOR_SELECTION);
 					else
 						KB_icolor(colors);
-					KB_iprint("Off");
+					KB_iprint("關");
 
 				}
 
@@ -5550,9 +5549,9 @@ printf("Drawing item %d, which is item %d, %s\n", i, j, item_names[j]);
 
 void draw_statusbar(KBgame *game) {
 	if (game->time_stop)
-		KB_TopBox(0, " Options / Controls / Time Stop:%d ", game->time_stop);
+		KB_TopBox(0, " 選項 / 操作說明 / 停時:%d ", game->time_stop);
 	else
-		KB_TopBox(0, " Options / Controls / Days Left:%d ", game->days_left);
+		KB_TopBox(0, " 選項 / 操作說明 / 剩餘天數:%d ", game->days_left);
 }
 
 void draw_combat_statusbar(KBcombat *war) {
@@ -5567,7 +5566,7 @@ void draw_combat_statusbar(KBcombat *war) {
 	KB_icolor(colors);
 	KB_iloc(local.status.x, local.status.y + sys->font_size.h / 8);
 	KB_iprint(" ");
-	KB_iprint("Options");
+	KB_iprint("選項");
 	KB_iprint(" / ");
 
 	/* Unit info */
@@ -5703,7 +5702,7 @@ int unit_try_wait(KBcombat *war) {
 
 	if (war->phase) u->acted = 1;
 
-	combat_log("%s wait", t->name);
+	combat_log("%s 待命", t->name);
 
 	return 1;
 }
@@ -5714,7 +5713,7 @@ void unit_try_pass(KBcombat *war) {
 
 	u->acted = 1;
 
-	combat_log("%s pass", t->name);
+	combat_log("%s 略過", t->name);
 }
 
 void unit_try_fly(KBcombat *war) {
@@ -5775,8 +5774,8 @@ void unit_try_shoot(KBcombat *war) {
 		victim = &war->units[other_side][other_id];
 
 		if (kills == -1) {
-			combat_log("%s shoot %s", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
-			combat_log("The spell seems to have no effect!", 0);
+			combat_log("%s 射擊 %s", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
+			combat_log("這個法術似乎沒有效果！", 0);
 			/* A turn well spent */
 			u->acted = 1;
 			return;
@@ -5784,7 +5783,7 @@ void unit_try_shoot(KBcombat *war) {
 
 		draw_damage(war, victim);
 
-		combat_log("%s shoot %s killing %d", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
+		combat_log("%s 射擊 %s，殲滅 %d 名", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
 
 		/* A turn well spent */
 		u->acted = 1;
@@ -5807,7 +5806,7 @@ void unit_ranged_damage(KBcombat *war, int other_side, int other_id) {
 
 	draw_damage(war, victim);
 
-	combat_log("%s shoot %s killing %d", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
+	combat_log("%s 射擊 %s，殲滅 %d 名", troops[u->troop_id].name, troops[victim->troop_id].name, kills);
 
 	/* A turn well spent */
 	u->acted = 1;
@@ -5879,7 +5878,7 @@ int ai_unit_think(KBcombat *combat) {
 
 		u->acted = 1;
 		acted = 1;
-		combat_log("%s are frozen", t->name);
+		combat_log("%s 被凍結", t->name);
 
 	}
 
@@ -5943,7 +5942,7 @@ int ai_unit_think(KBcombat *combat) {
 
 			if (acted == 1) {
 				draw_combat(combat);//refresh screen
-				combat_log("%s move", t->name);
+				combat_log("%s 移動", t->name);
 			}
 
 		}
@@ -6214,7 +6213,7 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 					combat->unit_id = next;
 
 				if (combat->units[combat->side][combat->unit_id]. out_of_control) {
-					combat_log("%s are out of control!",
+					combat_log("%s 失控了！",
 						troops[
 							combat->units[combat->side][combat->unit_id].troop_id
 						].name
@@ -6276,13 +6275,13 @@ int ask_quit_game(KBgame *game) {
 	/* Header (few pixels up) */
 	KB_iloc(text->x, text->y + fs->h/8);
 	KB_iprint("\n");
-	KB_iprint("Your game has been saved.");
+	KB_iprint("你的遊戲已存檔。");
 
 	/* Message */
 	KB_iloc(text->x, text->y);
 	KB_iprint("\n\n\n");
 	KB_ilh(fs->h + fs->h / 8);
-	KB_iprint("Press Control-Q to Quit or\nany other key to continue.");
+	KB_iprint("按 Control-Q 離開，或\n按其他任意鍵繼續。");
 
 //	KB_BottomBox(NULL, "\nYour game has been saved.\n\nPress Control-Q to Quit or\nany other key to continue.", 0);
 	KB_flip(sys);
@@ -6301,7 +6300,7 @@ int ask_fast_quit(KBgame *game) {
 	byte twirl_pos = 0;
 	word twirl_x, twirl_y;
 
-	KB_TopBox(0, " Quit to DOS without saving (y/n) ");
+	KB_TopBox(0, " 不存檔離開回到 DOS (y/n) ");
 
 	KB_getpos(sys, &twirl_x, &twirl_y);
 

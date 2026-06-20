@@ -1,14 +1,13 @@
-       Name: Ragnar Lodbrok
-       Alias: The Conquerer
-       Reward: 12,000 gold
-       Last Seen: %s
-          Castle: %s
-Distinguishing features:
-  Long unhinged beard, helmet
-  with sharp horns, wields a large
-  battleaxe.
-Crimes: Coming from distant lands
-  with his band of bandits, this
-  warrior took control of several
-  castles that were loyal to the
-  crown.
+       姓名:征服者拉格納
+       別號:征服者
+       懸賞:12,000 金幣
+       最後現身:%s
+          城堡:%s
+特徵:
+  一把狂亂的長鬚,頭
+  盔上長著尖角,揮舞
+  著一柄巨大的戰斧。
+罪行:這名戰士帶著他
+  的盜匪幫眾自遠方而
+  來,奪下了數座原本
+  效忠王室的城堡。

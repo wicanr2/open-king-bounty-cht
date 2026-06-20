@@ -479,7 +479,7 @@ char* KB_KeyLabel(int key1, int key2) {
 	if (key1 == SDLK_RIGHT) sprintf(val1, "  \x1B ");
 
 	if (key2 != -1) {
-		sprintf(buf, "%s or %s", val1, val2);
+		sprintf(buf, "%s 或 %s", val1, val2);
 	} else {
 		sprintf(buf, "%s", val1);
 	}
