@@ -275,8 +275,9 @@ void *AMIGA_Resolve(KBmodule *mod, int id, int sub_id) {
 		case GR_VIEW:
 			name = "view";
 			break;
-		case GR_CURSOR:
+		case GR_CURSOR:   /* = GR_HERO: 地圖英雄 sprite sheet (mount×flip 幀) */
 			name = "cursor";
+			transparent = 1;   /* index 0 (黑) -> colorkey,否則地圖上現黑框 */
 			break;
 		case GR_COMTILES:
 			name = "comtiles";
