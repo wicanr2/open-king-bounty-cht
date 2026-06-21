@@ -117,6 +117,7 @@ void inprint(SDL_Surface *dst, const char *str, Uint32 x, Uint32 y)
 			s_rect.x = col * s_rect.w;
 			s_rect.y = row * s_rect.h;
 		}
+		cjk_drawlist_remove(d_rect.x, d_rect.y); /* 此格改畫點陣字 → 清掉舊中文 */
 		SDL_BlitSurface(selected_font, &s_rect, dst, &d_rect);
 		d_rect.x += s_rect.w;
 		str++;

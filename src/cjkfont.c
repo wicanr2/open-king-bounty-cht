@@ -124,22 +124,47 @@ int cjkfont_has(uint32_t cp) { return cjkfont_get(cp, NULL, NULL) != NULL; }
 int cjkfont_glyph_w(void)    { return cjk.w; }
 int cjkfont_glyph_h(void)    { return cjk.h; }
 
-/* ---- CJK draw-list ----
- * 設計:單一清單,「印新中文時才清、跨 flip 保留」。
- *   - 一個 frame 內第一個 CJK glyph 進來時清空舊清單 (frame_open: 0→1)。
- *   - KB_flip 後 frame_open 歸 0;清單本身不清,讓「重畫但不重印文字」的畫面
- *     (城堡動畫背景、游標閃爍、靜態選單等待) 重複 present 時中文持續顯示。
- *   - 換畫面時必有新的中文被印出 → 自動清舊換新,不會殘留。 */
+/* ---- CJK draw-list (逐 cell 鏡像螢幕) ----
+ * 清單鏡像「螢幕上目前有哪些中文格」。draw-list 不隨 flip 整清,而是:
+ *   - 在某格畫中文 → 取代該格舊項 (cjk_drawlist_add)。
+ *   - 在某格畫 ASCII/點陣字 → 移除該格中文項 (cjk_drawlist_remove,由 inprint/
+ *     KB_print 的 ASCII 路徑呼叫)。
+ *   - 整塊清除 (FillRect/背景) → 移除該區中文項 (cjk_drawlist_remove_region)。
+ * 如此「部分重畫只重印部分文字」時,未被覆寫的中文格保留,不會整片消失。 */
 
 #define CJK_DRAWLIST_MAX 4096
 static cjk_draw_t cjk_list[CJK_DRAWLIST_MAX];
 static int cjk_n = 0;
-static int cjk_frame_open = 0;
+
+static int cell_overlap(const cjk_draw_t *d, int x, int y) {
+    return (x < d->x + d->cw && x + 1 > d->x && y < d->y + d->ch && y + 1 > d->y);
+}
+
+void cjk_drawlist_remove(int x, int y) {
+    int i;
+    for (i = 0; i < cjk_n; i++) {
+        if (cell_overlap(&cjk_list[i], x, y)) {
+            cjk_list[i] = cjk_list[--cjk_n]; /* swap with last */
+            i--;
+        }
+    }
+}
+
+void cjk_drawlist_remove_region(int x, int y, int w, int h) {
+    int i;
+    for (i = 0; i < cjk_n; i++) {
+        cjk_draw_t *d = &cjk_list[i];
+        if (x < d->x + d->cw && x + w > d->x && y < d->y + d->ch && y + h > d->y) {
+            cjk_list[i] = cjk_list[--cjk_n];
+            i--;
+        }
+    }
+}
 
 void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t fg, uint32_t bg, uint8_t cw, uint8_t ch)
 {
     cjk_draw_t *d;
-    if (!cjk_frame_open) { cjk_n = 0; cjk_frame_open = 1; } /* 新 frame 第一個字元 → 清舊 */
+    cjk_drawlist_remove(x, y);            /* 取代同格舊項,避免重複堆積 */
     if (cjk_n >= CJK_DRAWLIST_MAX) return;
     d = &cjk_list[cjk_n++];
     d->x = (int16_t)x;
@@ -151,12 +176,9 @@ void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t fg, uint32_t bg, uint8
     d->ch = ch;
 }
 
-void cjk_drawlist_flip(void)
-{
-    cjk_frame_open = 0; /* 本 frame 結束;清單保留供下次 present,下個中文進來才清 */
-}
+void cjk_drawlist_flip(void) { /* 不再整清:清單鏡像螢幕,逐格增刪 */ }
 
-void cjk_drawlist_clear(void) { cjk_n = 0; cjk_frame_open = 0; }
+void cjk_drawlist_clear(void) { cjk_n = 0; }
 int  cjk_drawlist_count(void) { return cjk_n; }
 
 const cjk_draw_t *cjk_drawlist_get(int i)

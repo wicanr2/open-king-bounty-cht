@@ -52,4 +52,12 @@ typedef SDL_Keysym SDL_keysym;
 #define SDL_SRCCOLORKEY SDL_TRUE
 #endif
 
+/* SDL_FillRect hook:遊戲對螢幕 surface 填色 (清背景/畫對話框) 時,連帶移除該
+ * 區域的 CJK draw-list 項,避免上一畫面的中文殘留 (ghost)。實作在 env-sdl.c;
+ * 該檔定義 KB_NO_FILLRECT_MACRO 以使用真正的 SDL_FillRect。 */
+extern int KB_FillRect_hook(SDL_Surface *s, const SDL_Rect *r, Uint32 color);
+#ifndef KB_NO_FILLRECT_MACRO
+#define SDL_FillRect(s, r, c) KB_FillRect_hook((s), (r), (c))
+#endif
+
 #endif /* OPENKB_SDLCOMPAT_H */

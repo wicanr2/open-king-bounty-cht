@@ -17,6 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
+#define KB_NO_FILLRECT_MACRO /* 本檔用真正的 SDL_FillRect (實作 hook) */
 #include "sdlcompat.h"
 
 #include "lib/kbconf.h"
@@ -50,6 +51,16 @@ KBconfig *conf = NULL;
 static SDL_Window   *g_window   = NULL;
 static SDL_Renderer *g_renderer = NULL;
 static SDL_Texture  *g_texture  = NULL;
+
+/* 遊戲螢幕 surface 指標,供 SDL_FillRect hook 判斷是否要連帶清 CJK 區域 */
+SDL_Surface *KB_screen = NULL;
+int KB_FillRect_hook(SDL_Surface *s, const SDL_Rect *r, Uint32 color) {
+	if (s == KB_screen) {
+		if (r) cjk_drawlist_remove_region(r->x, r->y, r->w, r->h);
+		else   cjk_drawlist_clear();
+	}
+	return SDL_FillRect(s, r, color); /* 此檔 macro 已停用 → 真正的 SDL_FillRect */
+}
 
 /* 供 game.c 改視窗標題 (取代 SDL_WM_SetCaption) */
 void KB_setcaption(const char *title) {
@@ -112,26 +123,12 @@ static SDL_Texture *cjk_glyph_tex(uint32_t cp) {
 	return NULL; /* cache 滿 (2048 槽,實務上夠) */
 }
 
-static int cjk_ensure_composite(void) {
-	int cw = KB_LOGICAL_W * CJK_SCALE;
-	int ch = KB_LOGICAL_H * CJK_SCALE;
-	if (cjkv.composite && (cjkv.cw != cw || cjkv.ch != ch)) {
-		SDL_DestroyTexture(cjkv.composite);
-		cjkv.composite = NULL;
-	}
-	if (!cjkv.composite) {
-		cjkv.composite = SDL_CreateTexture(g_renderer, SDL_PIXELFORMAT_ARGB8888,
-			SDL_TEXTUREACCESS_TARGET, cw, ch);
-		if (!cjkv.composite) return 0;
-		cjkv.cw = cw; cjkv.ch = ch;
-	}
-	return 1;
-}
-
-/* render target 須已是 composite。把 drawlist 的 CJK 畫上 (黑外框 + 字色)。 */
+/* 直接在 logical (320x200) 座標把 drawlist 的 CJK 畫到目前 render target。
+ * 由 renderer 的 logical size 一次縮放到視窗 (不經 640 合成層再降回,較銳利),
+ * 且滑鼠座標仍維持在 320 邏輯空間。黑外框確保任何背景上可讀。 */
 static void cjk_draw_overlay(void) {
-	static const int ox[8] = { -1, 1, 0, 0, -1, 1, -1, 1 };
-	static const int oy[8] = {  0, 0,-1, 1, -1,-1,  1, 1 };
+	static const int ox[4] = { -1, 1, 0, 0 };
+	static const int oy[4] = {  0, 0,-1, 1 };
 	int n = cjk_drawlist_count();
 	int i, k;
 	for (i = 0; i < n; i++) {
@@ -141,18 +138,15 @@ static void cjk_draw_overlay(void) {
 		Uint8 r, g, b;
 		if (!t) continue;
 
-		cell.x = d->x * CJK_SCALE;
-		cell.y = d->y * CJK_SCALE;
-		cell.w = d->cw * CJK_SCALE;
-		cell.h = d->ch * CJK_SCALE;
+		cell.x = d->x; cell.y = d->y; cell.w = d->cw; cell.h = d->ch;
 
-		/* 8 方位黑外框 (取代填底:在任何背景上可讀,且不受 bg 色擷取不準影響) */
+		/* 4 方位黑外框 (logical ±1) */
 		SDL_SetTextureColorMod(t, 0, 0, 0);
-		for (k = 0; k < 8; k++) {
+		for (k = 0; k < 4; k++) {
 			SDL_Rect o = cell; o.x += ox[k]; o.y += oy[k];
 			SDL_RenderCopy(g_renderer, t, NULL, &o);
 		}
-		/* 字色 (太暗自動提亮,確保可讀);ASCII 與 CJK 同尺寸,風格一致。 */
+		/* 字色 (太暗自動提亮) */
 		r = (d->fg >> 16) & 0xFF; g = (d->fg >> 8) & 0xFF; b = d->fg & 0xFF;
 		if ((r * 30 + g * 59 + b * 11) / 100 < 60) { r = g = b = 235; }
 		SDL_SetTextureColorMod(t, r, g, b);
@@ -192,10 +186,9 @@ KBenv *KB_startENV(KBconfig *conf) {
 		return NULL;
 	}
 
-	/* 邏輯畫布永遠 320x200,zoom=1:所有繪圖在原生解析度進行,
-	 * 放大由 SDL2 renderer 處理 (取代舊的軟體 filter/scale2x 預放大路徑)。
-	 * 把 conf->filter 轉成縮放品質提示後歸零,讓資源層的 (filter?2:1) 一律得 1。 */
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, conf->filter == 1 ? "linear" : "nearest");
+	/* 邏輯畫布永遠 320x200,zoom=1:所有繪圖在原生解析度進行,放大由 renderer 處理。
+	 * 底圖一律用 nearest 保持像素銳利 (pixel art 不糊)。 */
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	conf->filter = 0;
 
 	nsys->pan = 0;
@@ -246,6 +239,7 @@ KBenv *KB_startENV(KBconfig *conf) {
 		free(nsys);
 		return NULL;
 	}
+	KB_screen = nsys->screen; /* SDL_FillRect hook 據此清 CJK 區域 */
 
 	/* Set window icon */
 	iconfile = KB_fastpath(conf->install_dir, "/", "icon_32x32"
@@ -356,24 +350,14 @@ void KB_stopENV(KBenv *env) {
 	SDL_Quit();
 }
 
-/* 把軟體 surface 上傳 texture 並呈現到視窗 (取代 SDL1.2 SDL_Flip)。
- * 有 CJK 時走合成層:底圖 2x + 漢字疊圖;否則直接縮放呈現。 */
 /* 把目前畫面 (screen surface + 持續的 CJK 清單) 呈現到視窗。
- * 抽成獨立函式,讓視窗 resize/expose 時可重新呈現以隨視窗縮放 (不動清單)。 */
+ * 底圖上傳 texture → 依 logical size 縮放至視窗 (nearest 銳利);CJK glyph 直接
+ * 在 logical 座標疊畫。抽成獨立函式,讓視窗 resize/expose 時可重新呈現。 */
 void KB_present(KBenv *env) {
 	SDL_UpdateTexture(g_texture, NULL, env->screen->pixels, env->screen->pitch);
-
-	if (cjk_drawlist_count() > 0 && cjk_ensure_composite()) {
-		SDL_SetRenderTarget(g_renderer, cjkv.composite);
-		SDL_RenderCopy(g_renderer, g_texture, NULL, NULL); /* 320x200 -> 640x400 nearest */
-		cjk_draw_overlay();
-		SDL_SetRenderTarget(g_renderer, NULL);
-		SDL_RenderClear(g_renderer);
-		SDL_RenderCopy(g_renderer, cjkv.composite, NULL, NULL);
-	} else {
-		SDL_RenderClear(g_renderer);
-		SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
-	}
+	SDL_RenderClear(g_renderer);
+	SDL_RenderCopy(g_renderer, g_texture, NULL, NULL); /* 320x200 → 視窗 */
+	if (cjk_drawlist_count() > 0) cjk_draw_overlay();  /* 在其上疊中文 */
 	SDL_RenderPresent(g_renderer);
 }
 
@@ -483,6 +467,7 @@ void KB_print(KBenv *env, const char *str) {
 		letter.x = col * letter.w;
 		letter.y = row * letter.h;
 		KB_getpos(env, &dest.x, &dest.y);
+		cjk_drawlist_remove(dest.x, dest.y); /* 此格改畫點陣字 → 清掉舊中文 */
 		SDL_BlitSurface(env->font, &letter, env->screen, &dest);
 		env->cursor_x++;
 	}

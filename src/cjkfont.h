@@ -50,6 +50,8 @@ extern uint32_t cjk_text_fg;
 extern uint32_t cjk_text_bg;
 
 void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t fg, uint32_t bg, uint8_t cw, uint8_t ch);
+void cjk_drawlist_remove(int x, int y);                 /* 移除涵蓋該點的中文格 (ASCII 覆寫時) */
+void cjk_drawlist_remove_region(int x, int y, int w, int h); /* 移除該矩形內中文格 (FillRect/背景) */
 void cjk_drawlist_flip(void);
 void cjk_drawlist_clear(void);
 int  cjk_drawlist_count(void);

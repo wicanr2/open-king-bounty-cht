@@ -6692,14 +6692,15 @@ int run_game(KBconfig *conf) {
 	 * (KB_Resolve 型別感知:圖→DOS 優先、字→free 優先 = 原版畫面 + 中文)。
 	 * 公開包不含原版資料 → 此處不觸發,維持 free 美術。 */
 	{
-		const char *cand[5];
+		const char *cand[6];
 		int ci, found = 0;
-		cand[0] = conf->data_dir;
-		cand[1] = conf->install_dir;
-		cand[2] = "dos";
-		cand[3] = "kings-bounty";
-		cand[4] = ".";
-		for (ci = 0; ci < 5 && !found; ci++) {
+		cand[0] = getenv("KB_ORIGINAL_DOS"); /* 執行時可指定原版資料目錄 */
+		cand[1] = conf->data_dir;
+		cand[2] = conf->install_dir;
+		cand[3] = "dos";
+		cand[4] = "kings-bounty";
+		cand[5] = ".";
+		for (ci = 0; ci < 6 && !found; ci++) {
 			char *probe;
 			if (!cand[ci] || !cand[ci][0]) continue;
 			probe = KB_fastpath(cand[ci], "/", "256.CC");
