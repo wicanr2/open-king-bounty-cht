@@ -1018,6 +1018,13 @@ void KB_DrawMapTile(SDL_Surface *dest, SDL_Rect *dest_rect,	SDL_Surface *tileset
 	SDL_Rect src;
 	int th, tw;
 
+	/* 守衛:tileset 解析失敗 (某主題/大陸回 NULL) 時別 blit NULL → 否則 SDL 崩潰。
+	 * 印出證據供除錯 (理應不發生;若發生代表該主題的 GR_TILESET 回了 NULL)。 */
+	if (tileset == NULL) {
+		KB_errlog("KB_DrawMapTile: NULL tileset (tile %d) -- skipped\n", m);
+		return;
+	}
+
 	/* Calculate needed offsets on the 8x? tileset */
 	th = m / 8;
 	tw = m - (th * 8);

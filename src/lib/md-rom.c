@@ -165,7 +165,11 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 	int r, c, line;
 
 	pat = md_terrain_pattern(romname, &ntiles);
-	if (!pat) return NULL;
+	if (!pat) {
+		KB_errlog("[md] terrain pattern decompress failed (cell %d) -- NULL\n", cell_type);
+		return NULL;
+	}
+	KB_debuglog(0, "[md] build cell %d (ntiles=%d)\n", cell_type, ntiles);
 
 	f = KB_fopen(romname, "rb");
 	if (!f) return NULL;

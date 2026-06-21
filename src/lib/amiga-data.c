@@ -146,7 +146,19 @@ static SDL_Surface *amiga_load_surface(const char *path, int transparent) {
 	stream_off = hdr;
 	(void)comp_size;
 
-	if (w <= 0 || h <= 0 || w > 4096 || h > 4096) { free(file); return NULL; }
+	/* 除錯證據:每次載入印出檔名 + 解析出的 header (下次崩潰時 log 末行即兇手檔)。
+	 * 走 KB_debuglog (預設靜默,KB_VERBOSE=1 開啟);異常值另用 KB_errlog 必印。 */
+	KB_debuglog(0, "[amiga] %s: count=%d w=%d h=%d out_size=%d flen=%ld\n",
+		path, count, w, h, out_size, flen);
+
+	if (w <= 0 || h <= 0 || w > 4096 || h > 4096) {
+		KB_errlog("[amiga] %s: bad dims w=%d h=%d (count=%d) -- skipped\n", path, w, h, count);
+		free(file); return NULL;
+	}
+	if (out_size <= 0 || out_size > 0x20000) {
+		KB_errlog("[amiga] %s: bad out_size=%d -- skipped\n", path, out_size);
+		free(file); return NULL;
+	}
 
 	planes = AMIGA_PLANES;
 	rb = (w + 7) / 8;             /* bytes per plane row */

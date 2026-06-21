@@ -360,6 +360,14 @@ SDL_Surface* KB_LoadTileset_TILES(SDL_Rect *tilesize, KBresolve_cb resolve, KBmo
 
 	for (i = 0; i < 72; i++) {
 		SDL_Surface *tile = resolve(mod, GR_TILE, i);
+		/* 守衛:某 tile 解析失敗 (回 NULL) 不可 ClonePalette/Blit NULL → 會崩潰。
+		 * 印證據 (哪個 tile index 失敗) 後跳過該格。 */
+		if (tile == NULL) {
+			KB_errlog("KB_LoadTileset_TILES: GR_TILE %d returned NULL -- skipped\n", i);
+			dst.x += dst.w;
+			if (dst.x >= ts->w) { dst.x = 0; dst.y += dst.h; }
+			continue;
+		}
 		SDL_ClonePalette(ts, tile);
 		SDL_BlitSurface(tile, &src, ts, &dst);
 		dst.x += dst.w;
@@ -431,6 +439,13 @@ SDL_Surface* KB_LoadTilesetSalted(byte continent, KBresolve_cb resolve, KBmodule
 	if (!continent) return tileset; /* Continent 0 is never salted */
 
 	tilesalt = resolve(mod, GR_TILESALT, continent);
+	/* 守衛:某主題 (Genesis/Amiga) 可能不提供 GR_TILESALT → NULL。
+	 * 不可 deref tilesalt->w (會崩);直接回未加鹽的 tileset。 */
+	if (!tileset || !tilesalt) {
+		KB_errlog("KB_LoadTilesetSalted: tileset=%p tilesalt=%p (continent %d) -- skip salting\n",
+			(void*)tileset, (void*)tilesalt, continent);
+		return tileset;
+	}
 
 	/* Figure out the size of single tile */
 	tilesize.w = tilesalt->w / 3;
