@@ -22,7 +22,9 @@ Pixel layout: SEQUENTIAL bitplanes (plane0 full image, then plane1, ...).
   plane0 = LSB. For multi-frame sprites (count>1), the planes are stored
   per-frame: frame0 [p0..p4], frame1 [p0..p4], ...  Each frame is w*h*5/8 bytes.
 
-12-bit palette: R = (c>>8 & 0xF)*17, G = (c>>4 & 0xF)*17, B = (c & 0xF)*17.
+12-bit palette: each 4-bit channel is expanded by <<4 (n*16), matching the
+Amiga OCS/ECS hardware (low nibble stays 0), verified against a real Amiga
+screen capture. NOT *17 -- that over-brightens every channel by up to 15.
 
 Verified: cstl (castle scene 240x102), peas (4-frame peasant 48x34).
 """
@@ -87,7 +89,7 @@ def parse(path):
 
 
 def palette_rgb(palette):
-    return [(((c >> 8) & 0xF) * 17, ((c >> 4) & 0xF) * 17, (c & 0xF) * 17) for c in palette]
+    return [(((c >> 8) & 0xF) << 4, ((c >> 4) & 0xF) << 4, (c & 0xF) << 4) for c in palette]
 
 
 def decode_frames(path):

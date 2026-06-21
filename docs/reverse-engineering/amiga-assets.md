@@ -28,6 +28,21 @@ u16  out_size                    // **解壓後 planar bitmap 大小** (= w/8 ×
 ```
 > **關鍵踩雷**:stream 起點在 `out_size`(u16)**之後**,不是在 comp_size 之後。早期把 out_size 那 2 bytes 當成 stream 開頭 → 整張圖前一小段對、其餘全 drift 成雜訊,卡關最久就是這 2-byte off-by-two。
 
+## 12-bit palette 展開:`nibble << 4`,不是 `× 17`
+
+每個 4-bit 通道展開成 8-bit 時,Amiga OCS/ECS 硬體做的是 **`n << 4`(= `n × 16`,低 nibble 補 0)**,
+**不是 `n × 17`**。以真實 Amiga 截圖 `amiga_pic/kings-bounty_17.gif`(Plains 招募畫面,31 色)當 ground truth:
+用 `<< 4` 解出的 32 色 palette 與截圖的 31 色**逐色精準命中(最近色距離 = 0)**;用 `× 17` 則每通道最多偏亮 15
+(綠變螢光、紅岩偏紫紅、整體像過曝 / 反白)。這是唯一一個真正的解碼 bug,已修(`amiga-data.c` `amiga_color`、`amiga_decode.py` `palette_rgb`)。
+
+> **「plai 是迷幻 confetti」是視覺誤判,不是解碼錯誤。** LZSS、plane 排列(plane-major、plane0=LSB)、
+> 尺寸全部正確。location 圖(plai/cstl/town…)的草地、石牆本來就用**高頻 dithering 點繪**(綠/褐、灰/粉交錯)
+> 來在 32 色內表現質感——把原尺寸圖縮小或 2× 放大、再疊加 `× 17` 過曝,看起來就像雜訊。
+> 在原尺寸並把草地放大 4× 對照 `_17`,可見兩者點繪密度與顏色一致。
+> 排除過程已驗證:plane permutation(120 種)、row-interleave、word-interleave、ring fill(0 / 0x20 / 0xFF)、
+> LZSS length(+2 不命中 out_size、唯 +3 命中)、offset 高 nibble 位置——皆無法讓草地變「乾淨色塊」,
+> 因為原圖就不是色塊。
+
 ## 壓縮 codec:Okumura LZSS (與 Genesis 同源)
 
 對應 `src/lib/md-rom.c` 的 `md_lzss_decompress`(Genesis 版,已驗證可用):

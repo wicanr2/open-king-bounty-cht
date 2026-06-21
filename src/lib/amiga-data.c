@@ -91,11 +91,17 @@ static byte *amiga_lzss(const byte *src, int src_len, int out_size) {
 	return out;
 }
 
-/* Convert one 12-bit 0RGB Amiga color word to an SDL_Color (4-bit channels *17). */
+/* Convert one 12-bit 0RGB Amiga color word to an SDL_Color.
+ * The Amiga's OCS/ECS hardware expands each 4-bit channel by shifting it into
+ * the high nibble (n<<4), NOT by *17: the low nibble is left zero.  Verified
+ * against a real Amiga screen capture (kings-bounty_17, 31 colors) -- with
+ * <<4 the decoded palette matches the capture exactly; *17 over-brightens
+ * every channel by up to 15 (greens go fluorescent, the picture looks washed
+ * out).  See docs/reverse-engineering/amiga-assets.md. */
 static void amiga_color(word c, SDL_Color *out) {
-	out->r = (Uint8)(((c >> 8) & 0xF) * 17);
-	out->g = (Uint8)(((c >> 4) & 0xF) * 17);
-	out->b = (Uint8)(((c) & 0xF) * 17);
+	out->r = (Uint8)(((c >> 8) & 0xF) << 4);
+	out->g = (Uint8)(((c >> 4) & 0xF) << 4);
+	out->b = (Uint8)(((c) & 0xF) << 4);
 }
 
 /* Read u16 big-endian from buf at offset o. */
