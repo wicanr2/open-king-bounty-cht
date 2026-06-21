@@ -75,3 +75,6 @@ docs/test/qa3-*.png docs/test/qa4-*.png
 # 版權音樂素材 (個人用,不散布)
 music/
 fmtowns-cd/
+
+# Genesis ROM (版權,個人版用)
+genesis-orig/

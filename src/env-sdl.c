@@ -847,6 +847,48 @@ void* GNU_Resolve(KBmodule *mod, int id, int sub_id);
 void* DOS_Resolve(KBmodule *mod, int id, int sub_id);
 void* MD_Resolve(KBmodule *mod, int id, int sub_id);
 
+/* F8 美術主題:目前偏好的圖形家族 (預設 DOS 原版美術;只有 free 時 KB_Resolve
+ * 會 fallback 到 GNU)。F8 在已載入的家族間循環,文字恆走 GNU 維持中文。 */
+int kb_gfx_family = KBFAMILY_DOS;
+
+static const struct { int fam; const char *name; } gfx_themes[] = {
+	{ KBFAMILY_GNU, "free" },
+	{ KBFAMILY_DOS, "DOS" },
+	{ KBFAMILY_MD,  "Genesis" },
+};
+#define N_GFX_THEMES (int)(sizeof(gfx_themes)/sizeof(gfx_themes[0]))
+
+static int gfx_family_present(int fam) {
+	int i;
+	if (!conf) return 0;
+	for (i = 0; i < conf->num_modules; i++)
+		if (conf->modules[i].kb_family == fam) return 1;
+	return 0;
+}
+
+const char *KB_gfx_theme_name(void) {
+	int i;
+	for (i = 0; i < N_GFX_THEMES; i++)
+		if (gfx_themes[i].fam == kb_gfx_family) return gfx_themes[i].name;
+	return "?";
+}
+
+const char *KB_gfx_cycle_theme(void) {
+	int i, cur = 0;
+	for (i = 0; i < N_GFX_THEMES; i++)
+		if (gfx_themes[i].fam == kb_gfx_family) { cur = i; break; }
+	/* 前進到下一個「已載入模組」的家族 (略過未載入者) */
+	for (i = 1; i <= N_GFX_THEMES; i++) {
+		int idx = (cur + i) % N_GFX_THEMES;
+		if (gfx_family_present(gfx_themes[idx].fam)) {
+			kb_gfx_family = gfx_themes[idx].fam;
+			break;
+		}
+	}
+	SDL_FreeCachedSurfaces(); /* 清快取 → 下次繪製以新家族重載美術 */
+	return KB_gfx_theme_name();
+}
+
 void* KB_Resolve(int id, int sub_id) {
 	/* By contract, things resolved by this function MUST be freed.
 	 * But, alas, sometimes this function returns things that CAN NOT be freed,
@@ -860,7 +902,7 @@ void* KB_Resolve(int id, int sub_id) {
 	 * 音效) 優先用 GNU free (我們的中文翻譯)。每類先試偏好家族,再 fallback 另一個。
 	 * 如此:玩家自備原版資料 → 看到原版美術 + 中文;只有 free → 全 free + 中文。 */
 	int is_graphic = (id >= GR_TROOP && id <= GR_ENDTILES);
-	int pref = is_graphic ? KBFAMILY_DOS : KBFAMILY_GNU;
+	int pref = is_graphic ? kb_gfx_family : KBFAMILY_GNU;
 
 	for (pass = 0; pass < 2 && ret == NULL; pass++) {
 		for (i = 0; i < conf->num_modules; i++) {

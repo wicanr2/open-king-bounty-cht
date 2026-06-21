@@ -134,6 +134,11 @@ extern SDL_Surface* SDL_TakeSurface(int id, int sub_id, int flip);
 
 extern void SDL_FreeCachedSurfaces();
 
+/* F8 美術主題切換:在已載入的圖形家族 (free / DOS / Genesis) 間循環。
+ * 切換後清快取讓美術重載;文字維持中文 (非圖形資源仍走 GNU)。 */
+extern const char *KB_gfx_cycle_theme(void);
+extern const char *KB_gfx_theme_name(void);
+
 extern char **STRL_LoadArray(int id, int sub_id);
 extern void STRL_FreeArray(char **arr);
 

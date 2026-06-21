@@ -37,6 +37,12 @@ if [ -n "${KB_ORIGINAL_DOS:-}" ] && [ -f "$KB_ORIGINAL_DOS/256.CC" ]; then
   APPNAME="KingsBounty-CHT-original"
   echo "[build-appimage] 綁入原版 DOS 美術 (個人版,請勿散布)"
 fi
+# 個人版:綁入 Genesis ROM (kb.bin),F8 可循環到 Genesis 美術。版權素材,勿散布。
+if [ -n "${KB_GENESIS_ROM:-}" ] && [ -f "$KB_GENESIS_ROM/kb.bin" ]; then
+  cp "$KB_GENESIS_ROM/kb.bin" "$AD/$SHARE/kb.bin"
+  APPNAME="KingsBounty-CHT-original"
+  echo "[build-appimage] 綁入 Genesis ROM (個人版,請勿散布)"
+fi
 # 個人版:綁入各版本 BGM (music/<版本>/),啟動時 F9 可切換。版權素材,勿散布。
 if [ -d music ] && ls music/*/scenes.ini >/dev/null 2>&1; then
   cp -r music "$AD/$SHARE/music"

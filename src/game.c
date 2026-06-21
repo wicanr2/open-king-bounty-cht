@@ -6740,6 +6740,30 @@ int run_game(KBconfig *conf) {
 		}
 	}
 
+	/* 自動偵測 Genesis ROM (kb.bin):存在則加 MD 模組,F8 可循環到 Genesis 美術。
+	 * 公開包不含 ROM → 不觸發。 */
+	{
+		const char *gcand[5];
+		int gi, gfound = 0;
+		gcand[0] = getenv("KB_GENESIS_ROM"); /* 可直接指定 ROM 檔的所在目錄 */
+		gcand[1] = conf->data_dir;
+		gcand[2] = conf->install_dir;
+		gcand[3] = "genesis";
+		gcand[4] = ".";
+		for (gi = 0; gi < 5 && !gfound; gi++) {
+			char *probe;
+			if (!gcand[gi] || !gcand[gi][0]) continue;
+			probe = KB_fastpath(gcand[gi], "/", "kb.bin");
+			if (probe && file_size(probe) > 0) {
+				add_module_aux(conf, "Genesis art", KBFAMILY_MD, 0, gcand[gi], "kb.bin", NULL, NULL);
+				conf->fallback = 1;
+				gfound = 1;
+				KB_stdlog("Genesis ROM found at '%s' -- F8 can switch to Genesis artwork.\n", gcand[gi]);
+			}
+			if (probe) free(probe);
+		}
+	}
+
 	/* --- ! ! ! --- */
 	mod = select_module();
 

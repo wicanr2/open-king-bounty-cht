@@ -347,6 +347,13 @@ int KB_event(KBgamestate *state) {
 		if (event.type == SDL_KEYDOWN) {
 			SDL_keysym *kbd = &event.key.keysym;
 			kbd_state[kbd->scancode] = 1;
+			/* F8 全域切換美術主題 (free/DOS/Genesis);清快取後重呈現,
+			 * 地圖/戰鬥有 SYN 動畫計時器會持續重畫 → 下一幀即套用新美術。 */
+			if (kbd->sym == SDLK_F8) {
+				KB_stdlog("Art theme: %s\n", KB_gfx_cycle_theme());
+				KB_present(sys);
+				continue;
+			}
 			/* F9 全域切換背景音樂版本 (所有畫面通用,不佔用遊戲按鍵);消化此事件。 */
 			if (kbd->sym == SDLK_F9) {
 				KB_stdlog("BGM version: %s\n", KB_bgm_cycle_version());
