@@ -6778,7 +6778,7 @@ int run_game(KBconfig *conf) {
 	init_modules(conf);
 
 	/* Load and use module font */
-	KB_setfont(sys, SDL_LoadRESOURCE(GR_FONT, 0, 0)); 
+	KB_setfont(sys, SDL_LoadRESOURCE(GR_FONT, 0, 0));
 
 	/* Preload all resources */
 	prepare_resources();

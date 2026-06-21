@@ -202,7 +202,9 @@ KB_File * KB_fopenF_in( const char * filename, const char * mode, KB_DIR *wth )
 
 	f = fopen(filename, mode);
 	if (f == NULL) {
-		KB_errlog("Missing real file %s\n", filename);
+		/* 多模組 fallback 設計下,slotA(散檔)缺檔是常態(資源多在 .CC 內),
+		 * 之後 slotB(.CC)會接手 → 降為 debug,避免每個 DOS 資源刷紅字。 */
+		KB_debuglog(0, "Missing real file %s\n", filename);
 		return NULL;
 	}
 

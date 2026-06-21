@@ -198,7 +198,7 @@ void* KB_loaddirIMG(const char *filename, KB_DIR *dirs, int *max)
 
 	KB_File *f = KB_fopen_in( filename, "rb", dirs );
 	//f->type = KBDTYPE_GRPIMG;
-	if (!f) { KB_errlog("Can't open %s\n", filename); return NULL; }
+	if (!f) { KB_debuglog(0, "Can't open %s\n", filename); return NULL; }
 
 	grp = imgGroup_load(f);
 

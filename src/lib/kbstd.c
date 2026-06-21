@@ -64,18 +64,22 @@ void KB_logto_NULL(void)
 	_stderr = f;
 }
 
-void KB_debuglog(int mod, char *fmt, ...) 
+void KB_debuglog(int mod, char *fmt, ...)
 {
 	static int level = 0;
+	static int verbose = -1; /* 預設關閉 debug 輸出;設 KB_VERBOSE 才印 */
 	int i;
 
 	va_list argptr;
-	va_start(argptr, fmt);
+
+	if (verbose < 0) verbose = getenv("KB_VERBOSE") ? 1 : 0;
 
 	level += mod;
+	if (!verbose) return; /* 沉默 debug 級訊息 (fallback 缺檔等噪音) */
+
+	va_start(argptr, fmt);
 	for (i = 0; i < level; i++) fputc(' ', _stdout);
 	vfprintf(_stdout, fmt, argptr);
-
 	va_end(argptr);
 }
 

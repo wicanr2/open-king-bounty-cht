@@ -200,7 +200,7 @@ int ccGroup_append_list(struct ccGroup *grp, const char *filename) {
 		}
 		fclose(f);
 	} else {
-		KB_stdlog("%s not found\n", listfile);
+		KB_debuglog(0, "%s not found\n", listfile); /* .CCL 檔名索引可選,缺它用雜湊查找即可 */
 		return 1;
 	}
 	return 0;
@@ -431,7 +431,7 @@ void* KB_loaddirCC(const char *filename, KB_DIR *dirs, int *max)
 
 	KB_File *f = KB_fopen_in( filename, "rb", dirs );
 
-	if (!f) { printf("Can't open %s\n", filename); return NULL; }
+	if (!f) { KB_debuglog(0, "Can't open %s\n", filename); return NULL; }
 
 	grp = ccGroup_load(f);
 
