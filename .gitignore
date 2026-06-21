@@ -90,3 +90,4 @@ qa-*.py
 qa-*.c
 tools/__pycache__/
 tools/_*.py
+*.log
