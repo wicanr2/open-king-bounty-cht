@@ -38,10 +38,12 @@
 - [ ] **Tier 2 (大型逆向,逐項評估)**:Amiga(.adf) / Apple II(.nib/.dsk) / PC98(.d88) / 完整 FM Towns 圖形 loader。openkb 無 loader,需逆向各磁碟+圖形格式。
 
 ### F9 音樂版本切換
-- [ ] **新增 BGM 子系統**:openkb 目前只有 SFX,無場景背景音樂。需依場景 (大陸/城堡/戰鬥/片頭…) 循環播放 BGM。
-- [ ] **FM Towns 音樂導入** (使用者最想要):用 OPN2 真機錄音分軌,依場景表對應 (見 ASSETS-PLAN.md 場景表)。需音檔素材 (使用者提供或從錄音切軌)。
-- [ ] OGG 解碼評估 (SDL_mixer?);WAV 已可。
-- [ ] F9 在各版本音樂組間循環 (dos/amiga/apple2/fmtown/pc98/genesis)。
+- [x] **BGM 子系統** (src/bgm.c,SDL2_mixer):依場景循環播 OGG,F9 全域切換。✅
+- [x] **FM Towns 音樂導入**:該版 CD 映像 16 條 CDDA → OGG (music/fmtowns/,gitignore)。✅
+- [x] OGG 解碼:SDL2_mixer;AppImage 已 bundle vorbis/ogg codec 庫。✅
+- [x] F9 循環版本 + 個人版 AppImage 綁 music。✅ (驗證:build 容器偵測+Mix 成功;AppImage 含 codec)
+- [ ] **場景→音軌對照校正**:music/fmtowns/scenes.ini 為依長度推測版,需使用者**按耳朵校正** (哪條是城堡/各大陸/戰鬥)。
+- [ ] 其他版本音樂 (dos/genesis/amiga/pc98/apple2):各自抽取/錄音 + scenes.ini (genesis ROM 可試 VGM;Amiga/PC98/Apple2 待評估)。
 - [ ] (選用) 部分 FM Towns 非 UI 圖形採納。
 
 ### 其他
