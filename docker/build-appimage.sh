@@ -33,6 +33,15 @@ cp data/cjk24.bin "$AD/$SHARE/cjk24.bin"
 # 切勿散布此包。** 公開包不要設這個變數 (維持 free 美術)。
 APPNAME="KingsBounty-CHT"
 if [ -n "${KB_ORIGINAL_DOS:-}" ] && [ -f "$KB_ORIGINAL_DOS/256.CC" ]; then
+  # KB.EXE 內含 troop 數值表 (DAT_RANGEMIN..DAT_GROWTH 等) 與 AdLib 曲;原版
+  # KB.EXE 是 EXECOMP 壓縮,openkb 執行期不解壓 → 須離線先解壓,否則
+  # 一堆 "Unable to resolve resource DAT_*" + tungrp 讀取失敗 (數值用預設值)。
+  if [ -f "$KB_ORIGINAL_DOS/KB.EXE" ] && [ "$(wc -c < "$KB_ORIGINAL_DOS/KB.EXE")" -lt 100000 ]; then
+    gcc -w "$(dirname "$0")/../src/tools/unexecomp.c" -o /tmp/unexecomp 2>/dev/null && \
+    /tmp/unexecomp "$KB_ORIGINAL_DOS/KB.EXE" /tmp/KB.EXE.dec >/dev/null 2>&1 && \
+    [ -s /tmp/KB.EXE.dec ] && cp /tmp/KB.EXE.dec "$KB_ORIGINAL_DOS/KB.EXE" && \
+    echo "[build-appimage] KB.EXE 已解壓 (EXECOMP → 修復 DAT_* 數值表)"
+  fi
   cp "$KB_ORIGINAL_DOS"/256.CC "$KB_ORIGINAL_DOS"/416.CC "$KB_ORIGINAL_DOS"/KB.EXE "$AD/$SHARE/" 2>/dev/null
   APPNAME="KingsBounty-CHT-original"
   echo "[build-appimage] 綁入原版 DOS 美術 (個人版,請勿散布)"
