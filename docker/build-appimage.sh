@@ -27,6 +27,16 @@ rm -rf "$AD"; mkdir -p "$AD/usr/bin" "$AD/usr/lib" "$AD/$SHARE"
 cp openkb "$AD/usr/bin/"
 cp -r data/free "$AD/$SHARE/free"
 cp data/cjk24.bin "$AD/$SHARE/cjk24.bin"
+
+# 個人版:設 KB_ORIGINAL_DOS=<含 256.CC 的目錄> 可把原版資料綁進包內,
+# 啟動時自動偵測 → 原版 DOS 美術 + 中文。**含版權素材,僅供自己擁有正版者使用,
+# 切勿散布此包。** 公開包不要設這個變數 (維持 free 美術)。
+APPNAME="KingsBounty-CHT"
+if [ -n "${KB_ORIGINAL_DOS:-}" ] && [ -f "$KB_ORIGINAL_DOS/256.CC" ]; then
+  cp "$KB_ORIGINAL_DOS"/256.CC "$KB_ORIGINAL_DOS"/416.CC "$KB_ORIGINAL_DOS"/KB.EXE "$AD/$SHARE/" 2>/dev/null
+  APPNAME="KingsBounty-CHT-original"
+  echo "[build-appimage] 綁入原版 DOS 美術 (個人版,請勿散布)"
+fi
 # 引擎以 rootdir 找視窗 icon (icon_32x32.png);放進 bundled share 消除警告
 [ -f data/icon_32x32.png ] && cp data/icon_32x32.png "$AD/$SHARE/icon_32x32.png"
 [ -f data/free/icon_32x32.png ] && cp data/free/icon_32x32.png "$AD/openkb-cht.png" 2>/dev/null || \
@@ -80,6 +90,6 @@ EOF
 [ -f "$AD/openkb-cht.png" ] || { printf 'P3\n16 16\n255\n' > /tmp/i.ppm; for y in $(seq 0 15); do for x in $(seq 0 15); do echo "200 90 20"; done; done >> /tmp/i.ppm; convert /tmp/i.ppm "$AD/openkb-cht.png" 2>/dev/null || cp /tmp/i.ppm "$AD/openkb-cht.png"; }
 
 mkdir -p release
-ARCH=x86_64 "$AT" --appimage-extract-and-run "$AD" release/KingsBounty-CHT-x86_64.AppImage >/tmp/ai.log 2>&1 || { tail -20 /tmp/ai.log; exit 1; }
-ls -la release/*.AppImage
-echo "[build-appimage] -> release/KingsBounty-CHT-x86_64.AppImage"
+ARCH=x86_64 "$AT" --appimage-extract-and-run "$AD" "release/${APPNAME}-x86_64.AppImage" >/tmp/ai.log 2>&1 || { tail -20 /tmp/ai.log; exit 1; }
+ls -la "release/${APPNAME}-x86_64.AppImage"
+echo "[build-appimage] -> release/${APPNAME}-x86_64.AppImage"
