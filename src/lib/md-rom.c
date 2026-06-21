@@ -10,6 +10,19 @@
 #define CURSOR_OFFSET (0x062D6C - (16 * 8))
 #define TROOP_OFFSET 0x000668EC
 #define MAP_OFFSET 0x1AA8E /* -64 // ? */
+#define MD_PAL_OFFSET 0x025698 /* Genesis CRAM sprite palette (掃 ROM 找到,農民/villain 對色) */
+
+/* Genesis 色字 = 0000 BBB0 GGG0 RRR0 (9-bit, 每通道 3-bit)。轉 RGB888 (×36)。
+ * rompal 指向 ROM 內 32 bytes (16 色 big-endian word)。*/
+static void md_build_palette(const byte *rompal, SDL_Color pal[16]) {
+	int i;
+	for (i = 0; i < 16; i++) {
+		word w = (rompal[i*2] << 8) | rompal[i*2 + 1];
+		pal[i].r = (Uint8)(((w >> 1) & 7) * 36);
+		pal[i].g = (Uint8)(((w >> 5) & 7) * 36);
+		pal[i].b = (Uint8)(((w >> 9) & 7) * 36);
+	}
+}
 
 /* A tile is composed of several sub-tiles */
 /* Each subtile is 8 x 8 */
@@ -25,7 +38,7 @@
 #define SUBTILE_LEN ((SUBTILE_W * SUBTILE_H) / 2)
 #define TILE_LEN (SUBTILE_LEN * (SUBGROUP_W * SUBGROUP_H))
 
-SDL_Surface *MD_LoadIMGROW_BUF(const char *buf, int frames) {
+SDL_Surface *MD_LoadIMGROW_BUF(const char *buf, int frames, const SDL_Color *pal) {
 
 	SDL_Rect dstrect = { 0, 0, SUBTILE_W, SUBTILE_H };
 
@@ -43,10 +56,12 @@ SDL_Surface *MD_LoadIMGROW_BUF(const char *buf, int frames) {
 		dstrect.y = row * SUBTILE_H;
 
 		SDL_BlitXBPP(&buf[pos], surf, &dstrect, 4);
-		put_ega_pal(surf);
 
 		pos += SUBTILE_LEN;
 	}
+
+	/* 套 Genesis 真調色盤 (取代 EGA → 顏色正確) */
+	SDL_SetColors(surf, (SDL_Color *)pal, 0, 16);
 
 	SDL_Rect f = { 0, 0, surf->w, surf->h };
 	SDL_ReplaceIndex(surf, &f, 0, 0xFF);
@@ -119,6 +134,14 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 			int span_len = TILE_LEN * frames;
 
 			KB_File *f = KB_fopen(mod->slotA_name, "rb");
+
+			/* 讀 Genesis 調色盤 (32 bytes = 16 色) */
+			byte rompal[32];
+			SDL_Color pal[16];
+			KB_fseek(f, MD_PAL_OFFSET, 0);
+			KB_fread(rompal, sizeof(byte), 32, f);
+			md_build_palette(rompal, pal);
+
 			KB_fseek(f, offset, 0);
 
 			char buf[span_len];
@@ -126,8 +149,8 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 
 			KB_fclose(f);
 
-			SDL_Surface *surf = MD_LoadIMGROW_BUF(&buf[0], frames);
-			return surf;		
+			SDL_Surface *surf = MD_LoadIMGROW_BUF(&buf[0], frames, pal);
+			return surf;
 		}
 		break;
 		case UNKNOWN:
