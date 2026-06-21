@@ -25,7 +25,15 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 / 待確認
+## 🔧 進行中 / 待確認 (2026-06-21 第三輪實機)
+
+- [x] 城堡/城鎮 BGM 接線 (進城堡播 kb05);F9 BGM codec 已 bundle (vorbis 等)。
+- [x] 游標 twirl 殘影 (text_input 清欄)、側欄數字殘影 (draw_sidebar 清區)。
+- [ ] **原版 intro 畫面仍 free**:openkb 標題流程 (display_logo / GR_TITLE "title.256" / NWCP logo) 沒取 DOS 資源。`256.CCL/cstl.256 not found` 為**非致命警告** (命名查找用 KB_ccHash 直接算,gameplay 美術確為原版 DOS)。待查標題流程。
+- [ ] 招募「數量」輸入框等其他輸入點殘影 (text_input 已修;個別 input loop 待逐一確認)。
+- [ ] 場景→音軌對照按耳朵校正 (城堡已設 kb05)。
+
+## 🔧 (舊) 進行中 / 待確認
 
 - [ ] **credits→選角 殘影修復驗證**:blit hook 改用 src 尺寸判斷 (已改碼,需重編 + 實機確認)。code: `KB_BlitSurface_hook` in env-sdl.c。
 - [ ] commit 上述 blit hook + 重打包 release。
