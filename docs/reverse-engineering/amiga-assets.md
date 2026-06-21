@@ -20,13 +20,15 @@ big-endian:
 ```
 u16  count                       // 子圖/幀數
 count × { u16 a; u16 w; u16 h }  // 描述子;a: sprite=0x1f, tile/pic=0;w/h 像素尺寸
-u16  a_global; u16 0x0000
-u16[32] palette                  // 固定 32 色 = 5 bitplanes,12-bit 0RGB
-u16  comp_size; u16 0x0000       // LZSS 壓縮流大小
+u16  a_global                    // 描述子後僅 1 個 word,palette 緊接其後
+u16[32] palette                  // 固定 32 色 = 5 bitplanes,12-bit 0RGB;pal[0]=index0=黑(sprite 透明色)
+u16  comp_size; u16 0x0000; u16 0x0000
 u16  out_size                    // **解壓後 planar bitmap 大小** (= w/8 × h × 5 × frames)
 ... LZSS stream ...              // 緊接在 out_size 之後
 ```
-> **關鍵踩雷**:stream 起點在 `out_size`(u16)**之後**,不是在 comp_size 之後。早期把 out_size 那 2 bytes 當成 stream 開頭 → 整張圖前一小段對、其餘全 drift 成雜訊,卡關最久就是這 2-byte off-by-two。
+> **關鍵踩雷 1(palette off-by-one,最終根因)**:palette 從描述子後**第一個** word 開始(count=1 時 offset 10),不是第二個(offset 12)。早期多跳一個 word → 每個 pixel index 顯示成 `palette[i-1]` 的色:天空 teal 取代 cyan、草地中綠取代亮綠、sprite index 0 變白而非透明。`amiga_color`(`<<4`)與 plane 解碼本來就對,純粹 palette 起點偏移一格。對齊 `kings-bounty_17.gif` 逐像素驗證:每像素均差 **213.8 → 4.8**。修正:`amiga-data.c`(palette 讀取改 `2+count*6+2`,並把那個 word 移到 palette 之後、out_size 之前,保持 stream 起點不變)。
+>
+> **關鍵踩雷 2**:stream 起點在 `out_size`(u16)**之後**,不是在 comp_size 之後。早期把 out_size 那 2 bytes 當成 stream 開頭 → 整張圖前一小段對、其餘全 drift 成雜訊。
 
 ## 12-bit palette 展開:`nibble << 4`,不是 `× 17`
 
@@ -35,13 +37,12 @@ u16  out_size                    // **解壓後 planar bitmap 大小** (= w/8 ×
 用 `<< 4` 解出的 32 色 palette 與截圖的 31 色**逐色精準命中(最近色距離 = 0)**;用 `× 17` 則每通道最多偏亮 15
 (綠變螢光、紅岩偏紫紅、整體像過曝 / 反白)。這是唯一一個真正的解碼 bug,已修(`amiga-data.c` `amiga_color`、`amiga_decode.py` `palette_rgb`)。
 
-> **「plai 是迷幻 confetti」是視覺誤判,不是解碼錯誤。** LZSS、plane 排列(plane-major、plane0=LSB)、
-> 尺寸全部正確。location 圖(plai/cstl/town…)的草地、石牆本來就用**高頻 dithering 點繪**(綠/褐、灰/粉交錯)
-> 來在 32 色內表現質感——把原尺寸圖縮小或 2× 放大、再疊加 `× 17` 過曝,看起來就像雜訊。
-> 在原尺寸並把草地放大 4× 對照 `_17`,可見兩者點繪密度與顏色一致。
-> 排除過程已驗證:plane permutation(120 種)、row-interleave、word-interleave、ring fill(0 / 0x20 / 0xFF)、
-> LZSS length(+2 不命中 out_size、唯 +3 命中)、offset 高 nibble 位置——皆無法讓草地變「乾淨色塊」,
-> 因為原圖就不是色塊。
+> **plai 早期看起來「色彩不對」是真的解碼錯誤,根因為上述 palette off-by-one(踩雷 1),不是視覺誤判。**
+> LZSS、plane 排列(plane-major、plane0=LSB)、尺寸、`<<4` 展開全部正確;唯一錯的是 palette 起點偏移一格,
+> 讓全圖顏色整體位移(形狀正確但顏色錯)。location 圖的草地、石牆確實用**高頻 dithering 點繪**(綠/褐、灰/粉交錯)
+> 在 32 色內表現質感,放大後密度與 `_17` 一致——但這點繪之上仍須正確 palette 才會對。
+> 定位方法值得記住:**用「正確對齊時每個 index 應對應到參考圖單一顏色(色散最小)」反推**,
+> 一眼就看出 `index i → palette[i-1]` 的乾淨位移規律,比盲試 plane permutation 快得多。
 
 ## 壓縮 codec:Okumura LZSS (與 Genesis 同源)
 

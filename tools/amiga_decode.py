@@ -4,9 +4,9 @@
 Container format (big-endian):
   u16 count
   count * { u16 a; u16 w; u16 h }      # a: plane/flag (0x1f sprites, 0 tiles/pics)
-  u16 a_global; u16 0x0000
-  u16[32] palette                       # 32 colors = 5 bitplanes, 12-bit 0RGB
-  u16 comp_size; u16 0x0000             # size of the compressed LZSS stream
+  u16 a_global                          # one word, then palette starts
+  u16[32] palette                       # 32 colors = 5 bitplanes, 12-bit 0RGB; pal[0]=index0=black/transparent
+  u16 comp_size; u16 0x0000; u16 0x0000 # size of the compressed LZSS stream + pad
   u16 out_size                          # size of the decompressed planar bitmap
   ... LZSS stream ...                   # starts right after out_size
 
@@ -73,12 +73,12 @@ def parse(path):
     descs = []
     for _ in range(count):
         descs.append((u16(o), u16(o + 2), u16(o + 4))); o += 6
-    a_global = u16(o); o += 2
-    o += 2  # 0x0000
+    a_global = u16(o); o += 2  # one word, then palette (pal[0]=index0=black/transparent)
     palette = [u16(o + 2 * i) for i in range(32)]
     o += 64
     comp_size = u16(o); o += 2
     o += 2  # 0x0000
+    o += 2  # flags word (keeps stream start unchanged; see amiga-assets.md off-by-one)
     out_size = u16(o); o += 2
     stream = d[o:]
     return {
