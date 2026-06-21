@@ -25,7 +25,18 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 (2026-06-21 第六輪:多版本素材分工 — A 背景 agent / B 主線)
+## 🔧 進行中 (2026-06-21 第七輪:Genesis 世界地形完整破解+實作)
+
+- [x] **Genesis 世界地圖 terrain 完整破解+實作** (genesis-re agent 逆向 + 主線整合):
+  - 自製 **Okumura LZSS** 解壓器 ROM 0x18B0C(**length=(b2&0xf)+3**,off-by-one 是卡關主因)。
+  - terrain pattern = LZSS 塊 **0x30E82**(638 tiles);cell template **0x19666**(6×5 metatile);map **0x1AA8E**(&0x7F→0..71 對齊引擎 72-tile);palette **0x256B8**(4 line)。
+  - md-rom.c 實作 GR_TILE/GR_TILESET(C 版 LZSS + 快取 + template 組)+ 兩個引擎適配:**48×40 降採樣→48×34** 對齊 RECT_TILE、**index0 填海藍(0,72,180)不透明**(openkb 單 plane + draw_map 紅底,colorkey 會露紅)。
+  - Python 重現驗證 = 乾淨原版世界地圖(qa-md/VERIFY_fixed.png)。commit b070979 + 修正(本地,未 push)。
+  - 完整 recipe 在 skill ref 08 §8 + qa-md/FINDINGS.txt。**待實機 F8→Genesis 驗證**。
+  - 殘留(次要):起始城堡區物件/動畫水波 tile placeholder。
+- [ ] **Amiga 圖形**(amiga-crack agent):容器檔頭全破,圖形 codec 試 LZSS+3(NWC 同源,genesis-re 證實圖形=資料同一 LZSS,別假設第二 codec)。
+
+## 🔧 (第六輪) 多版本素材分工 — A 背景 agent / B 主線
 
 - **A (背景 agent genesis-re)**:反組譯 Genesis ROM 找地圖 tileset(疑壓縮)。進度見 skill ref 08。
 - **B (主線) Amiga 素材**:`amiga-orig/` .adf **完整解開**(amitools xdftool)→ `extracted/KB/GAME/` 72 個**具名**資源:
