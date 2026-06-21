@@ -6764,6 +6764,30 @@ int run_game(KBconfig *conf) {
 		}
 	}
 
+	/* 自動偵測 Amiga 素材 (已從 .adf unpack 的 GAME/ 目錄,以 tileseta 為標記)。
+	 * 存在則加 AMIGA 模組,F8 可循環到 Amiga 美術。公開包不含 → 不觸發。 */
+	{
+		const char *acand[5];
+		int ai, afound = 0;
+		acand[0] = getenv("KB_AMIGA_GAME"); /* 可直接指定 GAME 目錄 */
+		acand[1] = conf->data_dir;
+		acand[2] = conf->install_dir;
+		acand[3] = "amiga";
+		acand[4] = ".";
+		for (ai = 0; ai < 5 && !afound; ai++) {
+			char *probe;
+			if (!acand[ai] || !acand[ai][0]) continue;
+			probe = KB_fastpath(acand[ai], "/", "tileseta");
+			if (probe && file_size(probe) > 0) {
+				add_module_aux(conf, "Amiga art", KBFAMILY_AMIGA, 5, acand[ai], "", NULL, NULL);
+				conf->fallback = 1;
+				afound = 1;
+				KB_stdlog("Amiga data found at '%s' -- F8 can switch to Amiga artwork.\n", acand[ai]);
+			}
+			if (probe) free(probe);
+		}
+	}
+
 	/* --- ! ! ! --- */
 	mod = select_module();
 

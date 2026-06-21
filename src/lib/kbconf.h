@@ -30,6 +30,7 @@
 #define KBFAMILY_GNU	0x0F
 #define KBFAMILY_DOS	0x0D
 #define KBFAMILY_MD 	0x02
+#define KBFAMILY_AMIGA	0x0A
 
 typedef struct KBmodule {
 

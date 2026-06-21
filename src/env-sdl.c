@@ -846,15 +846,17 @@ SDL_Surface* KB_LoadIMG8(int id, int sub_id) {
 void* GNU_Resolve(KBmodule *mod, int id, int sub_id);
 void* DOS_Resolve(KBmodule *mod, int id, int sub_id);
 void* MD_Resolve(KBmodule *mod, int id, int sub_id);
+void* AMIGA_Resolve(KBmodule *mod, int id, int sub_id);
 
 /* F8 美術主題:目前偏好的圖形家族 (預設 DOS 原版美術;只有 free 時 KB_Resolve
  * 會 fallback 到 GNU)。F8 在已載入的家族間循環,文字恆走 GNU 維持中文。 */
 int kb_gfx_family = KBFAMILY_DOS;
 
 static const struct { int fam; const char *name; } gfx_themes[] = {
-	{ KBFAMILY_GNU, "free" },
-	{ KBFAMILY_DOS, "DOS" },
-	{ KBFAMILY_MD,  "Genesis" },
+	{ KBFAMILY_GNU,   "free" },
+	{ KBFAMILY_DOS,   "DOS" },
+	{ KBFAMILY_MD,    "Genesis" },
+	{ KBFAMILY_AMIGA, "Amiga" },
 };
 #define N_GFX_THEMES (int)(sizeof(gfx_themes)/sizeof(gfx_themes[0]))
 
@@ -913,6 +915,7 @@ void* KB_Resolve(int id, int sub_id) {
 				case KBFAMILY_GNU: ret = GNU_Resolve(mod, id, sub_id); break;
 				case KBFAMILY_DOS: ret = DOS_Resolve(mod, id, sub_id); break;
 				case KBFAMILY_MD:  ret = MD_Resolve(mod, id, sub_id); break;
+				case KBFAMILY_AMIGA: ret = AMIGA_Resolve(mod, id, sub_id); break;
 				default: break;
 			}
 			if (ret != NULL) break;

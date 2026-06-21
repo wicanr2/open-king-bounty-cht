@@ -52,6 +52,13 @@ if [ -n "${KB_GENESIS_ROM:-}" ] && [ -f "$KB_GENESIS_ROM/kb.bin" ]; then
   APPNAME="KingsBounty-CHT-original"
   echo "[build-appimage] 綁入 Genesis ROM (個人版,請勿散布)"
 fi
+# 個人版:綁入 Amiga 美術 (已從 .adf unpack 的 GAME/ 散檔),F8 可循環到 Amiga 美術。版權素材,勿散布。
+if [ -n "${KB_AMIGA_GAME:-}" ] && [ -f "$KB_AMIGA_GAME/tileseta" ]; then
+  mkdir -p "$AD/$SHARE/amiga"
+  cp "$KB_AMIGA_GAME"/* "$AD/$SHARE/amiga/" 2>/dev/null
+  APPNAME="KingsBounty-CHT-original"
+  echo "[build-appimage] 綁入 Amiga 美術 (個人版,請勿散布)"
+fi
 # 個人版:綁入各版本 BGM (music/<版本>/),啟動時 F9 可切換。版權素材,勿散布。
 if [ -d music ] && ls music/*/scenes.ini >/dev/null 2>&1; then
   cp -r music "$AD/$SHARE/music"
@@ -101,6 +108,8 @@ type = free
 path = $DATA/free/
 INI
 export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
+# Amiga 美術目錄 (若有綁入) → 引擎 auto-detect F8 可切 Amiga
+[ -f "$DATA/amiga/tileseta" ] && export KB_AMIGA_GAME="$DATA/amiga"
 # --rootdir 指向 bundled 資料,讓引擎找到 icon_32x32.png
 exec "$HERE/usr/bin/openkb" -c "$CFG" --rootdir "$DATA" --savedir "$SAVEDIR" "$@"
 EOF

@@ -43,6 +43,7 @@ LIB_SOURCES=\
 	src/lib/free-data.c src/lib/free-snd.c \
 	src/lib/dos-data.c src/lib/dos-cc.c src/lib/dos-img.c src/lib/dos-snd.c src/lib/dos-exe.c \
 	src/lib/md-rom.c \
+	src/lib/amiga-data.c \
 	src/lib/kbauto.c \
 	src/cjkfont.c \
 	src/inprint.c \
