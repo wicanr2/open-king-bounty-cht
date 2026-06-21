@@ -68,3 +68,6 @@ docs/test/t-*.png
 docs/test/fix-*.png
 docs/test/hybrid-*.png
 docs/test/resize-test.png
+docs/test/qa-hybrid/
+docs/test/charsel*.png
+docs/test/qa3-*.png docs/test/qa4-*.png
