@@ -298,9 +298,15 @@ int KB_event(KBgamestate *state) {
 
 	if (!eve)
 	while (SDL_PollEvent(&event)) {
-		//switch (event.type) {
-		//	case SDL_MOUSEMOTION:
-		//}
+		/* 視窗大小改變 / 需重繪 → 重新呈現目前畫面,讓內容隨視窗縮放
+		 * (openkb 只在重畫時 present,故 resize 後需主動重呈現)。 */
+		if (event.type == SDL_WINDOWEVENT &&
+			(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED
+			|| event.window.event == SDL_WINDOWEVENT_RESIZED
+			|| event.window.event == SDL_WINDOWEVENT_EXPOSED)) {
+			KB_present(sys);
+			continue;
+		}
 		if (event.type == SDL_MOUSEMOTION) {
 			mouse_x = event.motion.x;
 			mouse_y = event.motion.y;

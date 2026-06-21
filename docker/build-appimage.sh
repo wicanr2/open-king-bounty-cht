@@ -27,6 +27,8 @@ rm -rf "$AD"; mkdir -p "$AD/usr/bin" "$AD/usr/lib" "$AD/$SHARE"
 cp openkb "$AD/usr/bin/"
 cp -r data/free "$AD/$SHARE/free"
 cp data/cjk24.bin "$AD/$SHARE/cjk24.bin"
+# 引擎以 rootdir 找視窗 icon (icon_32x32.png);放進 bundled share 消除警告
+[ -f data/icon_32x32.png ] && cp data/icon_32x32.png "$AD/$SHARE/icon_32x32.png"
 [ -f data/free/icon_32x32.png ] && cp data/free/icon_32x32.png "$AD/openkb-cht.png" 2>/dev/null || \
   { [ -f data/icon_32x32.png ] && cp data/icon_32x32.png "$AD/openkb-cht.png"; }
 
@@ -47,12 +49,14 @@ CFGDIR="${XDG_CONFIG_HOME:-$HOME/.config}/open-king-bounty-cht"
 SAVEDIR="${XDG_DATA_HOME:-$HOME/.local/share}/open-king-bounty-cht/saves"
 mkdir -p "$CFGDIR" "$SAVEDIR"
 CFG="$CFGDIR/openkb.ini"
+# sound 預設關閉:free 模組的 tune 在 SDL2 下播放為噪音,待修;
+# 想嘗試可把 sound 改 1。
 cat > "$CFG" <<INI
 [main]
 datadir = $DATA
 autodiscover = 0
 [sdl]
-sound = 1
+sound = 0
 fullscreen = 0
 filter = normal2x
 [module]
@@ -61,7 +65,8 @@ type = free
 path = $DATA/free/
 INI
 export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
-exec "$HERE/usr/bin/openkb" -c "$CFG" --savedir "$SAVEDIR" "$@"
+# --rootdir 指向 bundled 資料,讓引擎找到 icon_32x32.png
+exec "$HERE/usr/bin/openkb" -c "$CFG" --rootdir "$DATA" --savedir "$SAVEDIR" "$@"
 EOF
 chmod +x "$AD/AppRun"
 

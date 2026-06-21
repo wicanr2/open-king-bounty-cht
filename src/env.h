@@ -90,6 +90,7 @@ extern KBenv *KB_startENV(KBconfig *conf);
 extern void KB_stopENV(KBenv *env);
 
 extern void KB_flip(KBenv *env);
+extern void KB_present(KBenv *env);
 extern void KB_setcaption(const char *title);
 
 extern void KB_play(KBenv *env, KBsound *snd);

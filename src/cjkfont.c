@@ -121,19 +121,24 @@ int cjkfont_has(uint32_t cp) { return cjkfont_get(cp, NULL, NULL) != NULL; }
 int cjkfont_glyph_w(void)    { return cjk.w; }
 int cjkfont_glyph_h(void)    { return cjk.h; }
 
-/* ---- CJK draw-list ---- */
+/* ---- CJK draw-list ----
+ * 設計:單一清單,「印新中文時才清、跨 flip 保留」。
+ *   - 一個 frame 內第一個 CJK glyph 進來時清空舊清單 (frame_open: 0→1)。
+ *   - KB_flip 後 frame_open 歸 0;清單本身不清,讓「重畫但不重印文字」的畫面
+ *     (城堡動畫背景、游標閃爍、靜態選單等待) 重複 present 時中文持續顯示。
+ *   - 換畫面時必有新的中文被印出 → 自動清舊換新,不會殘留。 */
 
 #define CJK_DRAWLIST_MAX 4096
-static cjk_draw_t cjk_lists[2][CJK_DRAWLIST_MAX];
-static int cjk_n[2] = { 0, 0 };
-static int cjk_front = 0;
+static cjk_draw_t cjk_list[CJK_DRAWLIST_MAX];
+static int cjk_n = 0;
+static int cjk_frame_open = 0;
 
 void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t rgb, uint8_t fonth)
 {
-    int b = 1 - cjk_front;
     cjk_draw_t *d;
-    if (cjk_n[b] >= CJK_DRAWLIST_MAX) return;
-    d = &cjk_lists[b][cjk_n[b]++];
+    if (!cjk_frame_open) { cjk_n = 0; cjk_frame_open = 1; } /* 新 frame 第一個中文 → 清舊 */
+    if (cjk_n >= CJK_DRAWLIST_MAX) return;
+    d = &cjk_list[cjk_n++];
     d->x = (int16_t)x;
     d->y = (int16_t)y;
     d->cp = cp;
@@ -143,14 +148,13 @@ void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t rgb, uint8_t fonth)
 
 void cjk_drawlist_flip(void)
 {
-    cjk_front = 1 - cjk_front;
-    cjk_n[1 - cjk_front] = 0;
+    cjk_frame_open = 0; /* 本 frame 結束;清單保留供下次 present,下個中文進來才清 */
 }
 
-void cjk_drawlist_clear(void) { cjk_n[0] = 0; cjk_n[1] = 0; }
-int  cjk_drawlist_count(void) { return cjk_n[cjk_front]; }
+void cjk_drawlist_clear(void) { cjk_n = 0; cjk_frame_open = 0; }
+int  cjk_drawlist_count(void) { return cjk_n; }
 
 const cjk_draw_t *cjk_drawlist_get(int i)
 {
-    return ((i >= 0) && (i < cjk_n[cjk_front])) ? &cjk_lists[cjk_front][i] : NULL;
+    return ((i >= 0) && (i < cjk_n)) ? &cjk_list[i] : NULL;
 }

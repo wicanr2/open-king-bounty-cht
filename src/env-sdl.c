@@ -355,12 +355,10 @@ void KB_stopENV(KBenv *env) {
 
 /* 把軟體 surface 上傳 texture 並呈現到視窗 (取代 SDL1.2 SDL_Flip)。
  * 有 CJK 時走合成層:底圖 2x + 漢字疊圖;否則直接縮放呈現。 */
-void KB_flip(KBenv *env) {
+/* 把目前畫面 (screen surface + 持續的 CJK 清單) 呈現到視窗。
+ * 抽成獨立函式,讓視窗 resize/expose 時可重新呈現以隨視窗縮放 (不動清單)。 */
+void KB_present(KBenv *env) {
 	SDL_UpdateTexture(g_texture, NULL, env->screen->pixels, env->screen->pitch);
-
-	/* 先把本 frame 累積的 pending 換成 front,讓「畫一次就等待」的選單/對話
-	 * 在這一次 flip 就把剛加入的 CJK glyph 畫出來 (openkb 多為 redraw-then-flip)。 */
-	cjk_drawlist_flip();
 
 	if (cjk_drawlist_count() > 0 && cjk_ensure_composite()) {
 		SDL_SetRenderTarget(g_renderer, cjkv.composite);
@@ -374,6 +372,13 @@ void KB_flip(KBenv *env) {
 		SDL_RenderCopy(g_renderer, g_texture, NULL, NULL);
 	}
 	SDL_RenderPresent(g_renderer);
+}
+
+void KB_flip(KBenv *env) {
+	KB_present(env);
+	/* 本 frame 結束:CJK 清單保留 (供 resize 重呈現與動畫畫面持續顯示),
+	 * 下一個被印出的中文會自動清舊換新。 */
+	cjk_drawlist_flip();
 }
 
 
