@@ -45,7 +45,8 @@ LIB_SOURCES=\
 	src/lib/md-rom.c \
 	src/lib/kbauto.c \
 	src/cjkfont.c \
-	src/inprint.c
+	src/inprint.c \
+	src/bgm.c
 
 LIB_BINARY=src/libkb.a
 

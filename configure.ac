@@ -28,6 +28,7 @@ AS_IF([test -n "$SDL_CONFIG"], [
 AC_CHECK_LIB([SDL2], [SDL_Init], [ ], [AC_MSG_ERROR([cannot find `SDL2' library, a mandatory dependancy])])
 AC_CHECK_LIB([SDL2_image], [IMG_Load], [ ])
 AC_CHECK_LIB([SDL2_net], [SDLNet_Init])
+AC_CHECK_LIB([SDL2_mixer], [Mix_OpenAudio], [LIBS="$LIBS -lSDL2_mixer"])
 AC_CHECK_LIB([png], [png_create_write_struct], [ ])
 
 # Optional libraries.

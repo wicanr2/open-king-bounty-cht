@@ -21,6 +21,7 @@
 #include "sdlcompat.h"
 
 #include "bounty.h"
+#include "bgm.h"
 #include "play.h"
 #include "save.h"
 #include "ui.h"
@@ -825,6 +826,7 @@ int select_module() {
 	 * 打包版在選單意外收到 quit/esc 即 "No module selected" 致命。 */
 	if (conf->num_modules >= 1) {
 		conf->module = 0;
+		KB_bgm_scene(BGM_TITLE); /* 標題/選角/製作名單 BGM */
 		return 0;
 	}
 
@@ -3532,6 +3534,9 @@ int run_combat(KBgame *game, int mode, int id) {
 
 	KBcombat combat = { 0 };
 	int winner;
+
+	/* 戰鬥 BGM:攻城 (mode 1) 用攻城曲,其餘一般戰鬥曲。 */
+	KB_bgm_scene(mode == 1 ? BGM_SIEGE : BGM_COMBAT);
 
 	switch (mode) {
 
@@ -6372,6 +6377,9 @@ void adventure_loop(KBgame *game) {
 	reset_adventure_menu_hotspots();
 
 	while (!done) {
+
+		/* 世界地圖 BGM:依目前大陸播放對應曲 (同場景不會重啟)。 */
+		KB_bgm_scene(BGM_FIELD0 + (game->continent & 3));
 
 		key = KB_event(&adventure_state);
 

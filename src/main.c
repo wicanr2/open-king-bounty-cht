@@ -59,6 +59,7 @@ void dump_version(void) {
 }
 
 int main(int argc, char* argv[]) {
+	setvbuf(stdout, NULL, _IOLBF, 0); /* 行緩衝:確保 log 即時輸出 (利於除錯/非乾淨結束) */
 	KB_logto_STD();
 
 	int playing = 1;	/* Play 1 game of KB */

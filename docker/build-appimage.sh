@@ -37,6 +37,12 @@ if [ -n "${KB_ORIGINAL_DOS:-}" ] && [ -f "$KB_ORIGINAL_DOS/256.CC" ]; then
   APPNAME="KingsBounty-CHT-original"
   echo "[build-appimage] 綁入原版 DOS 美術 (個人版,請勿散布)"
 fi
+# 個人版:綁入各版本 BGM (music/<版本>/),啟動時 F9 可切換。版權素材,勿散布。
+if [ -d music ] && ls music/*/scenes.ini >/dev/null 2>&1; then
+  cp -r music "$AD/$SHARE/music"
+  APPNAME="KingsBounty-CHT-original"
+  echo "[build-appimage] 綁入背景音樂 (個人版,請勿散布)"
+fi
 # 引擎以 rootdir 找視窗 icon (icon_32x32.png);放進 bundled share 消除警告
 [ -f data/icon_32x32.png ] && cp data/icon_32x32.png "$AD/$SHARE/icon_32x32.png"
 [ -f data/free/icon_32x32.png ] && cp data/free/icon_32x32.png "$AD/openkb-cht.png" 2>/dev/null || \
@@ -48,6 +54,13 @@ for lib in $(ldd "$AD/usr/bin/openkb" | awk '/=>/{print $3}'); do
     */libc.so*|*/libm.so*|*/libpthread*|*/libdl*|*/librt*|*/ld-linux*|*/libGL*|*/libGLX*|*/libX11*|*/libxcb*|*/libstdc++*|*/libgcc*) ;;
     *) cp -L "$lib" "$AD/usr/lib/" 2>/dev/null || true ;;
   esac
+done
+# SDL2_mixer 的 OGG 解碼庫是 runtime dlopen (ldd 抓不到) → 明確 bundle,
+# 否則 Mix_Init(MIX_INIT_OGG) 失敗、背景音樂無聲。連 SDL2_mixer 本體一併確保。
+for pat in libSDL2_mixer libvorbisfile libvorbisenc libvorbis libogg libFLAC libopus libopusfile libmpg123 libxmp libmodplug; do
+  for f in /usr/lib/*/${pat}.so* /usr/lib/${pat}.so*; do
+    [ -e "$f" ] && cp -L "$f" "$AD/usr/lib/" 2>/dev/null || true
+  done
 done
 
 # AppRun:產生指向 bundled free 模組的設定,savedir 放使用者家目錄

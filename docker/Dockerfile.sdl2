@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
       build-essential autoconf automake pkg-config git ca-certificates wget curl \
-      libsdl2-dev libsdl2-image-dev libsdl2-net-dev libpng-dev \
+      libsdl2-dev libsdl2-image-dev libsdl2-net-dev libsdl2-mixer-dev libpng-dev \
       xvfb imagemagick xdotool \
     && rm -rf /var/lib/apt/lists/*
 

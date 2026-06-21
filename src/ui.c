@@ -23,6 +23,7 @@
 #include "lib/kbres.h"
 #include "env.h"
 #include "ui.h"
+#include "bgm.h"
 
 #include "../vendor/vendor.h" /* scale2x, inprint, etc */
 
@@ -346,6 +347,11 @@ int KB_event(KBgamestate *state) {
 		if (event.type == SDL_KEYDOWN) {
 			SDL_keysym *kbd = &event.key.keysym;
 			kbd_state[kbd->scancode] = 1;
+			/* F9 全域切換背景音樂版本 (所有畫面通用,不佔用遊戲按鍵);消化此事件。 */
+			if (kbd->sym == SDLK_F9) {
+				KB_stdlog("BGM version: %s\n", KB_bgm_cycle_version());
+				continue;
+			}
 			for (i = 0; i < state->max_spots; i++) {
 				KBhotspot *sp = &state->spots[i];
 				if ((sp->flag & KFLAG_ANYKEY) || 

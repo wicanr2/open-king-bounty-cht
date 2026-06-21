@@ -28,6 +28,7 @@
 #include "../vendor/vendor.h"
 #include "env.h"
 #include "cjkfont.h"
+#include "bgm.h"
 
 #ifdef HAVE_LIBSDL_IMAGE
 #include <SDL_image.h>
@@ -178,8 +179,6 @@ KBenv *KB_startENV(KBconfig *conf) {
 	Uint32 iflags, winflags;
 	int win_w, win_h;
 
-	SDL_AudioSpec desired;
-
 	char *iconfile;
 
 	KBenv *nsys = malloc(sizeof(KBenv));
@@ -279,32 +278,9 @@ KBenv *KB_startENV(KBconfig *conf) {
 	free(iconfile);
 
 	if (conf->sound) {
-		/* Open audio device */
-		desired.format = AUDIO_FORMAT;
-		desired.freq = 11025;	/* Common values are 11025, 22050 and 44100 hz. We don't need much (yet)! */
-		desired.channels = 2;  	// TODO: allow user selection
-		desired.samples = 512;	/* Large audio buffer reduces risk of dropouts but increases response time */
-
-		desired.callback = KBenv_audio_callback;
-		desired.userdata = nsys;
-
-		/* 傳 NULL 為 obtained:強制 device 採用 desired 格式 (S16/11025/2ch),
-		 * 由 SDL 內部轉換到實際硬體。否則 SDL2 在現代 Linux (PulseAudio/PipeWire)
-		 * 常回傳 AUDIO_F32,而 tune synth 產生的是 S16 → 被當 float 解讀成噪音。
-		 * mixer 直接採用 desired,讓 synth 以正確 freq/format/channels 取樣。 */
-		if (SDL_OpenAudio(&desired, NULL) < 0) {
-			KB_errlog("Couldn't open audio device: %s\n", SDL_GetError());
-
-			conf->sound = 0; /* Turn sound off */
-		} else {
-			nsys->mixer = desired;
-			KB_stdlog("Opened audio device: %d channels, %d frequency, format 0x%04x\n",
-				nsys->mixer.channels, nsys->mixer.freq, nsys->mixer.format);
-
-			SDL_PauseAudio(0); /* Start playing */
-
-			KB_SetAudioSpec(&nsys->mixer); /* Store for later */
-		}
+		/* 改用 SDL2_mixer 的 BGM 子系統 (各版本 OGG 場景音樂),取代原本的方波
+		 * SFX raw callback (PC 喇叭式音效,且 idle 噪音問題)。音樂素材在 music/<版本>/。 */
+		KB_bgm_init(conf->install_dir, conf->data_dir);
 	}
 
 	nsys->sound = NULL;
@@ -340,7 +316,7 @@ KBenv *KB_startENV(KBconfig *conf) {
 
 void KB_stopENV(KBenv *env) {
 
-	SDL_CloseAudio();
+	KB_bgm_shutdown();
 
 	if (env->font) SDL_FreeSurface(env->font);
 	if (env->icon) SDL_FreeSurface(env->icon);
@@ -909,33 +885,10 @@ void* KB_Resolve(int id, int sub_id) {
  * SDL_SOUND internal mixer.
  */
 void KB_play(KBenv *sys, KBsound *snd) {
-
-	int n;
-
-	if (snd == NULL) {
-		KB_debuglog(0, "(Non)Playing an empty sound\n");
-		return;
-	}
-
-	sys->sound = NULL;
-
-	switch (snd->type) {	//TODO: make this a callback, for speed
-		case KBSND_DOS:
-
-			n = tunFile_reset(snd->data, sys->mixer.format);
-
-		break;
-		case KBSND_WAV:
-
-			n = wavFile_reset(snd->data, sys->mixer.format);
-
-		break;
-		default:
-		break;
-	}
-
-	sys->sound = snd;
+	/* 方波 SFX 已停用 (改用 SDL2_mixer BGM,見 bgm.c);no-op,避免與 mixer 搶裝置。 */
+	(void)sys; (void)snd;
 }
+#if 0 /* 舊 raw SFX 混音 callback,改用 SDL2_mixer 後停用 */
 void KBenv_audio_callback(void *userdata, Uint8 *stream, int len) {
 
 	KBenv *sys = (KBenv *) userdata;
@@ -977,8 +930,9 @@ void KBenv_audio_callback(void *userdata, Uint8 *stream, int len) {
 			KB_errlog("Audio buffer underrun: need %d more bytes of samples\n", len);
 			break;
 		}
-		
+
 		len -= n;
 	}
 
 }
+#endif /* 舊 raw SFX callback */
