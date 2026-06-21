@@ -1114,8 +1114,14 @@ void draw_sidebar(KBgame *game, int tick) {
 
 	SDL_Rect *right_frame  = local.frames[FRAME_RIGHT];
 
-	/* 清側欄區舊 CJK (數字以小圖重畫,不觸發 blit hook → 上一畫面數字會殘留)。 */
-	cjk_drawlist_remove_region(right_frame->x, right_frame->y, right_frame->w, right_frame->h);
+	/* 清側欄區舊 CJK (數字以小圖重畫,不觸發 blit hook → 上一畫面數字會殘留)。
+	 * 側欄內容畫在 (screen->w - right_frame->w - purse->w) 起的 purse 欄 + right_frame,
+	 * 故須涵蓋兩者整條;之前只清 right_frame 漏掉左邊 purse 欄的部隊數字。 */
+	{
+		int sb_w = local.side_tile->w + right_frame->w;
+		int sb_x = screen->w - sb_w;
+		cjk_drawlist_remove_region(sb_x, local.map.y, sb_w, screen->h - local.map.y);
+	}
 
 	SDL_Surface *purse = SDL_TakeSurface(GR_PURSE, 0, 0);
 	SDL_Surface *sidebar = SDL_TakeSurface(GR_UI, 0, 0);

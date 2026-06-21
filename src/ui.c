@@ -452,6 +452,11 @@ int KB_event(KBgamestate *state) {
 		}
 	}
 
+	/* 無事件時讓出 CPU:遊戲主迴圈會緊接著再呼叫 KB_event,沒有睡眠就會
+	 * 整顆核心空轉 (~100%)。動畫計時器走 SOFT_WAIT (數十 ms),睡 ~6ms
+	 * 不影響動畫流暢度,卻能把閒置 CPU 從 100% 降到個位數。 */
+	if (!eve) SDL_Delay(6);
+
 	return eve;
 }
 
