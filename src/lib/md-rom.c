@@ -20,11 +20,15 @@
  *  - cell template    : 0x19666,每 cell-type 60 bytes = 6x5=30 個 VDP nametable word
  *                       (bit0-10 tile index、bit11 hflip、bit13-14 palette line)
  *  - map cell data    : 0x1AA8E (見 MAP_OFFSET),cell-type 經引擎 &0x7F → 0..71
- *  - terrain palette  : 0x256B8 起,4 條 line x 16 色
+ *  - terrain palette  : LZSS 塊 @ 0x3371A,解壓出 128 bytes = 4 line x 16 色
  * 一個 cell = 6x5 個 8x8 tile = 48x40 px 的 metatile。GR_TILE sub_id = cell-type。*/
 #define MD_TERRAIN_LZSS 0x30E82  /* LZSS 壓縮的地形 tile pattern */
 #define MD_CELLTPL_OFFSET 0x19666 /* cell-type → 6x5 nametable word 模板表 */
-#define MD_TERRAIN_PAL 0x0256B8  /* 地形 palette (4 line x 16 色) */
+/* 地形 palette:LZSS 壓縮 @ 0x3371A,解壓得 128 bytes = 4 line x 16 個 Genesis bus word
+ * (0000 BBB0 GGG0 RRR0,big-endian)。以 Genesis Plus GX 模擬器 dump 世界地圖 live CRAM
+ * 逐色比對確認 (64 色 57 完全吻合,差異僅各 line index0 透明色與 line3 水波動畫 cycling 色)。
+ * 舊值 0x256B8 是 sprite/UI 用色(line0 全藍),誤當地形 palette → 草地被畫成藍色。 */
+#define MD_TERRAIN_PAL_LZSS 0x3371A
 #define MD_CELL_COLS 6           /* 一個 cell 寬幾個 8x8 tile */
 #define MD_CELL_ROWS 5           /* 一個 cell 高幾個 8x8 tile */
 #define MD_CELL_W (MD_CELL_COLS * 8) /* 48 */
@@ -132,6 +136,35 @@ static const byte *md_terrain_pattern(const char *romname, int *out_ntiles) {
 	return cache + 2;
 }
 
+/* 解壓並快取地形 palette (LZSS 塊 @ MD_TERRAIN_PAL_LZSS,生命週期只解一次)。
+ * 回傳指向 128 bytes (4 line x 16 個 Genesis bus word) 的指標;失敗回 NULL。*/
+static const byte *md_terrain_palette(const char *romname) {
+	static byte *cache = NULL;
+	static int cache_len = 0;
+	if (cache == NULL) {
+		KB_File *f = KB_fopen(romname, "rb");
+		byte *comp;
+		long flen;
+		int n, dsz;
+		if (!f) return NULL;
+		KB_fseek(f, 0, SEEK_END);
+		flen = KB_ftell(f);
+		if (flen <= MD_TERRAIN_PAL_LZSS) { KB_fclose(f); return NULL; }
+		KB_fseek(f, MD_TERRAIN_PAL_LZSS, 0);
+		n = (int)(flen - MD_TERRAIN_PAL_LZSS);
+		comp = malloc(n);
+		if (!comp) { KB_fclose(f); return NULL; }
+		KB_fread(comp, 1, n, f);
+		KB_fclose(f);
+		cache = md_lzss_decompress(comp, n, &dsz);
+		free(comp);
+		if (!cache) return NULL;
+		cache_len = dsz;
+	}
+	if (cache_len < 4 * 32) return NULL; /* 需至少 4 line x 32 bytes */
+	return cache;
+}
+
 /* 把一個 8x8 4bpp tile (32 bytes,高 nibble=左像素) 畫進 8-bit PAL surface。
  * 支援水平翻轉 (hflip)。pal_base = 該 sub-tile 的 palette line 在 64 色表的起點 (line*16)。
  * 像素 0 一律映到全域 index 0 (各 line 共用的透明色,設成 colorkey);像素 1..15 映到
@@ -156,9 +189,9 @@ static void md_blit_subtile(const byte *tile, SDL_Surface *surf, int ox, int oy,
  * palette 取 4 條 line (per-tile bit13-14 選);index 0 設為 colorkey 透明。失敗回 NULL。*/
 static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 	const byte *pat;
+	const byte *rompal;       /* 4 line x 32 bytes (LZSS 解壓出的地形 palette) */
 	int ntiles = 0;
 	byte tplbuf[60];          /* 60 bytes = 30 nametable word */
-	byte rompal[4 * 32];      /* 4 line x 32 bytes */
 	SDL_Color pal64[64];      /* 4 line x 16 色 (per-tile palette;index = line*16 + pixel) */
 	SDL_Surface *surf;
 	KB_File *f;
@@ -169,14 +202,17 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 		KB_errlog("[md] terrain pattern decompress failed (cell %d) -- NULL\n", cell_type);
 		return NULL;
 	}
+	rompal = md_terrain_palette(romname);
+	if (!rompal) {
+		KB_errlog("[md] terrain palette decompress failed (cell %d) -- NULL\n", cell_type);
+		return NULL;
+	}
 	KB_debuglog(0, "[md] build cell %d (ntiles=%d)\n", cell_type, ntiles);
 
 	f = KB_fopen(romname, "rb");
 	if (!f) return NULL;
 	KB_fseek(f, MD_CELLTPL_OFFSET + cell_type * 60, 0);
 	if (KB_fread(tplbuf, 1, 60, f) != 60) { KB_fclose(f); return NULL; }
-	KB_fseek(f, MD_TERRAIN_PAL, 0);
-	KB_fread(rompal, 1, sizeof(rompal), f);
 	KB_fclose(f);
 
 	/* 組 64 色 palette:4 條 Genesis line 各 16 色,展平成 line*16+pixel。
