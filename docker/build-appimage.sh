@@ -49,14 +49,12 @@ CFGDIR="${XDG_CONFIG_HOME:-$HOME/.config}/open-king-bounty-cht"
 SAVEDIR="${XDG_DATA_HOME:-$HOME/.local/share}/open-king-bounty-cht/saves"
 mkdir -p "$CFGDIR" "$SAVEDIR"
 CFG="$CFGDIR/openkb.ini"
-# sound 預設關閉:free 模組的 tune 在 SDL2 下播放為噪音,待修;
-# 想嘗試可把 sound 改 1。
 cat > "$CFG" <<INI
 [main]
 datadir = $DATA
 autodiscover = 0
 [sdl]
-sound = 0
+sound = 1
 fullscreen = 0
 filter = normal2x
 [module]

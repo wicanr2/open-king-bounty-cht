@@ -41,6 +41,10 @@ def collect_codepoints(text_files, chars_literal):
             add(fh.read())
     if chars_literal:
         add(chars_literal)
+    # 一律納入可列印 ASCII (0x20–0x7E),讓英文/數字也以同一套 Noto 字形渲染,
+    # 與中文風格一致 (box-drawing / 控制字元不納入,仍走點陣)。
+    for cp in range(0x20, 0x7F):
+        cps.add(chr(cp))
     return sorted(cps, key=ord)
 
 

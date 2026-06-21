@@ -137,28 +137,26 @@ static void cjk_draw_overlay(void) {
 	for (i = 0; i < n; i++) {
 		const cjk_draw_t *d = cjk_drawlist_get(i);
 		SDL_Texture *t = cjk_glyph_tex(d->cp);
-		int sz, lum;
+		SDL_Rect cell;
 		Uint8 r, g, b;
-		SDL_Rect dst;
 		if (!t) continue;
-		/* 依原版字高選 CJK 尺寸,使其 ≤ 行距避免密集面板垂直重疊。
-		 * openkb 字高 8 → 16px composite (= 8px 邏輯 = 一行高),24-atlas 由 SDL 平滑縮小。 */
-		sz = (d->fonth >= 10) ? 24 : (d->fonth >= 8) ? 16 : 14;
-		dst.w = sz; dst.h = sz;
-		dst.x = d->x * CJK_SCALE;
-		dst.y = (d->y + d->fonth) * CJK_SCALE - sz; /* 貼齊文字行底 */
-		/* 8 方位黑外框 */
+
+		cell.x = d->x * CJK_SCALE;
+		cell.y = d->y * CJK_SCALE;
+		cell.w = d->cw * CJK_SCALE;
+		cell.h = d->ch * CJK_SCALE;
+
+		/* 8 方位黑外框 (取代填底:在任何背景上可讀,且不受 bg 色擷取不準影響) */
 		SDL_SetTextureColorMod(t, 0, 0, 0);
 		for (k = 0; k < 8; k++) {
-			SDL_Rect o = dst; o.x += ox[k]; o.y += oy[k];
+			SDL_Rect o = cell; o.x += ox[k]; o.y += oy[k];
 			SDL_RenderCopy(g_renderer, t, NULL, &o);
 		}
-		/* 字色 (太暗自動提亮,確保任何背景可讀) */
-		r = (d->rgb >> 16) & 0xFF; g = (d->rgb >> 8) & 0xFF; b = d->rgb & 0xFF;
-		lum = (r * 30 + g * 59 + b * 11) / 100;
-		if (lum < 110) { r = g = b = 235; }
+		/* 字色 (太暗自動提亮,確保可讀);ASCII 與 CJK 同尺寸,風格一致。 */
+		r = (d->fg >> 16) & 0xFF; g = (d->fg >> 8) & 0xFF; b = d->fg & 0xFF;
+		if ((r * 30 + g * 59 + b * 11) / 100 < 60) { r = g = b = 235; }
 		SDL_SetTextureColorMod(t, r, g, b);
-		SDL_RenderCopy(g_renderer, t, NULL, &dst);
+		SDL_RenderCopy(g_renderer, t, NULL, &cell);
 	}
 }
 
@@ -280,13 +278,18 @@ KBenv *KB_startENV(KBconfig *conf) {
 		desired.callback = KBenv_audio_callback;
 		desired.userdata = nsys;
 
-		if (SDL_OpenAudio(&desired, &nsys->mixer) < 0) {
+		/* 傳 NULL 為 obtained:強制 device 採用 desired 格式 (S16/11025/2ch),
+		 * 由 SDL 內部轉換到實際硬體。否則 SDL2 在現代 Linux (PulseAudio/PipeWire)
+		 * 常回傳 AUDIO_F32,而 tune synth 產生的是 S16 → 被當 float 解讀成噪音。
+		 * mixer 直接採用 desired,讓 synth 以正確 freq/format/channels 取樣。 */
+		if (SDL_OpenAudio(&desired, NULL) < 0) {
 			KB_errlog("Couldn't open audio device: %s\n", SDL_GetError());
 
 			conf->sound = 0; /* Turn sound off */
 		} else {
-			KB_stdlog("Opened audio device: %d channels, %d frequency, %d sampling rate\n", 
-				nsys->mixer.channels, nsys->mixer.freq, nsys->mixer.samples);
+			nsys->mixer = desired;
+			KB_stdlog("Opened audio device: %d channels, %d frequency, format 0x%04x\n",
+				nsys->mixer.channels, nsys->mixer.freq, nsys->mixer.format);
 
 			SDL_PauseAudio(0); /* Start playing */
 
@@ -423,7 +426,8 @@ void KB_setcolor(KBenv *env, Uint32* colors) /* Colors must be in 0x00RRGGBB for
 	}
 	SDL_SetColors(env->font, pal, 0, 4);
 
-	env->text_rgb = colors[0] & 0x00FFFFFF; /* 前景色,供 CJK glyph 上色 */
+	cjk_text_fg = colors[0] & 0x00FFFFFF;
+	cjk_text_bg = colors[1] & 0x00FFFFFF;
 }
 
 /* 解 3-byte UTF-8 (0xE0-0xEF 前導,涵蓋 U+0800..U+FFFF,含 CJK)。
@@ -447,6 +451,8 @@ void KB_print(KBenv *env, const char *str) {
 	for (i = 0; i < len; i++) {
 		int id = (unsigned char)str[i];
 		int row, col;
+		uint32_t cp = 0;
+		int nbytes = 1;
 
 		if (str[i] == '\n') {
 			env->cursor_x = 0;
@@ -454,19 +460,22 @@ void KB_print(KBenv *env, const char *str) {
 			continue;
 		}
 
-		/* CJK:3-byte UTF-8 且在 atlas 內 → 記進 draw-list (合成層畫),
-		 * 佔 2 個 ASCII 格寬;否則走原 ASCII 路徑。 */
-		if (id >= 0xE0 && id <= 0xEF && i + 2 < len) {
-			uint32_t cp = kb_utf8_decode3((const unsigned char *)&str[i]);
-			if (cp && cjkfont_has(cp)) {
-				word px, py;
-				KB_getpos(env, &px, &py);
-				cjk_drawlist_add(px, py, cp, env->text_rgb, env->font_size.h);
-				/* CJK glyph 合成層約 16px (=8px 邏輯=1 格);前進 1 格使漢字相鄰緊湊 */
-				env->cursor_x += 1;
-				i += 2; /* 跳過 2 個延續位元組 (迴圈尾 i++ 吃前導) */
-				continue;
-			}
+		/* 解碼點:可列印 ASCII 或 3-byte UTF-8 CJK */
+		if (id >= 0x20 && id < 0x7F) { cp = id; nbytes = 1; }
+		else if (id >= 0xE0 && id <= 0xEF && i + 2 < len) {
+			cp = kb_utf8_decode3((const unsigned char *)&str[i]); nbytes = 3;
+		}
+
+		/* 在 atlas 內 (ASCII 或 CJK) → 走 Noto 合成層 (風格一致);
+		 * 否則走點陣 (box-drawing/控制字元)。皆前進 1 格。 */
+		if (cp && cjkfont_has(cp)) {
+			word px, py;
+			KB_getpos(env, &px, &py);
+			cjk_drawlist_add(px, py, cp, cjk_text_fg, cjk_text_bg,
+				env->font_size.w, env->font_size.h);
+			env->cursor_x += 1;
+			i += (nbytes - 1); /* 迴圈尾 i++ 吃最後一個位元組 */
+			continue;
 		}
 
 		row = id / 16;

@@ -15,7 +15,6 @@
 
 static SDL_Surface *inline_font = NULL;
 static SDL_Surface *selected_font = NULL;
-static Uint32 inprint_fg = 0xFFFFFF; /* 目前前景色,供 CJK glyph 上色 */
 
 void prepare_inline_font(void)
 {
@@ -57,7 +56,8 @@ void incolor(Uint32 fore, Uint32 back) /* Colors must be in 0x00RRGGBB format ! 
 	pal[1].g = (Uint8)((fore & 0x0000FF00) >> 8);
 	pal[1].b = (Uint8)((fore & 0x000000FF));
 	SDL_SetColors(selected_font, pal, 0, 2);
-	inprint_fg = fore & 0x00FFFFFF;
+	cjk_text_fg = fore & 0x00FFFFFF;
+	cjk_text_bg = back & 0x00FFFFFF;
 }
 
 /* 解 3-byte UTF-8 (0xE0-0xEF 前導);非該序列回 0。 */
@@ -83,6 +83,8 @@ void inprint(SDL_Surface *dst, const char *str, Uint32 x, Uint32 y)
 	while (*str)
 	{
 		int id = (unsigned char)*str;
+		Uint32 cp = 0;
+		int nbytes = 1;
 
 		if (id == '\n')
 		{
@@ -92,18 +94,21 @@ void inprint(SDL_Surface *dst, const char *str, Uint32 x, Uint32 y)
 			continue;
 		}
 
-		/* CJK:3-byte UTF-8 且在 atlas 內 → 記進 draw-list (合成層畫),佔 2 格寬 */
-		if (id >= 0xE0 && id <= 0xEF && str[1] && str[2])
+		/* 解出碼點:可列印 ASCII (0x20–0x7E) 或 3-byte UTF-8 CJK */
+		if (id >= 0x20 && id < 0x7F) { cp = id; nbytes = 1; }
+		else if (id >= 0xE0 && id <= 0xEF && str[1] && str[2]) {
+			cp = inprint_utf8_3((const unsigned char *)str); nbytes = 3;
+		}
+
+		/* 在 atlas 內 (ASCII 或 CJK) → 走 Noto 合成層,風格一致;否則走點陣
+		 * (box-drawing 0x0E–0x15、控制字元等不在 atlas)。皆前進 1 格。 */
+		if (cp && cjkfont_has(cp))
 		{
-			Uint32 cp = inprint_utf8_3((const unsigned char *)str);
-			if (cp && cjkfont_has(cp))
-			{
-				cjk_drawlist_add(d_rect.x, d_rect.y, cp, inprint_fg, (Uint8)s_rect.h);
-				/* CJK glyph 在合成層約 16px (= 8px 邏輯 = 1 格),前進 1 格使漢字相鄰緊湊 */
-				d_rect.x += s_rect.w;
-				str += 3;
-				continue;
-			}
+			cjk_drawlist_add(d_rect.x, d_rect.y, cp, cjk_text_fg, cjk_text_bg,
+				(Uint8)s_rect.w, (Uint8)s_rect.h);
+			d_rect.x += s_rect.w;
+			str += nbytes;
+			continue;
 		}
 
 		{

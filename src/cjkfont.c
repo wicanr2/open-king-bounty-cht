@@ -17,6 +17,9 @@
 
 static const char CJK_MAGIC[8] = { 'O','K','B','C','J','K','\0','\1' };
 
+uint32_t cjk_text_fg = 0xFFFFFF; /* 預設白字 */
+uint32_t cjk_text_bg = 0x000000; /* 預設黑底 */
+
 static struct {
     uint8_t *raw;
     int w, h;
@@ -133,17 +136,19 @@ static cjk_draw_t cjk_list[CJK_DRAWLIST_MAX];
 static int cjk_n = 0;
 static int cjk_frame_open = 0;
 
-void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t rgb, uint8_t fonth)
+void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t fg, uint32_t bg, uint8_t cw, uint8_t ch)
 {
     cjk_draw_t *d;
-    if (!cjk_frame_open) { cjk_n = 0; cjk_frame_open = 1; } /* 新 frame 第一個中文 → 清舊 */
+    if (!cjk_frame_open) { cjk_n = 0; cjk_frame_open = 1; } /* 新 frame 第一個字元 → 清舊 */
     if (cjk_n >= CJK_DRAWLIST_MAX) return;
     d = &cjk_list[cjk_n++];
     d->x = (int16_t)x;
     d->y = (int16_t)y;
     d->cp = cp;
-    d->rgb = rgb;
-    d->fonth = fonth;
+    d->fg = fg;
+    d->bg = bg;
+    d->cw = cw;
+    d->ch = ch;
 }
 
 void cjk_drawlist_flip(void)

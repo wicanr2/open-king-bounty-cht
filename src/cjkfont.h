@@ -35,13 +35,21 @@ int  cjkfont_glyph_h(void);
  * (x, y, codepoint, RGB字色, 字高) 記進 list;KB_flip 時在 640×400 合成層
  * 以 glyph + 黑外框畫出。double-buffer 綁 flip,避免重複 present 時閃爍。 */
 typedef struct cjk_draw_s {
-    int16_t  x, y;     /* 320×200 邏輯座標 (glyph 左、文字行頂) */
-    uint32_t rgb;      /* 0x00RRGGBB 字色 */
-    uint8_t  fonth;    /* 當下原版字高,供垂直對齊 */
-    uint32_t cp;       /* Unicode 碼點 */
+    int16_t  x, y;     /* 320×200 邏輯座標 (cell 左上) */
+    uint32_t fg;       /* 0x00RRGGBB 字色 */
+    uint32_t bg;       /* 0x00RRGGBB 底色 (反白/填底用;0xFFFFFFFF=不填底) */
+    uint8_t  cw, ch;   /* cell 寬高 (邏輯像素),供填底與字框定位 */
+    uint32_t cp;       /* Unicode 碼點 (含 ASCII) */
 } cjk_draw_t;
 
-void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t rgb, uint8_t fonth);
+#define CJK_BG_NONE 0xFFFFFFFFu /* 不填底 */
+
+/* 目前文字前景/底色 (0x00RRGGBB),由 incolor()/KB_setcolor() 設定,
+ * inprint 與 KB_print 共用 (兩者其實共用同一個 font surface)。 */
+extern uint32_t cjk_text_fg;
+extern uint32_t cjk_text_bg;
+
+void cjk_drawlist_add(int x, int y, uint32_t cp, uint32_t fg, uint32_t bg, uint8_t cw, uint8_t ch);
 void cjk_drawlist_flip(void);
 void cjk_drawlist_clear(void);
 int  cjk_drawlist_count(void);
