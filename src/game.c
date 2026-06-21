@@ -820,6 +820,13 @@ int select_module() {
 		return -1;
 	}
 
+	/* 只有單一模組時直接選用,跳過互動選單。
+	 * 避免打包版 (僅綁 free 模組) 在選單意外收到 quit/esc 即 "No module selected" 致命。 */
+	if (conf->num_modules == 1) {
+		conf->module = 0;
+		return 0;
+	}
+
 	/* Prepare menu */
 	int i, l = 0;
 	for (i = 0; i < conf->num_modules; i++) {
