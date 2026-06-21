@@ -88,3 +88,5 @@ qa-amiga/
 qa-md/
 qa-*.py
 qa-*.c
+tools/__pycache__/
+tools/_*.py
