@@ -25,7 +25,15 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 / 待確認 (2026-06-21 第三輪實機)
+## 🔧 進行中 / 待確認 (2026-06-21 第四輪:F8 + DOS 噪音釐清)
+
+- [x] **DOS 美術一直正常** (誤判更正):DOS_Resolve(GR_TILE/GR_SELECT)=OK,tileseta/select/MCGA 等資源**都在 256.CC**(雜湊查找)。`Missing real file / Can't open / 256.CCL not found` 是 KB_fopen_with 先試 slotA 散檔(必缺)、再試 slotB(.CC,成功) 的 **fallback 常態噪音**,非載入失敗。已降為 KB_debuglog + 加 KB_VERBOSE 開關靜默。
+- [x] F8 三主題循環 (free/DOS/Genesis),雜訊清除。
+- [ ] **Genesis 只做 troop/villain** (MD_Resolve 限制):地圖 tile/UI fallback free → 「看起來像 free」。戰鬥 troop sprite 才是 Genesis。完整 Genesis 需實作全部 ROM offset (大型逆向,低優先)。
+- [ ] 招募數量輸入殘影 (其他輸入點待確認)。
+- [ ] 場景→音軌對照按耳朵校正 (城堡已 kb05)。
+
+## 🔧 (前一輪) 進行中 / 待確認 (2026-06-21 第三輪實機)
 
 - [x] 城堡/城鎮 BGM 接線 (進城堡播 kb05);F9 BGM codec 已 bundle (vorbis 等)。
 - [x] 游標 twirl 殘影 (text_input 清欄)、側欄數字殘影 (draw_sidebar 清區)。
