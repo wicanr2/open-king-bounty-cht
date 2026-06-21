@@ -18,6 +18,7 @@
  *  along with openkb.  If not, see <http://www.gnu.org/licenses/>.
  */
 #define KB_NO_FILLRECT_MACRO /* 本檔用真正的 SDL_FillRect (實作 hook) */
+#define KB_NO_BLIT_MACRO     /* 本檔用真正的 SDL_BlitSurface (實作 hook) */
 #include "sdlcompat.h"
 
 #include "lib/kbconf.h"
@@ -60,6 +61,21 @@ int KB_FillRect_hook(SDL_Surface *s, const SDL_Rect *r, Uint32 color) {
 		else   cjk_drawlist_clear();
 	}
 	return SDL_FillRect(s, r, color); /* 此檔 macro 已停用 → 真正的 SDL_FillRect */
+}
+
+/* 整屏/大面積背景 blit 到螢幕時清該區 CJK (例:credits→選角 用背景圖覆蓋,非 FillRect)。
+ * 小面積 blit (文字/sprite) 不觸發。 */
+int KB_BlitSurface_hook(SDL_Surface *src, SDL_Rect *sr, SDL_Surface *dst, SDL_Rect *dr) {
+	if (dst == KB_screen && src) {
+		/* dstrect.w/h 在輸入時被 SDL 忽略 (改用來源尺寸);故以 src 尺寸判斷大小。
+		 * srcrect 若有則用其尺寸 (blit 子區域)。 */
+		int bw = (sr ? sr->w : src->w);
+		int bh = (sr ? sr->h : src->h);
+		int x = dr ? dr->x : 0, y = dr ? dr->y : 0;
+		if (bw >= KB_LOGICAL_W * 3 / 4 && bh >= KB_LOGICAL_H * 3 / 4)
+			cjk_drawlist_remove_region(x, y, bw, bh);
+	}
+	return SDL_BlitSurface(src, sr, dst, dr); /* 此檔 macro 已停用 → 真正的 SDL_BlitSurface */
 }
 
 /* 供 game.c 改視窗標題 (取代 SDL_WM_SetCaption) */

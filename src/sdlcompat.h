@@ -60,4 +60,12 @@ extern int KB_FillRect_hook(SDL_Surface *s, const SDL_Rect *r, Uint32 color);
 #define SDL_FillRect(s, r, c) KB_FillRect_hook((s), (r), (c))
 #endif
 
+/* SDL_BlitSurface hook:整屏/大面積背景圖 blit 到螢幕時 (dstrect=NULL 或涵蓋大半屏)
+ * 連帶清該區 CJK,避免上一畫面中文殘留 (例:credits→選角 以背景圖覆蓋,非 FillRect)。
+ * 小面積 blit (文字/sprite) 不觸發。 */
+extern int KB_BlitSurface_hook(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
+#ifndef KB_NO_BLIT_MACRO
+#define SDL_BlitSurface(src, sr, dst, dr) KB_BlitSurface_hook((src), (sr), (dst), (dr))
+#endif
+
 #endif /* OPENKB_SDLCOMPAT_H */
