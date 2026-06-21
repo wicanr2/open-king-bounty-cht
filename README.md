@@ -122,6 +122,18 @@ KB_ORIGINAL_DOS=/path/to/your/kings-bounty  ./KingsBounty-CHT-x86_64.AppImage
 
 完整的技術決策與取捨記錄於 [`docs/adr/0001-engine-and-cjk-approach.md`](docs/adr/0001-engine-and-cjk-approach.md),逐階段的工程計畫見 [`PLAN.md`](PLAN.md)。
 
+## 多版本美術與逆向工程
+
+按 F8 可在四套美術主題間切換:`free`、原版 DOS、Genesis、Amiga。文字維持繁體中文不變,只換底圖與調色盤。
+
+Amiga 美術存放在自帶的容器格式裡:檔頭含子圖數、描述子、32 色 palette、壓縮與解壓尺寸,接著是壓縮資料流。壓縮採 Okumura LZSS,與 Genesis 版同源(`length = (b2 & 0xF) + 3`);像素排列為 sequential planar(5 個 bitplane,plane0 為 LSB,byte 內 MSB-first)。palette 是 12-bit 0RGB,每個 4-bit 通道展開成 8-bit 時用 `nibble << 4`(對應 Amiga OCS/ECS 硬體行為),不是 `× 17`。
+
+Amiga 主題初期配色全錯,根因是 palette off-by-one:真實 palette 從描述子之後的「第一個」word 開始(count=1 時 offset 10),舊碼多跳了一個 word,使每個 pixel index 都顯示成 `palette[i-1]` 的色——天空變 teal、亮綠草地變中綠、sprite 的 index 0 變白而非透明。定位方法是反推:正確對齊時每個 index 應對應參考截圖中的單一顏色(色散最小),由此一眼看出 `index i → palette[i-1]` 的位移規律,比盲試 plane 排列快得多;比對「palette 色集」會被 index 重排隱藏,所以驗證配色必須逐像素比對渲染結果。以真實 Amiga「Plains」截圖為基準,逐像素均差從 213.8 降到 4.8(commit `03ffd6f` / `3cd74fd`)。另修正地圖英雄的黑色方框:`GR_HERO` 與 `GR_CURSOR` 是同一資源,Amiga 載入時漏設 transparent,index 0 未轉成 colorkey,補上後 index 0 透明、可見草地(commit `d9d9617`)。
+
+目前 F8 四主題中,`free`、DOS、Amiga 的配色與透明皆正確;Genesis 主題的世界地圖 tileset 尚未完全破解,切換到 Genesis 時地圖仍有破碎、藍色直條紋的 tile(troop sprite 顯示正常),屬已知待辦。
+
+完整的逆向細節(容器格式、LZSS 參數、planar 解碼、驗證表)見 [`docs/reverse-engineering/amiga-assets.md`](docs/reverse-engineering/amiga-assets.md)。
+
 ## 譯名來源
 
 法術、兵種、寶物、職業與遊戲標題,一律採用 1990 年代官方繁體中文手冊的譯名。當年的手冊以「中文(English)」並列的方式給出這些名稱,我們照單沿用,不另創術語。

@@ -37,6 +37,7 @@
   - **SDL 1.2 → SDL 2 移植**:視訊核心重寫、相容 shim、邏輯畫布固定 320×200 + renderer 縮放。
   - **CJK 點陣渲染管線**:640×400 合成層 + 24×24 漢字 atlas + 八方位黑外框,文字路徑加 UTF-8 解碼分流。
   - **全文翻譯**:`data/free/` 資料檔(兵種、城鎮、城堡、法術、寶物、惡棍故事、片頭與結局)+ 原始碼內嵌英文字串(UI 標籤、遊戲訊息)。
+  - **多版本美術逆向(F8 主題切換)**:破解 Genesis ROM 與 Amiga `.adf` 同源的 Okumura LZSS 美術格式,實作 KBFAMILY 載入器,修正 Amiga palette off-by-one 與 sprite 透明色;F8 可在 free / DOS / Genesis / Amiga 間切換(Genesis 地圖 tileset 破解中)。
   - **跨平台打包**:Linux AppImage(可建置);Windows / macOS / Android 規劃中。
 - 以 **Claude Code (Opus 4.8)** 協作完成。
 - GitHub:[wicanr2/open-king-bounty-cht](https://github.com/wicanr2/open-king-bounty-cht)。
