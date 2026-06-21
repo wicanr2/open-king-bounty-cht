@@ -25,7 +25,18 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 / 待確認 (2026-06-21 第四輪:F8 + DOS 噪音釐清)
+## 🔧 進行中 / 待確認 (2026-06-21 第五輪:DOS 資料修復 + Genesis palette + 多版本素材計畫)
+
+優先序 (使用者定):**1 Genesis 完整化 → 2 各平台音樂 → 3 Amiga 美術+音樂**;FM Towns sprite 不提取;FM Towns 音樂設預設 (已成立)。
+
+- [x] **KB.EXE 解壓** (EXECOMP):修 `Unable to resolve DAT_*` (troop 數值表 range/melee/skills/moves/cost/growth…) + tungrp。build-appimage 自動解壓 (<100KB 判定)。
+- [x] **#2 Genesis 調色盤修正**:讀 ROM 真 CRAM palette (0x25698) 取代 EGA;9-bit→RGB888。troop/villain 顏色應正確。**待使用者進城堡 F8→Genesis 驗證**。
+- [ ] **Genesis 完整化剩餘** (大型 RE):MD_Resolve 只做 troop/villain/world → tile/UI/cursor/select/title 全缺 → Genesis 主題地圖/UI 仍 free。要補各資源 ROM offset + 對應 palette。
+- [ ] **Genesis 音樂** (VGM):屬優先序 2;ROM 內 YM2612 序列,需模擬器側錄。
+- [ ] 各平台音樂 (DOS AdLib / Amiga MOD / PC98 YM2608)。
+- [ ] Amiga 美術 (.adf planar loader,優先序 3)。
+
+## 🔧 (前一輪) 進行中 / 待確認 (2026-06-21 第四輪:F8 + DOS 噪音釐清)
 
 - [x] **DOS 美術一直正常** (誤判更正):DOS_Resolve(GR_TILE/GR_SELECT)=OK,tileseta/select/MCGA 等資源**都在 256.CC**(雜湊查找)。`Missing real file / Can't open / 256.CCL not found` 是 KB_fopen_with 先試 slotA 散檔(必缺)、再試 slotB(.CC,成功) 的 **fallback 常態噪音**,非載入失敗。已降為 KB_debuglog + 加 KB_VERBOSE 開關靜默。
 - [x] F8 三主題循環 (free/DOS/Genesis),雜訊清除。
