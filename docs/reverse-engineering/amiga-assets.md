@@ -45,24 +45,38 @@ u16  out_size                    // **解壓後 planar bitmap 大小** (= w/8 ×
 - bit 取法:byte 內 MSB first(`bit = 7-(x&7)`)。
 - **多幀 sprite**(count>1,如 peas/drag 4 幀):各幀獨立,幀內 5 planes sequential;幀大小 = `w/8 × h × 5`,幀接幀。
 
-## 驗證結果(全部 out_size 精準命中、視覺正確)
+## 驗證結果
 
-| 資源 | count | 尺寸 | out_size | 內容 |
-|---|---|---|---|---|
-| cstl | 1 | 240×102 | 15300 | 城堡場景(藍天白雲、石牆、紅旗) |
-| town | 1 | 240×102 | 15300 | 城鎮(白屋紅瓦、市政廳、綠樹) |
-| cave/dngn/frst/plai | 1 | 240×102 | 15300 | 各 location 場景 |
-| tileseta | 36 | 48×34 | 36720 | 36 個地圖 tile(城堡/水/樹/橋…) |
-| title | 1 | 320×200 | 40000 | 標題全螢幕圖 |
-| select | 3 | 288×184 | 35440 | 選單背景 |
-| view | 14 | 48×34 | 14280 | UI 元件 |
-| comtiles | 15 | 48×34 | 15300 | 戰鬥 tile |
-| peas | 4 | 48×34 | 4080 | 農民 sprite(4 幀持乾草叉) |
-| spri/drag/knig… | 4/4/1 | 48×34 / 96×102 | — | troop/monster sprite |
+**62 個圖形資源全部解碼,out_size 100% 精準命中**(`tools/amiga_batch.py` 批次轉 PNG 到 `qa-amiga/all/`)。
+strip 尺寸與 free DOS 版同名 PNG **逐一吻合**(192×34 sprite、240×102 location、96×102、1728×34 tileset…),為強力交叉驗證。
+
+目視確認(✅ = 已並排對照 free DOS 版,內容正確;Amiga 版美術較精細但同構):
+
+| 資源 | count | 尺寸 | out_size | 目視 | 內容 |
+|---|---|---|---|---|---|
+| cstl | 1 | 240×102 | 15300 | ✅ | 城堡場景(藍天白雲、石牆、紅旗) |
+| town | 1 | 240×102 | 15300 | ✅ | 城鎮(白屋紅瓦、市政廳、綠樹) |
+| cave/dngn/frst/plai | 1 | 240×102 | 15300 | size✓ | 各 location 場景 |
+| tileseta/tilesetb | 36 | 48×34 | 36720 | ✅ | 36 個地圖 tile(城堡/水/樹/橋…),與 free 同序 |
+| tilesalt | 9 | 48×34 | — | size✓ | 替代地圖 tile |
+| title | 1 | 320×200 | 40000 | ✅ | 標題全螢幕圖 |
+| nwcp | 1 | 320×200 | — | size✓ | NWC logo(Amiga 全螢幕,free 裁成 320×82) |
+| select | 3 | 288×184 | 35440 | size✓ | 選單背景(Amiga 獨有,無 free 對照) |
+| endpic | 5 | 144×170 | — | size✓ | 結局圖(Amiga 獨有) |
+| view | 14 | 48×34 | 14280 | size✓ | UI 元件 |
+| comtiles | 15 | 48×34 | 15300 | size✓ | 戰鬥 tile(sprite,colorkey) |
+| cursor | 28 | 48×34 | — | size✓ | 游標幀(Amiga 28 幀 > free 16 幀) |
+| peas | 4 | 48×34 | 4080 | ✅ | 農民 sprite(4 幀持乾草叉) |
+| drag | 4 | 48×34 | 4080 | ✅ | 藍龍 sprite(4 幀,frame3 噴火) |
+| knig/barb/pala/sorc | 1 | 96×102 | 6120 | ✅(knig) | 英雄肖像 |
+| spri/mili/ogre/skel/…(troop) | 4 | 48×34 | 4080 | size✓ | troop/monster sprite |
+
+> **sprite 透明色**:a_global==0x1f 的 sprite,**index 0 = 透明**(批次轉 PNG 時設 colorkey alpha=0)。已對照 free 同 sprite 確認:Amiga sprite 背景確為 index 0(對應 free 版的 magenta 透明區)。
 
 ## 解碼器與工具
 
 - **`tools/amiga_decode.py`** — 完整圖形解碼器:`parse()`(檔頭)、`lzss_decompress()`(Okumura +3)、`decode_frames()`(→ index 2D array + palette)、`palette_rgb()`。CLI:`python3 amiga_decode.py <resource>` 印 header/解壓資訊。
+- **`tools/amiga_batch.py`** — 批次把全部 62 個圖形資源轉 PNG 到 `qa-amiga/all/`(多幀排成水平 strip,sprite index0 設 colorkey 透明),印驗證表(對照 free DOS 尺寸)。
 - `tools/amiga_hunks.py` — hunk 執行檔解析(23 CODE + 2 DATA)。
 - `tools/amiga_disasm_dump.py <seg> <start> <end>` — capstone M68K 反組譯。
 - `tools/amiga_disasm_scan.py` — 解壓特徵掃描。
