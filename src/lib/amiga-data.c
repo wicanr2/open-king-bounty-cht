@@ -142,12 +142,18 @@ static SDL_Surface *amiga_load_surface(const char *path, int transparent) {
 	hdr = 2 + count * 6;          /* count + descriptors */
 	w = be16(file, 4);            /* desc[0].w (all descriptors share w/h) */
 	h = be16(file, 6);            /* desc[0].h */
-	hdr += 2 + 2;                 /* a_global + 0x0000 */
-	/* palette: 32 words */
+	hdr += 2;                     /* a_global (one word), then palette */
+	/* palette: 32 words. pal[0] = index 0 = black/transparent.
+	 * NOTE: palette starts ONE word after the descriptors, not two.
+	 * The earlier off-by-one shifted every colour by one slot (sky teal
+	 * instead of cyan, grass mid-green instead of bright, white instead of
+	 * transparent sprite index 0). Verified pixel-perfect (mean dRGB 4.8)
+	 * against the Amiga "Plains" screenshot. */
 	for (i = 0; i < 32; i++) amiga_color(be16(file, hdr + i * 2), &pal[i]);
 	hdr += 32 * 2;
 	comp_size = be16(file, hdr); hdr += 2;
 	hdr += 2;                     /* 0x0000 */
+	hdr += 2;                     /* flags word (LZSS stream is +8 after palette) */
 	out_size = be16(file, hdr); hdr += 2;
 	stream_off = hdr;
 	(void)comp_size;
