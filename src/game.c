@@ -820,9 +820,10 @@ int select_module() {
 		return -1;
 	}
 
-	/* 只有單一模組時直接選用,跳過互動選單。
-	 * 避免打包版 (僅綁 free 模組) 在選單意外收到 quit/esc 即 "No module selected" 致命。 */
-	if (conf->num_modules == 1) {
+	/* 直接選用第一個模組,跳過互動選單。資源解析已型別感知 (KB_Resolve) 同時
+	 * 使用所有模組 (free 文字 + 自動偵測到的 DOS 原版美術),不需玩家手選;也避免
+	 * 打包版在選單意外收到 quit/esc 即 "No module selected" 致命。 */
+	if (conf->num_modules >= 1) {
 		conf->module = 0;
 		return 0;
 	}
@@ -6686,6 +6687,31 @@ int run_game(KBconfig *conf) {
 
 	/* User-configured modules */
 	register_modules(conf);
+
+	/* 自動偵測原版 DOS 資料 (256.CC):若存在則加 dos 模組,圖形自動改用原版美術
+	 * (KB_Resolve 型別感知:圖→DOS 優先、字→free 優先 = 原版畫面 + 中文)。
+	 * 公開包不含原版資料 → 此處不觸發,維持 free 美術。 */
+	{
+		const char *cand[5];
+		int ci, found = 0;
+		cand[0] = conf->data_dir;
+		cand[1] = conf->install_dir;
+		cand[2] = "dos";
+		cand[3] = "kings-bounty";
+		cand[4] = ".";
+		for (ci = 0; ci < 5 && !found; ci++) {
+			char *probe;
+			if (!cand[ci] || !cand[ci][0]) continue;
+			probe = KB_fastpath(cand[ci], "/", "256.CC");
+			if (probe && file_size(probe) > 0) {
+				add_module_aux(conf, "DOS art", KBFAMILY_DOS, 8, cand[ci], "", NULL, NULL);
+				conf->fallback = 1; /* 初始化/解析時同時涵蓋 free + dos 兩模組 */
+				found = 1;
+				KB_stdlog("Original DOS data found at '%s' -- using original artwork.\n", cand[ci]);
+			}
+			if (probe) free(probe);
+		}
+	}
 
 	/* --- ! ! ! --- */
 	mod = select_module();

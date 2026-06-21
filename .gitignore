@@ -61,3 +61,4 @@ vendor/rsrc.h
 vendor/*.tar.gz
 vendor/*.tgz
 data/cjk24.bin
+dos-orig/

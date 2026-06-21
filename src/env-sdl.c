@@ -877,23 +877,30 @@ void* KB_Resolve(int id, int sub_id) {
 	 *
 	 * TODO: remove KB_strlist_peek calls from resolvers, either rethink this contract.
 	 */
-	int i, l;
+	int i, pass;
 	void *ret = NULL;
-	i = conf->module;
-	l = (conf->num_modules * conf->fallback) + ((i+1) * (1-conf->fallback));
-	for (; i < l; i++) {
-		KBmodule *mod = &conf->modules[i];
-		/* This could be a callback... */
-		switch (mod->kb_family) {
-			case KBFAMILY_GNU: ret = GNU_Resolve(mod, id, sub_id); break;
-			case KBFAMILY_DOS: ret = DOS_Resolve(mod, id, sub_id); break;
-			case KBFAMILY_MD:  ret = MD_Resolve(mod, id, sub_id); break;
-			default: break;
+	/* 型別感知解析 (混合模式):圖形 (GR_*) 優先用 DOS 原版美術,其餘 (字串/資料/
+	 * 音效) 優先用 GNU free (我們的中文翻譯)。每類先試偏好家族,再 fallback 另一個。
+	 * 如此:玩家自備原版資料 → 看到原版美術 + 中文;只有 free → 全 free + 中文。 */
+	int is_graphic = (id >= GR_TROOP && id <= GR_ENDTILES);
+	int pref = is_graphic ? KBFAMILY_DOS : KBFAMILY_GNU;
+
+	for (pass = 0; pass < 2 && ret == NULL; pass++) {
+		for (i = 0; i < conf->num_modules; i++) {
+			KBmodule *mod = &conf->modules[i];
+			if (pass == 0 && mod->kb_family != pref) continue; /* 先試偏好家族 */
+			if (pass == 1 && mod->kb_family == pref) continue; /* 再試其餘 */
+			switch (mod->kb_family) {
+				case KBFAMILY_GNU: ret = GNU_Resolve(mod, id, sub_id); break;
+				case KBFAMILY_DOS: ret = DOS_Resolve(mod, id, sub_id); break;
+				case KBFAMILY_MD:  ret = MD_Resolve(mod, id, sub_id); break;
+				default: break;
+			}
+			if (ret != NULL) break;
 		}
-		if (ret != NULL) break;
 	}
 	if (ret == NULL)
-		KB_errlog("Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, l);
+		KB_errlog("Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, conf->num_modules);
 	return ret;
 }
 
