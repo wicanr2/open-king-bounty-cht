@@ -25,7 +25,18 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 (2026-06-21 第七輪:Genesis 世界地形完整破解+實作)
+## ✅ 第八輪完成 (2026-06-21):F8 四主題 — free / DOS / Genesis / Amiga
+
+- [x] **Amiga F8 主題完整整合**(amiga-crack 逆向+loader / 主線接線):
+  - Amiga 圖形 = **同源 Okumura LZSS**(length+3,與 Genesis 同公式);容器 count/desc/32色palette/comp_size/**out_size**/stream;sequential planar(plane0=LSB)。
+  - `src/lib/amiga-data.c`:`AMIGA_Resolve`(GR_TROOP/VILLAIN/PORTRAIT/LOCATION/TITLE/SELECT/VIEW/CURSOR/COMTILES/TILE/TILESET),讀已 unpack 的 GAME 散檔。
+  - 接線:`kbconf` KBFAMILY_AMIGA、`env-sdl` KB_Resolve+gfx_themes(F8 加 Amiga)、`game.c` auto-detect(tileseta 標記)、`Makefile`、`build-appimage` 綁 Amiga + AppRun KB_AMIGA_GAME。
+  - **引擎內驗證**:GR_TILESET(乾淨 8 欄地圖 tile,48×34 對齊)、GR_LOCATION(城堡背景)、GR_TROOP 皆正確(diag BMP)。
+  - 62 個 Amiga 資源批次轉 PNG 驗證(out_size 100% 命中、尺寸對 free)。
+  - **F8 現循環 free / DOS / Genesis / Amiga 四主題**。push 完成(e66c29c)。
+- [x] 兩個逆向 agent(genesis-re / amiga-crack)任務完成,已關閉。
+
+## 🔧 第七輪 (2026-06-21):Genesis 世界地形完整破解+實作
 
 - [x] **Genesis 世界地圖 terrain 完整破解+實作** (genesis-re agent 逆向 + 主線整合):
   - 自製 **Okumura LZSS** 解壓器 ROM 0x18B0C(**length=(b2&0xf)+3**,off-by-one 是卡關主因)。
