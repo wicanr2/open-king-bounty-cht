@@ -28,7 +28,8 @@
 #define MD_CELL_COLS 6           /* 一個 cell 寬幾個 8x8 tile */
 #define MD_CELL_ROWS 5           /* 一個 cell 高幾個 8x8 tile */
 #define MD_CELL_W (MD_CELL_COLS * 8) /* 48 */
-#define MD_CELL_H (MD_CELL_ROWS * 8) /* 40 */
+#define MD_CELL_H (MD_CELL_ROWS * 8) /* 40 (Genesis metatile 原高) */
+#define MD_TILE_H 34                 /* 引擎 RECT_TILE 高 (free ui.ini,全主題共用,F8 不重載) → 降採樣對齊 */
 #define MD_NUM_CELLS 72          /* 引擎 tileset 模型用 72 個 tile (map &0x7F) */
 
 /* Genesis 色字 = 0000 BBB0 GGG0 RRR0 (9-bit, 每通道 3-bit)。轉 RGB888 (×36)。
@@ -132,16 +133,21 @@ static const byte *md_terrain_pattern(const char *romname, int *out_ntiles) {
 }
 
 /* 把一個 8x8 4bpp tile (32 bytes,高 nibble=左像素) 畫進 8-bit PAL surface。
- * 支援水平翻轉 (hflip)。dst 像素值 = 4bpp index (0..15)。*/
-static void md_blit_subtile(const byte *tile, SDL_Surface *surf, int ox, int oy, int hflip) {
+ * 支援水平翻轉 (hflip)。pal_base = 該 sub-tile 的 palette line 在 64 色表的起點 (line*16)。
+ * 像素 0 一律映到全域 index 0 (各 line 共用的透明色,設成 colorkey);像素 1..15 映到
+ * pal_base + 像素 → per-tile palette line 正確上色。*/
+static void md_blit_subtile(const byte *tile, SDL_Surface *surf, int ox, int oy,
+                            int hflip, int pal_base) {
 	int y, x;
 	for (y = 0; y < 8; y++) {
 		Uint8 *row = (Uint8 *)surf->pixels + (oy + y) * surf->pitch + ox;
 		for (x = 0; x < 8; x += 2) {
 			byte b = tile[y * 4 + x / 2];
 			int hi = b >> 4, lo = b & 0xF;
-			if (hflip) { row[7 - x] = hi; row[7 - (x + 1)] = lo; }
-			else       { row[x] = hi;     row[x + 1] = lo; }
+			Uint8 ph = hi ? (Uint8)(pal_base + hi) : 0;
+			Uint8 pl = lo ? (Uint8)(pal_base + lo) : 0;
+			if (hflip) { row[7 - x] = ph; row[7 - (x + 1)] = pl; }
+			else       { row[x] = ph;     row[x + 1] = pl; }
 		}
 	}
 }
@@ -153,7 +159,7 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 	int ntiles = 0;
 	byte tplbuf[60];          /* 60 bytes = 30 nametable word */
 	byte rompal[4 * 32];      /* 4 line x 32 bytes */
-	SDL_Color pal[4][16];
+	SDL_Color pal64[64];      /* 4 line x 16 色 (per-tile palette;index = line*16 + pixel) */
 	SDL_Surface *surf;
 	KB_File *f;
 	int r, c, line;
@@ -169,8 +175,10 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 	KB_fread(rompal, 1, sizeof(rompal), f);
 	KB_fclose(f);
 
+	/* 組 64 色 palette:4 條 Genesis line 各 16 色,展平成 line*16+pixel。
+	 * metatile 內每個 sub-tile 依其 template 的 palette line 取對應 16 色區段。*/
 	for (line = 0; line < 4; line++)
-		md_build_palette(rompal + line * 32, pal[line]);
+		md_build_palette(rompal + line * 32, &pal64[line * 16]);
 
 	surf = SDL_CreatePALSurface(MD_CELL_W, MD_CELL_H);
 	if (!surf) return NULL;
@@ -184,19 +192,32 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 		int hflip = (e >> 11) & 1;
 		line = (e >> 13) & 3;
 		if (idx < ntiles)
-			md_blit_subtile(pat + idx * 32, surf, c * 8, r * 8, hflip);
+			md_blit_subtile(pat + idx * 32, surf, c * 8, r * 8, hflip, line * 16);
 		/* idx 越界 (動畫 tile placeholder) → 留 index 0 (透明,露底層) */
 	}
 
-	/* 套對應 palette line (per-tile palette 簡化:多數 cell 同 line,取 0 號 word 的 line) */
-	{
-		word e0 = (tplbuf[0] << 8) | tplbuf[1];
-		int l0 = (e0 >> 13) & 3;
-		SDL_SetColors(surf, pal[l0], 0, 16);
-	}
+	/* index 0 = Genesis 透明色,真機露出 backdrop 海色。openkb 單 plane 無 plane B、
+	 * 且 draw_map 畫地圖前 FillRect 紅底 (0xFF0000) → 不能 colorkey (會露紅)。
+	 * 改把共用透明色 (pal64[0]) 設成不透明海藍,讓海洋/露底處顯示海色。 */
+	pal64[0].r = 0; pal64[0].g = 72; pal64[0].b = 180;
+	SDL_SetColors(surf, pal64, 0, 64);
 
-	/* index 0 = 透明 (露出底層 plane / 海色),設 colorkey */
-	SDL_SetColorKey(surf, SDL_SRCCOLORKEY, 0);
+	/* 垂直降採樣 48x40 → 48x34,對齊引擎 RECT_TILE 高 (否則地圖整體垂直錯位)。
+	 * 索引式取樣 (不混色) 保留 palette。 */
+	{
+		SDL_Surface *out = SDL_CreatePALSurface(MD_CELL_W, MD_TILE_H);
+		if (out) {
+			int yy;
+			SDL_SetColors(out, pal64, 0, 64);
+			for (yy = 0; yy < MD_TILE_H; yy++) {
+				int srcy = yy * MD_CELL_H / MD_TILE_H;
+				memcpy((Uint8 *)out->pixels + yy * out->pitch,
+				       (Uint8 *)surf->pixels + srcy * surf->pitch, MD_CELL_W);
+			}
+			SDL_FreeSurface(surf);
+			return out;
+		}
+	}
 
 	return surf;
 }
@@ -308,7 +329,7 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 		break;
 		case GR_TILESET:	/* 整套地形 tileset;sub_id = continent (目前共用一套) */
 		{
-			SDL_Rect tilesize = { 0, 0, MD_CELL_W, MD_CELL_H };
+			SDL_Rect tilesize = { 0, 0, MD_CELL_W, MD_TILE_H };
 			return KB_LoadTileset_TILES(&tilesize, MD_Resolve, mod);
 		}
 		break;
