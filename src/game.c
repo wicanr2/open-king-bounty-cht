@@ -22,6 +22,7 @@
 
 #include "bounty.h"
 #include "bgm.h"
+#include "cjkfont.h"
 #include "play.h"
 #include "save.h"
 #include "ui.h"
@@ -196,6 +197,9 @@ char *text_input(int max_len, int numbers_only, int x, int y, int loc_id, int tr
 		if (redraw) {
 			if (loc_id != 0xFF) draw_location(loc_id, troop_id, troop_frame);
 
+			/* 先用空格鋪滿輸入欄寬,清掉上一輪的字/游標殘跡 (游標 twirl 變化會留殘影)。 */
+			KB_iloc(x, y);
+			KB_iprintf("%-*s ", max_len, entered_name);
 			KB_iloc(x, y);
 			KB_iprintf("%s", entered_name);
 			KB_iloc(x + curs * fs->w, y);
@@ -1109,6 +1113,9 @@ void draw_sidebar(KBgame *game, int tick) {
 	SDL_Surface *screen = sys->screen;
 
 	SDL_Rect *right_frame  = local.frames[FRAME_RIGHT];
+
+	/* 清側欄區舊 CJK (數字以小圖重畫,不觸發 blit hook → 上一畫面數字會殘留)。 */
+	cjk_drawlist_remove_region(right_frame->x, right_frame->y, right_frame->w, right_frame->h);
 
 	SDL_Surface *purse = SDL_TakeSurface(GR_PURSE, 0, 0);
 	SDL_Surface *sidebar = SDL_TakeSurface(GR_UI, 0, 0);
@@ -2280,6 +2287,8 @@ void recruit_soldiers(KBgame *game, int loc_id, int troop_id) {
 
 void visit_home_castle(KBgame *game) {
 
+	KB_bgm_scene(BGM_CASTLE);
+
 	int id = MAX_CASTLES;
 	//printf("Visiting castle %d at %d , %d , %d x %d <%p>\n", id, game->x, game->y, bg->w, bg->h, bg);
 
@@ -2351,6 +2360,7 @@ void visit_home_castle(KBgame *game) {
 }
 
 void visit_own_castle(KBgame *game, int castle_id) {
+	KB_bgm_scene(BGM_CASTLE);
 	enum {
 		MODE_GARRISON,
 		MODE_REMOVE,
@@ -2537,6 +2547,8 @@ int lay_siege(KBgame *game, int castle_id) {
 
 void visit_castle(KBgame *game) {
 
+	KB_bgm_scene(BGM_CASTLE);
+
 	enum {
 		not_found,
 		home,
@@ -2627,6 +2639,8 @@ void gather_information(KBgame *game, int id) {
 }
 
 void visit_town(KBgame *game) {
+
+	KB_bgm_scene(BGM_TOWN);
 
 	int id = 0;
 	int i;
