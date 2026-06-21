@@ -25,7 +25,16 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
-## 🔧 進行中 / 待確認 (2026-06-21 第五輪:DOS 資料修復 + Genesis palette + 多版本素材計畫)
+## 🔧 進行中 (2026-06-21 第六輪:多版本素材分工 — A 背景 agent / B 主線)
+
+- **A (背景 agent genesis-re)**:反組譯 Genesis ROM 找地圖 tileset(疑壓縮)。進度見 skill ref 08。
+- **B (主線) Amiga 素材**:`amiga-orig/` .adf **完整解開**(amitools xdftool)→ `extracted/KB/GAME/` 72 個**具名**資源:
+  - 地圖 tiles:`tileseta`(36 子圖)/`tilesetb`/`tilesalt`;location 圖:cstl/town/cave/dngn/frst/plai;UI:select/title/view/comtiles/cursor/nwcp;troop sprite:peas/spri/… ;音效樣本:Bash/Bump/Death/Horns/King/Vict/Treas/Walk/Tele(8-bit signed PCM)。
+  - **格式**:`子圖數(u16)` + 描述子`(flag,w,h)` + 12-bit RGB palette + planar 點陣。**但 raw planar 解出是雜訊 → 點陣為壓縮**(sprite=TTComp;pic/tile 疑 NWC 自有 RLE)。→ 需破解壓縮才能轉 PNG。
+  - openkb 無 Amiga loader;導入路徑:解碼→PNG→當 free 格式 theme,或寫 KBFAMILY_AMIGA。
+- **B 音樂現實 (誠實)**:只有 FM Towns 是真 looping BGM(CDDA,已完成設預設)。Amiga=SFX/jingle 取樣(非 BGM)。Genesis/PC98/DOS BGM=晶片序列,需模擬器側錄。→ 「各平台 BGM」對非 FMTowns 平台都要晶片模擬,成本高。
+
+## 🔧 (第五輪) DOS 資料修復 + Genesis palette + 多版本素材計畫
 
 優先序 (使用者定):**1 Genesis 完整化 → 2 各平台音樂 → 3 Amiga 美術+音樂**;FM Towns sprite 不提取;FM Towns 音樂設預設 (已成立)。
 
