@@ -42,7 +42,8 @@
 ## 📋 待辦 — 使用者需求 (多版本素材 / 音樂,見 ASSETS-PLAN.md)
 
 ### F8 美術主題切換
-- [ ] **Tier 1**:free ↔ DOS ↔ Genesis(MD) 循環 (openkb 原生支援)。實作:多圖形模組註冊 + F8 切換目前圖形模組 + KB_Resolve 圖形偏好用它;文字維持中文。
+- [x] **Tier 1**:free ↔ DOS ↔ Genesis(MD) 循環。✅ KB_Resolve 圖形 pref 改用 kb_gfx_family 全域;F8 在已載入家族間循環+清快取重載;文字恆走 GNU。Genesis ROM (kb.bin) 自動偵測 + 個人版 AppImage 綁入。驗證:log 確認三主題循環無崩潰;adventure_state 有 SYN 計時器→地圖即時生效;選角畫面確認為 DOS 美術。
+  - 注意:純靜態入口畫面 (選角/標題,無 SYN 計時器) F8 不即時更新,下次重畫才套用 (架構限制,可接受)。
 - [ ] **Tier 2 (大型逆向,逐項評估)**:Amiga(.adf) / Apple II(.nib/.dsk) / PC98(.d88) / 完整 FM Towns 圖形 loader。openkb 無 loader,需逆向各磁碟+圖形格式。
 
 ### F9 音樂版本切換
