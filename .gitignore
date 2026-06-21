@@ -62,3 +62,9 @@ vendor/*.tar.gz
 vendor/*.tgz
 data/cjk24.bin
 dos-orig/
+docs/test/qa/
+docs/test/qa2-*.png
+docs/test/t-*.png
+docs/test/fix-*.png
+docs/test/hybrid-*.png
+docs/test/resize-test.png

@@ -4768,13 +4768,13 @@ KBgamestate adventure_state = {
 		{	_NON, SDLK_u, 0, 0      	},
 		{	_NON, SDLK_v, 0, 0      	},
 		{	_NON, SDLK_w, 0, 0      	},
-		{	_NON, SDLK_q, 0, KFLAG_TRAPSIGNAL },
+		{	_NON, SDLK_F10, 0, KFLAG_TRAPSIGNAL },	/* SAVE_QUIT:F10 (取代 ESC 直接退出) + 視窗關閉 */
 
 		{	_NON, SDLK_q, KMOD_CTRL, 0	},
-		{	_NON, SDLK_d, 0, 0      	},
+		{	_NON, SDLK_d, 0      , 0    	},
 		{	_NON, SDLK_o, 0, 0      	},
 
-		{	_NON, SDLK_F10, 0, 0      	},
+		{	_NON, SDLK_F12, 0, 0      	},	/* CHEAT (debug):原為 F10,讓位給退出 → 改 F12 */
 		{	__NON, { SOFT_WAIT }, SDLK_SYN, 0, KFLAG_TIMER },
 		0,
 	},
@@ -6275,32 +6275,29 @@ KBgamestate quit_question = {
 };
 int ask_quit_game(KBgame *game) {
 
+	int done = 0, quit = 0;
+
+	/* 自動存檔 */
 	save_game(game);
 
 	SDL_Rect *text = KB_BottomFrame();
 	SDL_Rect *fs = &sys->font_size;
 
-	/* Header (few pixels up) */
-	KB_iloc(text->x, text->y + fs->h/8);
-	KB_iprint("\n");
-	KB_iprint("你的遊戲已存檔。");
-
-	/* Message */
 	KB_iloc(text->x, text->y);
-	KB_iprint("\n\n\n");
+	KB_iprint("\n\n");
 	KB_ilh(fs->h + fs->h / 8);
-	KB_iprint("按 Control-Q 離開，或\n按其他任意鍵繼續。");
-
-//	KB_BottomBox(NULL, "\nYour game has been saved.\n\nPress Control-Q to Quit or\nany other key to continue.", 0);
+	KB_iprint("遊戲已自動存檔。\n要離開遊戲嗎? (Y/N)");
 	KB_flip(sys);
 
-	int done = 0;
 	while (!done) {
-		int key = KB_event(&quit_question);
-		if (key) done = key;
+		int key = KB_event(&yes_no_interactive); /* Y=1, N=2, timer=3 */
+		if (key == 1) { quit = 1; done = 1; }                 /* Y → 離開 */
+		else if (key == 2 || key == 0xFF) { quit = 0; done = 1; } /* N / ESC → 繼續 */
+		/* key==3 (timer) → 重畫游標,忽略 */
 	}
 
-	return 2 - done;
+	/* 回傳 0 表示要離開 (呼叫端: if (!ask_quit_game(game)) done = 1;) */
+	return quit ? 0 : 1;
 }
 int ask_fast_quit(KBgame *game) {
 
@@ -6378,7 +6375,8 @@ void adventure_loop(KBgame *game) {
 
 		key = KB_event(&adventure_state);
 
-		if (key == 0xFF) done = 1;
+		/* ESC 不再直接退出 (cancel 語意);離開遊戲改用 F10 (→ KEY_ACT(SAVE_QUIT)
+		 * → ask_quit_game,自動存檔 + Y/N 確認)。 */
 
 		if (key == KEY_ACT(VIEW_OPTIONS) || key == KEY_ACT(VIEW_CONTROLS)) {
 			int redraw_under = 0;

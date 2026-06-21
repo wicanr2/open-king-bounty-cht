@@ -928,9 +928,9 @@ void KBenv_audio_callback(void *userdata, Uint8 *stream, int len) {
 	 * so this condition for outer loop is a reasonable assumption. */
 	while (len) {
 
-		if (sys->sound == NULL) { /* No sample selected, fill with silence and break */
-			int i;
-			//for (i = 0; i < len; i++) *stream++ = sys->mixer.silence;
+		if (sys->sound == NULL) { /* 無音效 → 填靜音 (S16=0) 後結束。
+			* 原本只 break 不填,SDL 會播放緩衝區殘留 → 持續嘟嘟噪音 (城堡內等)。 */
+			SDL_memset(stream, 0, len);
 			break;
 		}
 
