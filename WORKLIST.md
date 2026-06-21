@@ -25,6 +25,20 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
+## 🔧 第九輪 (2026-06-22):Amiga 配色根因 + 英雄透明 / Genesis tileset 仍破碎
+
+- [x] **Amiga palette off-by-one(所有配色錯誤的唯一根因)**(commit 03ffd6f / 3cd74fd):
+  - 真實 palette 從描述子後**第一個** word 開始(count=1 時 offset 10),引擎舊碼多跳一個 word → 每 pixel index 顯示成 `palette[i-1]` 的色(天空 teal 取代 cyan、草地中綠取代亮綠、sprite index0 變白而非透明)。`amiga_color`(`<<4`)與 plane 解碼本來就對。
+  - 修正 `src/lib/amiga-data.c`(palette 讀取改 `2+count*6+2`,word 移到 palette 之後保持 stream 起點不變);`tools/amiga_decode.py` 同步;`docs/reverse-engineering/amiga-assets.md` 更正(舊「confetti 是視覺誤判」結論作廢)。
+  - **驗證**:對齊 `kings-bounty_17.gif` 逐像素均差 **213.8 → 4.8**;引擎內 dump 世界地圖(亮綠草地/藍水/灰石城堡/黃沙/棕山)、location(城堡+雪山+綠谷)皆正確。
+  - 定位法(可重用):色散最小對齊 → 反推每 index 真實色 → 一眼看出 off-by-one;比盲試 plane permutation 快。教訓:比 palette **色集**(index 重排下不變)測不到此 bug,要比**渲染後逐像素**。
+- [x] **Amiga 地圖英雄黑框**(commit d9d9617):`GR_HERO = GR_CURSOR`(cursor=英雄 sprite sheet),`AMIGA_Resolve` 的 GR_CURSOR 漏設 `transparent=1` → index0(黑)未轉 colorkey。已加,引擎內驗證 sprite 疊綠底無黑框。
+- [ ] **Genesis tileset 尚未完全破解 — 切換 Genesis 主題地圖仍破碎**(2026-06-22 實機 06-54-21.png):
+  - 現象:**部分 tile 正常**(左側草地+樹),但中右大片是**藍色直條紋 + 破碎 tile**;英雄 sprite 正常。
+  - 研判方向:① 部分 terrain tile 的 LZSS pattern / metatile 組裝對某些 tile 值錯位(藍直條 = plane/pixel 排列 drift 或 cell template 取錯);② 可能 map tile 值 `&0x7F` 後仍有超出 638-tile pattern 範圍者落到未定義區;③ palette line 取錯(類似 Amiga off-by-one,但 Genesis 走 0x3371A 已修草地藍)。
+  - 待辦:對照 Genesis 模擬器實機世界地圖截圖,逐 tile 比對哪些值破碎 → 縮小是 pattern 解碼、metatile 組裝、還是 tile-index 映射問題。可沿用本輪「色散/結構對齊反推」法。
+  - 影響:Genesis 主題地圖不可用;**不影響 free/DOS/Amiga 三主題**(皆正常)。
+
 ## ✅ 第八輪完成 (2026-06-21):F8 四主題 — free / DOS / Genesis / Amiga
 
 - [x] **Amiga F8 主題完整整合**(amiga-crack 逆向+loader / 主線接線):
