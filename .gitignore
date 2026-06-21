@@ -85,3 +85,6 @@ qa-rom/
 amiga-orig/
 apple2-orig/
 qa-amiga/
+qa-md/
+qa-*.py
+qa-*.c
