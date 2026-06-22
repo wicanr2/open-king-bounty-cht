@@ -2,8 +2,13 @@
 #ifndef OPENKB_CONFIG_H_ANDROID
 #define OPENKB_CONFIG_H_ANDROID
 #define PACKAGE "openkb"
+#define PACKAGE_NAME "openkb"
 #define PACKAGE_VERSION "0.0.3"
 #define VERSION "0.0.3"
+#define STDC_HEADERS 1
+#define HAVE_STDLIB_H 1
+#define HAVE_MALLOC 1
+/* 不定義 HAVE_MALLOC_H → kbstd.h 走 <stdlib.h> (bionic 兩者皆有,stdlib 較可攜) */
 #define HAVE_LIBSDL 1
 #define HAVE_LIBSDL_IMAGE 1
 #define HAVE_ISASCII 1
