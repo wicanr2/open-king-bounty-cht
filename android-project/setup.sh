@@ -31,6 +31,15 @@ SDL="$tmp/SDL2-$SDL_VER"
 # 1. 以 SDL2 的 android-project 為模板 (gradle / wrapper / SDL java glue / jni 骨架)
 cp -a "$SDL/android-project/." "$BUILD/"
 
+# gradle 的 minSdkVersion 決定 ndkBuild 的 API level (會覆寫 Application.mk 的 APP_PLATFORM);
+# seekdir/telldir 等 bionic 函式 API 23 才有 → 統一拉到 23。涵蓋多種寫法。
+for g in "$BUILD/build.gradle" "$BUILD/app/build.gradle"; do
+  [ -f "$g" ] && sed -i -E \
+    -e 's/minSdkVersion[[:space:]]+[0-9]+/minSdkVersion 23/g' \
+    -e 's/minSdk[[:space:]]+[0-9]+/minSdk 23/g' \
+    -e 's/minSdk[[:space:]]*=[[:space:]]*[0-9]+/minSdk = 23/g' "$g"
+done
+
 # 2. 原生相依源放進 app/jni/ (各自帶 Android.mk)
 JNI="$BUILD/app/jni"
 rm -rf "$JNI/SDL"; cp -a "$SDL" "$JNI/SDL"
