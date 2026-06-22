@@ -92,3 +92,5 @@ tools/__pycache__/
 tools/_*.py
 *.log
 qa-themes/
+qa-spr/
+qa-md/
