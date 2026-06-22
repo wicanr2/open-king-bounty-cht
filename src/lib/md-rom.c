@@ -54,6 +54,29 @@ static void md_build_palette(const byte *rompal, SDL_Color pal[16]) {
 	}
 }
 
+/* 由 16 個 Genesis bus word (記憶體陣列,非 ROM 位元組) 建 palette。 */
+static void md_build_palette_words(const word *src, SDL_Color pal[16]) {
+	int i;
+	for (i = 0; i < 16; i++) {
+		word w = src[i];
+		pal[i].r = (Uint8)(((w >> 1) & 7) * 36);
+		pal[i].g = (Uint8)(((w >> 5) & 7) * 36);
+		pal[i].b = (Uint8)(((w >> 9) & 7) * 36);
+	}
+}
+
+/* Genesis sprite 調色盤。ROM 內的 sprite/villain palette 是壓縮的 (raw 搜尋找不到),
+ * 而舊用的 MD_PAL_OFFSET (0x25698) 整條是黑色 → troop/villain 變黑剪影。
+ * 以下兩條由 Genesis 模擬器 (GPGX) CRAM dump 取得 (ground truth):
+ *  - troop:世界地圖 CRAM line0 (灰/棕/黃/紅,單位通用色)。
+ *  - villain:角色畫面 CRAM line0 (紫底 + 膚色,對應 wanted 畫面)。 */
+static const word md_troop_pal[16] = {
+	0x0040, 0x0eee, 0x0ccc, 0x0888, 0x0444, 0x0000, 0x0048, 0x026c, 0x06ae, 0x00ee, 0x00ae, 0x006e, 0x000e, 0x000a, 0x0006, 0x0ee4
+};
+static const word md_villain_pal[16] = {
+	0x0020, 0x0888, 0x0866, 0x0666, 0x0644, 0x0422, 0x0200, 0x0000, 0x0000, 0x0002, 0x0068, 0x0048, 0x0006, 0x0006, 0x0000, 0x0604
+};
+
 /* === Okumura LZSS 解壓 (對應 ROM 0x18B0C) ===
  * ring buffer 4096 bytes、初值填 0x20、起始寫入位 0xFEE;
  * src header 8 bytes,out_size = header offset+4 的 big-endian long,壓縮流從 src+8 起;
@@ -327,6 +350,7 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 
 	int frames = 0;
 	int offset = 0;
+	const word *md_pal = NULL;   /* 非 NULL → 用此硬編 sprite palette (取代全黑的 MD_PAL_OFFSET) */
 
 	switch (id) {
 		case GR_LOGO:
@@ -339,6 +363,7 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 			offset = TROOP_OFFSET;
 			frames = 4;
 			offset += (TILE_LEN * frames) * sub_id;
+			md_pal = md_troop_pal;
 		}
 		break;
 		case GR_VILLAIN:	/* Villain animated face */
@@ -347,6 +372,7 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 			offset = VILLAIN_OFFSET;
 			frames = 4;
 			offset += (TILE_LEN * frames) * sub_id;
+			md_pal = md_villain_pal;
 		}
 		break;
 		case DAT_WORLD:	/* World data for all 4 continents, sub_id - undefined */
@@ -392,12 +418,17 @@ void* MD_Resolve(KBmodule *mod, int id, int sub_id) {
 
 			KB_File *f = KB_fopen(mod->slotA_name, "rb");
 
-			/* 讀 Genesis 調色盤 (32 bytes = 16 色) */
-			byte rompal[32];
+			/* Genesis 調色盤:troop/villain 用硬編 CRAM palette (ROM 內為壓縮、
+			 * 且 MD_PAL_OFFSET 全黑);其餘 ROW 資源沿用 MD_PAL_OFFSET。 */
 			SDL_Color pal[16];
-			KB_fseek(f, MD_PAL_OFFSET, 0);
-			KB_fread(rompal, sizeof(byte), 32, f);
-			md_build_palette(rompal, pal);
+			if (md_pal) {
+				md_build_palette_words(md_pal, pal);
+			} else {
+				byte rompal[32];
+				KB_fseek(f, MD_PAL_OFFSET, 0);
+				KB_fread(rompal, sizeof(byte), 32, f);
+				md_build_palette(rompal, pal);
+			}
 
 			KB_fseek(f, offset, 0);
 
