@@ -21,7 +21,7 @@ VERSION=@PACKAGE_VERSION@
 GAME_RESOURCES=
 GAME_RES_OBJECTS=
 GAME_WIN_VERSION=
-MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw32)
+MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw)
 ifneq ("$(MSYS_TEST)","")
 	CFLAGS+=-I/mingw/include/SDL2 -DUSE_WINAPI
 	GAME_RESOURCES+=dist/win/openkb.rc

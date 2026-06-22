@@ -56,8 +56,13 @@ cp "$HERE/overlay/Application.mk"     "$JNI/Application.mk"
 cp "$HERE/overlay/Android.mk"         "$JNI/src/Android.mk"
 cp "$HERE/overlay/cfg-android.h"      "$JNI/src/config.h"
 
-# 4. 連結引擎源 (jni/src/openkb -> repo 根),Android.mk 以 $(OKB)=openkb 參照 src/ vendor/
-ln -sfn "$ROOT" "$JNI/src/openkb"
+# 4. 引擎源:先跑 fetch-vendor 產生 vendor/*.c (inprint/savepng/scale2x),
+#    再「實體複製」src + vendor 進 jni/src/openkb (Android.mk 以 $(OKB)=openkb 參照)。
+#    不用 symlink:gradle 把 jni 複製到 intermediates 時 symlink 會斷 → No rule to make target。
+sh "$ROOT/docker/fetch-vendor.sh"
+rm -rf "$JNI/src/openkb"; mkdir -p "$JNI/src/openkb/vendor"
+cp -a "$ROOT/src" "$JNI/src/openkb/src"
+cp "$ROOT/vendor/"*.c "$ROOT/vendor/"*.h "$JNI/src/openkb/vendor/" 2>/dev/null || true
 
 # 5. stage assets:free 美術 + CJK atlas
 ASSETS="$APPMAIN/assets/data"
