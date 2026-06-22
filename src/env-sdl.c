@@ -937,7 +937,10 @@ void* KB_Resolve(int id, int sub_id) {
 		}
 	}
 	if (ret == NULL)
-		KB_errlog("Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, conf->num_modules);
+		/* 解析失敗多為「free 模組未提供某選用資料」(refill_rules 等呼叫端皆 null-guard,
+		 * 缺值時回退 bounty.c 內建預設,不影響執行)。預設靜默,設 KB_VERBOSE=1 才印,
+		 * 避免嚇到玩家 (見 GitHub issue #1 的 DAT_* 訊息)。 */
+		KB_debuglog(0, "Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, conf->num_modules);
 	return ret;
 }
 
