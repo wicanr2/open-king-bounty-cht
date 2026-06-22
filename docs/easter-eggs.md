@@ -13,7 +13,11 @@
 
 把開發者放進遊戲、互相開玩笑,是 New World Computing 的招牌傳統 —— 後來的《魔法門》(Might and Magic)、《英雄無敵》(Heroes of Might and Magic)系列也一路延續這種惡趣味。
 
-其餘的反派(Murray the Miser、Hack、Baron Johnno Makahl、Dread Pirate Rob、Auric、Czar Nickolai the Mad…)看名字與描述也都像團隊成員或圈內人的化身,但目前只有上面兩位能對得夠有把握;其他的留待繼續比對製作名單。
+其中 **Canegor = Caneghem** 連維基百科與 CRPG 史學家(CRPG Addict)都認可;**Mahk = Mark** 則是從執行檔字串與通緝令描述推出來的(把同事愛大吼寫進通緝令)。
+
+另一個有意思的:**Hack**(別名 The Rogue)——比較像是在向 1980 年代的 roguelike 經典《Hack》/《Rogue》致敬,而不是某個人。
+
+至於其餘的反派(Murray the Miser、Baron Johnno Makahl、Dread Pirate Rob、Sir Moradon、Bargash、Auric、Czar Nickolai the Mad…),名字與描述看起來也都像在惡搞身邊的人,但**查不到可靠的對照**:原版執行檔的製作名單只列了 5 個人(Caneghem、Mark / Andy Caldwell、Kenneth Mayfield、Vincent DeQuattro),這些名字對不上其餘反派,推測是當年朋友、同事或圈內哏,連專門寫 CRPG 歷史的研究者也只能猜。為免穿鑿附會,這裡只記能確定的兩位。
 
 完整製作群(取自 `KB.EXE` 標題畫面):
 
@@ -39,6 +43,10 @@
 
 ## 怎麼找到的
 
-把原版 `KB.EXE` 先解開外殼壓縮(原版用 LZEXE 之類的方式打包),再掃描裡面的可讀文字字串,逐段對照遊戲內容與製作名單比對出來的。圖形資料檔(`256.CC` / `416.CC`)是壓縮過的容器,本身沒有可讀文字。
+把原版 `KB.EXE` 先解開外殼壓縮(原版用 LZEXE 之類的方式打包),再掃描裡面的可讀文字字串,逐段對照遊戲內容與製作名單比對出來的。圖形資料檔(`256.CC` / `416.CC`)是壓縮過的容器,本身沒有可讀文字。反派與開發者的對照另以網路資料交叉查證。
+
+參考:
+- [King's Bounty — Wikipedia](https://en.wikipedia.org/wiki/King%27s_Bounty)
+- [The CRPG Addict — Game 149: King's Bounty (1990)](http://crpgaddict.blogspot.com/2014/06/game-149-kings-bounty-1990.html)
 
 > 本頁僅為研究與致敬,引用原版執行檔中的**少量文字**作為佐證(合理引用);原版遊戲與其資料的版權仍屬原權利人,本專案不散布原版檔案本身。向 1990 年的 New World Computing 團隊致敬。
