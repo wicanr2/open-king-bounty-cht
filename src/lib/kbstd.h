@@ -119,9 +119,15 @@ extern int KB_strcasecmp(const char *left, const char *right);
 
 extern char* KB_strtoupper(char *src);
 
-/* note: this is also specified in vendor.h */
-//extern size_t strlcat(char *dst, const char *src, size_t size);
-//extern size_t strlcpy(char *dst, const char *src, size_t size);
+/* strlcat/strlcpy 原型放這 (大家都 include kbstd.h;不是每個用 KB_strlcat 的 TU 都
+ * include vendor.h)。mingw lib 有符號但 header 沒原型,且新版 gcc C23 把 implicit
+ * declaration 當錯 → 對 !HAVE 或 mingw 補原型。 */
+#if !defined(HAVE_STRLCAT) || defined(__MINGW32__)
+extern size_t strlcat(char *dst, const char *src, size_t size);
+#endif
+#if !defined(HAVE_STRLCPY) || defined(__MINGW32__)
+extern size_t strlcpy(char *dst, const char *src, size_t size);
+#endif
 #define KB_strlcat strlcat
 #define KB_strlcpy strlcpy
 
