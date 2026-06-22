@@ -164,12 +164,22 @@ void* KB_loaddirD(const char *filename, KB_DIR *wth, int *max)
 
 void KB_seekdirD(KB_DIR *dirp, long loc)
 {
+#if defined(__ANDROID__)
+	/* bionic 沒有 seekdir;引擎只用到 rewind (KB_rewinddir → loc 0)。
+	 * 用 rewinddir 處理 rewind;非零 loc 罕用於本引擎,退化成從頭重掃即可。 */
+	rewinddir(dirp->d);
+#else
 	seekdir(dirp->d, loc);
+#endif
 }
 
 long KB_telldirD(KB_DIR *dirp)
 {
+#if defined(__ANDROID__)
+	return 0;	/* bionic 沒有 telldir;引擎只用於 rewind,回 0 足夠 */
+#else
 	return telldir(dirp->d);
+#endif
 }
 
 struct KB_Entry * KB_readdirD(KB_DIR *dirp)
