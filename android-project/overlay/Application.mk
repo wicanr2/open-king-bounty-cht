@@ -1,5 +1,5 @@
 APP_ABI := arm64-v8a armeabi-v7a
-APP_PLATFORM := android-21
+APP_PLATFORM := android-23
 APP_STL := c++_shared
 APP_CPPFLAGS := -frtti -fexceptions
 # 暫允許缺少的 shared 相依 (SDL2_mixer/image 的 codec 子專案尚未備齊);
