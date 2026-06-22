@@ -33,7 +33,13 @@
   - **驗證**:對齊 `kings-bounty_17.gif` 逐像素均差 **213.8 → 4.8**;引擎內 dump 世界地圖(亮綠草地/藍水/灰石城堡/黃沙/棕山)、location(城堡+雪山+綠谷)皆正確。
   - 定位法(可重用):色散最小對齊 → 反推每 index 真實色 → 一眼看出 off-by-one;比盲試 plane permutation 快。教訓:比 palette **色集**(index 重排下不變)測不到此 bug,要比**渲染後逐像素**。
 - [x] **Amiga 地圖英雄黑框**(commit d9d9617):`GR_HERO = GR_CURSOR`(cursor=英雄 sprite sheet),`AMIGA_Resolve` 的 GR_CURSOR 漏設 `transparent=1` → index0(黑)未轉 colorkey。已加,引擎內驗證 sprite 疊綠底無黑框。
-- [~] **Genesis tileset 大幅縮小破口 — 用實機圖反推,定位到「水」cell**(2026-06-22,實機 06-54-21.png + `genesis_pic/`):
+- [x] **Genesis tileset 水 cell 修正 + vflip(2026-06-22,實機 `genesis_pic/` 反推 + 第一性原理)**:
+  - **第一性原理判定**:LZSS/tile/template/palette 解碼對(~9 成 cell 正確);唯一破口 = cell-type 0(最常見,河流/內陸水)= tile 14×30 全相同。反證:tile 14 在 line2 的 index3/4 是棕,而該棕被另 47 個地形 cell 正確當泥土/陰影 → 若 cell0 是普通 metatile 真機也會棕,但實機水是藍 → **cell0/tile14 是「水」特例,真機靠 palette cycling 動畫顯示藍**(MD 省 ROM:1 tile 重複 + palette 動畫)。
+  - **修正**`src/lib/md-rom.c`:`MD_WATER_TILE 14` 強制 palette line 1(index3/4=藍,≈實機河流藍 `(4,38,132)/(36,110,196)`),不動其他 47 cell;index0 露底已是海藍 → 水 cell 整體呈藍。python+in-engine 雙驗證:cell0 (72,0,0)/(144,72,0) 棕 → (0,36,144)/(36,108,216) 藍;地圖 render 河流連貫(`qa-md/map_WATERFIX.png`)。
+  - **補 vflip(bit 12)**:引擎原本忽略 nametable vflip(MD 用 h/v flip 重用 tile 拼圖案省空間);cell 16/27/29/31 有用,已在 `md_blit_subtile` 實作。
+  - 河流藍 ≠ 海洋(cell 27-39)teal,與實機一致。
+- [ ] **Genesis troop/villain sprite 全黑(待修,2026-06-22 sprite 對照表發現)**:`MD_PAL_OFFSET 0x25698` 整條 = `(0,0,0)` 全黑 → troop/villain 黑剪影(sprite data 形狀對)。隔壁 line(0x256B8 藍/灰/紅、0x256D8 棕/橙)有真色,但**單一 16 色 palette 無法正確上色所有 troop**——MD 戰鬥載入 4 條 sprite palette、各 troop assign 不同條;openkb 對全部 troop 套同一條。正解:找每個 troop 的 palette line 分配(sprite attribute / 戰鬥畫面 CRAM),或用模擬器 CRAM dump。屬深層 RE。
+- [~] **Genesis tileset(舊紀錄,已被上方取代)— 用實機圖反推定位到「水」cell**(2026-06-22,實機 06-54-21.png + `genesis_pic/`):
   - **72 cell 中約 9 成正確**:草地、森林、海洋(cell 27-39 teal)、沙漠、山、城堡(cell 8-14 灰)、物件(井/樹/招牌/寶箱)皆對。LZSS(ring 0x20、p=8、out_size=header[4..7] BE、pattern skip 2)、638 tiles、palette 0x3371A 4 line、nametable word(idx&0x7FF / hflip bit11 / line bit13-14)、vflip(bit12,引擎目前忽略)都驗證可用。
   - **破口收斂到 cell-type 0(map 最常見,第一洲 647、全圖 1531)= 內陸水域**:map 結構圖顯示 cell 0 形成蜿蜒水道+湖,與海洋連通(= 河/湖)。cell 0 的 template = **tile 14 重複 30 次**;**tile 14 只被 cell 0-6 使用 = 它就是「水 tile」**(bytes `43 00 00 00` = 細直線 + index0)。
   - **為何破**:tile 14 用 nibble 4,3,template 標 palette **line 2** → line2 col3/4 = 棕(144,72,0)/暗紅(72,0,0) → 水變「棕線 on 藍底」直條紋。但 line 2 對 grass/山/沙是**正確**的(它們也用 line 2,render 對)→ 所以**我們的 line 2 解碼沒錯,真機上 tile14+line2 也會是棕**。
