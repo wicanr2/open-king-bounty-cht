@@ -25,6 +25,23 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
+## 🔧 第十輪 (2026-06-22):多平台 CI 打包 + Android 移植 (branch `android-port`)
+
+### ✅ 已完成
+- [x] **GitHub Actions 多平台 CI**(`.github/workflows/build.yml`):font + linux(AppImage)/ windows(MSYS2+DLL)/ macos(.app)/ android(NDK APK)。**五個 job 全綠**。產物:AppImage 11MB / Windows zip 18MB / macOS .app 7MB / Android APK 5MB。建公開 free 版。
+- [x] **桌面跨平台編譯修正**(clang/mingw C23 比 gcc 嚴):移除 libhfs/librsrc;`add_module_aux` 補宣告;`wavFile_read_FILE` 前向宣告;`KB_getpos` word 暫存;strlcat/strlcpy 原型移 kbstd.h;`KBRW_*` 宣告改 SDL2 簽名;windows `mkdir`→`_mkdir` + MSYS_TEST 認 MINGW64 + 不建 openkb.rc;build-appimage.sh apt 加 sudo。
+- [x] **Android 骨架**:`android-project/`(setup.sh + overlay + src/android.c bootstrap);NDK build 通(SDL2 + WAV-only mixer + PNG image;seekdir/telldir rewinddir 後備;combat.c 不編)。
+- [x] **Android phase 3 觸控**:`src/touch.c` D-pad + A(Enter)/B(ESC),FINGER→SDLK_* 餵回 KB_event。
+
+### ⏳ 待辦(避免遺忘)
+- [ ] **【週末】使用者用手機實測 APK**(GitHub Actions → 對應 run → Artifacts → `KingsBounty-CHT-android-apk`)→ 回報:能否啟動、看到標題、D-pad 走地圖、A/B 確認取消。據實機修。
+- [ ] **Android phase 4 情境快捷列**:讀當前 keymap → 浮出字母按鈕(A–E)/ 直接點選單那行 → 城鎮/商店字母選單可用(目前只有方向鍵+Enter/ESC,字母選單不能操作)。
+- [ ] Android phase 5:數字步進器(招募數量)、命名 IME(SDL_StartTextInput)、生命週期 pause/resume 存檔。
+- [ ] Android 手感打磨:D-pad 按住連續移動(目前點一下一步)、控制透明度可調、左右手對調、SDL2_mixer 補 OGG(目前 WAV-only 無音樂)、☰ 系統選單(F8/F9/存退)。
+- [ ] **合併決策**:android-port 待真機驗證 + phase 4 後再考慮併 main;桌面 CI 修正(libhfs 移除等)目前只在 android-port,可考慮先 cherry-pick / 併回 master。
+- [ ] 觸發 CI 注意:`gh workflow run build.yml --ref android-port` 前要等 GitHub 更新 branch head(push 後 sleep ~18s + 確認 ls-remote),否則跑到舊 commit。
+- 方法論 skill:`retro-keyboard-to-touch`(鍵盤老遊戲→觸控)。
+
 ## 🔧 第九輪 (2026-06-22):Amiga 配色根因 + 英雄透明 / Genesis tileset 仍破碎
 
 - [x] **Amiga palette off-by-one(所有配色錯誤的唯一根因)**(commit 03ffd6f / 3cd74fd):
