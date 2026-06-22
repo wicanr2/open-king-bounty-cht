@@ -35,6 +35,11 @@
 ### 🔍 已釐清(紅鯡魚)
 - `Unable to resolve resource DAT_RANGEMIN…` 等一堆 → **無害**。`bounty.c` 內建 canonical `troops[MAX_TROOPS]` 表,`refill_rules()` 對 DAT_* 是 null-guard 覆寫 → free 版缺這些只是保留內建預設值(move_rate 等不為 0)。ASan + xvfb 完整跑「新遊戲→騎士→命名→難度→進地圖→移動→開選單」**全程無崩潰**(Linux)。
 
+### ✅ 已修(續)
+- [x] **DAT_* 'Unable to resolve' 訊息**:改用既有 `KB_debuglog`(受 `KB_VERBOSE` 控制)→ **預設靜默**、`KB_VERBOSE=1` 才印。驗證:預設 0 條、verbose 44 條,皆正常進遊戲。commit `e37e34b`。
+- [x] **併 master + 發 Release**:android-port → master 合併(`5d081d9`),tag `v0.0.3-cht.1` 觸發 CI(run 27957777230)重編五平台 free 版 + 建 GitHub Release。
+- [ ] **(進行中)重打包 mac 完整版**:等 CI 新 mac 引擎(含修復)→ build-dist-all 注入完整資料 → dist-all。同步刷新 win/linux 完整版引擎。
+
 ### ⏳ 待辦
 - [ ] **issue #1 選完難度閃退**:Linux 完整遊玩重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
 - [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
