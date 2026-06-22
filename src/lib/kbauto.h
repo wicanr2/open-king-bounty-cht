@@ -33,6 +33,11 @@ extern void stop_modules(KBconfig *conf);
 
 extern void wipe_module(KBmodule *mod);
 
+/* 程式化加入一個模組 (game.c 的 DOS/Genesis/Amiga 自動偵測、android bootstrap 用)。
+ * 需顯式宣告:clang / mingw 把 implicit declaration 當錯誤 (gcc 只當警告)。 */
+extern void add_module_aux(KBconfig *conf, const char *name, int family, int bpp,
+                           const char *path, const char *slotA, const char *slotB, const char *slotC);
+
 extern void register_module(KBconfig *conf, KBmodule *mod);
 extern void register_modules(KBconfig *conf);
 

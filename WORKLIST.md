@@ -25,6 +25,40 @@
   - ESC→F10 退出 + 自動存檔 + Y/N (cheat 改 F12);ESC 改 cancel。
   - 缺字「嗎」(重烤 atlas,1226 字)。
 
+## 🔧 第十一輪 (2026-06-22):使用者回報 GitHub issue (#1 #2) — 啟動閃退
+
+使用者(PowerSaka / shiun-git)在 macOS 上回報公開 free 版開不起來。
+
+### ✅ 已修 + 驗證
+- [x] **savedir 首次啟動閃退**(issue #2 完整、issue #1「需手動建 `~/.openkb`」):`save_dir` 預設 `$HOME/.openkb/saves`(兩層),`test_directory` 只單層 `mkdir` → 父層 `.openkb` 不存在即 ENOENT 失敗 → `Can't start without a proper savedir`。改 `src/lib/kbstd.c` `test_directory` 為遞迴建立(mkdir -p,中間層錯誤忽略 + 最後 stat 驗證),跨平台 + Android 通用。**已驗證**:全新無 `.openkb` 的 HOME 自動建 `~/.openkb/saves`、不再 fatal。commit `8bba5ec`(android-port)。
+
+### 🔍 已釐清(紅鯡魚)
+- `Unable to resolve resource DAT_RANGEMIN…` 等一堆 → **無害**。`bounty.c` 內建 canonical `troops[MAX_TROOPS]` 表,`refill_rules()` 對 DAT_* 是 null-guard 覆寫 → free 版缺這些只是保留內建預設值(move_rate 等不為 0)。ASan + xvfb 完整跑「新遊戲→騎士→命名→難度→進地圖→移動→開選單」**全程無崩潰**(Linux)。
+
+### ⏳ 待辦
+- [ ] **issue #1 選完難度閃退**:Linux 完整遊玩重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
+- [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
+- [ ] 回覆 GitHub issue #1 #2(對外訊息,需使用者確認)。
+- [ ] (選用)在 `free-data.c` 補實作 troop DAT_*(skill/moves/melee/ranged/ammo/gold/group/abilities/dwelling)以消除誤導性錯誤訊息 — 確認非崩潰主因,可延後。
+
+## 🔧 第十輪 (2026-06-22):多平台 CI 打包 + Android 移植 (branch `android-port`)
+
+### ✅ 已完成
+- [x] **完整版三平台包 `dist-all/`**(`docker/build-dist-all.sh`,host 端組裝,gitignore):Linux AppImage / Windows x64 zip / macOS .app zip,**三者都含全套美術(free + DOS `256.CC`/`416.CC`/`KB.EXE` + Genesis `kb.bin` + Amiga `GAME`)+ FM-Towns 音樂(16 軌 ogg)**。做法:完整資料 payload 取自已驗證的完整版 AppImage 內解壓 `$SHARE`(單一真值),注入 CI 出的 win/mac 包(引擎與資料無關);win `play.bat` / mac `launch` 注入 `KB_AMIGA_GAME` + `KB_MUSIC` env。F8 切主題、F9 切音樂。**含版權素材,個人用勿散布**。AppImage headless smoke 確認 BGM=fmtowns + Amiga 偵測;F8 四主題 playtest 背景驗證中。
+- [x] **GitHub Actions 多平台 CI**(`.github/workflows/build.yml`):font + linux(AppImage)/ windows(MSYS2+DLL)/ macos(.app)/ android(NDK APK)。**五個 job 全綠**。產物:AppImage 11MB / Windows zip 18MB / macOS .app 7MB / Android APK 5MB。建公開 free 版。
+- [x] **桌面跨平台編譯修正**(clang/mingw C23 比 gcc 嚴):移除 libhfs/librsrc;`add_module_aux` 補宣告;`wavFile_read_FILE` 前向宣告;`KB_getpos` word 暫存;strlcat/strlcpy 原型移 kbstd.h;`KBRW_*` 宣告改 SDL2 簽名;windows `mkdir`→`_mkdir` + MSYS_TEST 認 MINGW64 + 不建 openkb.rc;build-appimage.sh apt 加 sudo。
+- [x] **Android 骨架**:`android-project/`(setup.sh + overlay + src/android.c bootstrap);NDK build 通(SDL2 + WAV-only mixer + PNG image;seekdir/telldir rewinddir 後備;combat.c 不編)。
+- [x] **Android phase 3 觸控**:`src/touch.c` D-pad + A(Enter)/B(ESC),FINGER→SDLK_* 餵回 KB_event。
+
+### ⏳ 待辦(避免遺忘)
+- [ ] **【週末】使用者用手機實測 APK**(GitHub Actions → 對應 run → Artifacts → `KingsBounty-CHT-android-apk`)→ 回報:能否啟動、看到標題、D-pad 走地圖、A/B 確認取消。據實機修。
+- [ ] **Android phase 4 情境快捷列**:讀當前 keymap → 浮出字母按鈕(A–E)/ 直接點選單那行 → 城鎮/商店字母選單可用(目前只有方向鍵+Enter/ESC,字母選單不能操作)。
+- [ ] Android phase 5:數字步進器(招募數量)、命名 IME(SDL_StartTextInput)、生命週期 pause/resume 存檔。
+- [ ] Android 手感打磨:D-pad 按住連續移動(目前點一下一步)、控制透明度可調、左右手對調、SDL2_mixer 補 OGG(目前 WAV-only 無音樂)、☰ 系統選單(F8/F9/存退)。
+- [ ] **合併決策**:android-port 待真機驗證 + phase 4 後再考慮併 main;桌面 CI 修正(libhfs 移除等)目前只在 android-port,可考慮先 cherry-pick / 併回 master。
+- [ ] 觸發 CI 注意:`gh workflow run build.yml --ref android-port` 前要等 GitHub 更新 branch head(push 後 sleep ~18s + 確認 ls-remote),否則跑到舊 commit。
+- 方法論 skill:`retro-keyboard-to-touch`(鍵盤老遊戲→觸控)。
+
 ## 🔧 第九輪 (2026-06-22):Amiga 配色根因 + 英雄透明 / Genesis tileset 仍破碎
 
 - [x] **Amiga palette off-by-one(所有配色錯誤的唯一根因)**(commit 03ffd6f / 3cd74fd):

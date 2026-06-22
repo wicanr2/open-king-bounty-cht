@@ -118,11 +118,12 @@ KB_FILE_IF_NAME_ADD(BUF)
 #ifdef HAVE_LIBSDL
 #include <SDL.h>
 
-/* RWops interface to file */
+/* RWops interface to file — 簽名對齊 SDL2 (kbfile.c 的定義用 Sint64/size_t);
+ * 舊宣告是 SDL1.2 的 int → clang 報 conflicting types。 */
 extern SDL_RWops* KBRW_open( KB_File *f );
-extern int KBRW_seek( SDL_RWops *ctx, int offset, int whence );
-extern int KBRW_read( SDL_RWops *ctx, void *ptr, int size, int maxnum);
-extern int KBRW_write( SDL_RWops *ctx, const void *ptr, int size, int num);
+extern Sint64 KBRW_seek( SDL_RWops *ctx, Sint64 offset, int whence );
+extern size_t KBRW_read( SDL_RWops *ctx, void *ptr, size_t size, size_t maxnum);
+extern size_t KBRW_write( SDL_RWops *ctx, const void *ptr, size_t size, size_t num);
 extern int KBRW_close( SDL_RWops *ctx);
 #endif
 

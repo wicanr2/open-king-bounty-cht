@@ -9,9 +9,13 @@ cd "$(dirname "$0")/.."
 [ -f data/cjk24.bin ]  || { echo "先 docker/build-font.sh 烤 cjk24.bin"; exit 1; }
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq >/dev/null 2>&1
-apt-get install -y -qq --no-install-recommends wget file patchelf libfuse2 >/dev/null 2>&1 || \
-  apt-get install -y -qq --no-install-recommends wget file patchelf >/dev/null 2>&1
+# 非 root (如 GitHub Actions runner) 用 sudo;工具齊全 (CI 預先裝過) 就跳過 apt
+SUDO=""; [ "$(id -u)" = 0 ] || SUDO="sudo"
+if ! command -v wget >/dev/null 2>&1 || ! command -v file >/dev/null 2>&1; then
+  $SUDO apt-get update -qq >/dev/null 2>&1 || true
+  $SUDO apt-get install -y -qq --no-install-recommends wget file patchelf libfuse2 >/dev/null 2>&1 || \
+    $SUDO apt-get install -y -qq --no-install-recommends wget file patchelf >/dev/null 2>&1 || true
+fi
 
 AT=/tmp/appimagetool
 if [ ! -x "$AT" ]; then

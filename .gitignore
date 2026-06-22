@@ -94,3 +94,9 @@ tools/_*.py
 qa-themes/
 qa-spr/
 qa-md/
+android-project/build/
+android-project/dl/
+android-project/_src/
+
+# 完整版(含版權 DOS/Genesis/Amiga 美術 + FM-Towns 音樂)— 個人用,勿散布
+dist-all/

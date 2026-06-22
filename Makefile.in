@@ -21,12 +21,12 @@ VERSION=@PACKAGE_VERSION@
 GAME_RESOURCES=
 GAME_RES_OBJECTS=
 GAME_WIN_VERSION=
-MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw32)
+MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw)
 ifneq ("$(MSYS_TEST)","")
-	CFLAGS+=-I/mingw/include/SDL2 -DUSE_WINAPI
-	GAME_RESOURCES+=dist/win/openkb.rc
-	GAME_RES_OBJECTS+=dist/win/openkb.rc.o
-	GAME_WIN_VERSION=$(shell echo @VERSION@ | tr . ,),0
+	# Windows/MINGW:只需 -DUSE_WINAPI (SDL include 由 sdl2-config 提供)。
+	# 不建 dist/win/openkb.rc:其 @VERSION@ 在非 automake Makefile.in 未被代換,
+	# windres 會 syntax error;圖示/版本資源非必要,略過。
+	CFLAGS+=-DUSE_WINAPI
 endif
 
 ifneq ("$(datadir)","/usr/local/share")
@@ -68,7 +68,9 @@ MAN_PAGES=$(MAN_SOURCES:.man=.6)
 LIBHFS_BINARY=vendor/libhfs.a
 LIBRSRC_BINARY=vendor/librsrc.a
 
-LIB_OBJECTS=$(LIB_SOURCES:.c=.o) $(LIBHFS_BINARY) $(LIBRSRC_BINARY)
+# libhfs/librsrc (Mac 資源 fork) 已移除:free/dos/genesis/amiga 模組皆未引用 (無 include/
+# 無符號呼叫/IO 層未接);保留只會帶來 ftp 來源 + 古董 configure 在 mac/win 編不過的麻煩。
+LIB_OBJECTS=$(LIB_SOURCES:.c=.o)
 VEND_OBJECTS=$(VEND_SOURCES:.c=.o)
 GAME_OBJECTS=$(GAME_SOURCES:.c=.o) $(GAME_RES_OBJECTS)
 GAME2_OBJECTS=$(GAME2_SOURCES:.c=.o)
@@ -76,14 +78,6 @@ GAME2_OBJECTS=$(GAME2_SOURCES:.c=.o)
 .SUFFIXES: .6 .man
 
 all: $(GAME_BINARY)
-
-$(LIBHFS_BINARY): $(VEND_DEPS)
-	make -C vendor/libhfs
-	cp vendor/libhfs/libhfs.a vendor/.
-
-$(LIBRSRC_BINARY): $(VEND_DEPS)
-	make -C vendor/librsrc
-	cp vendor/librsrc/librsrc.a vendor/.
 
 $(LIB_BINARY): $(CONFIG_HEADER) $(LIB_OBJECTS)
 	ar rcs $(LIB_BINARY) $(LIB_OBJECTS)

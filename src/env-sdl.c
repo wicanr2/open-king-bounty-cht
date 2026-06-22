@@ -29,6 +29,7 @@
 #include "env.h"
 #include "cjkfont.h"
 #include "bgm.h"
+#include "touch.h"
 
 #ifdef HAVE_LIBSDL_IMAGE
 #include <SDL_image.h>
@@ -350,6 +351,15 @@ void KB_present(KBenv *env) {
 	SDL_RenderClear(g_renderer);
 	SDL_RenderCopy(g_renderer, g_texture, NULL, NULL); /* 320x200 → 視窗 */
 	if (cjk_drawlist_count() > 0) cjk_draw_overlay();  /* 在其上疊中文 */
+#ifdef __ANDROID__
+	{	/* 觸控覆蓋層:暫停 logical 縮放,用真實視窗 px 畫 D-pad/A/B */
+		int ww = 0, wh = 0;
+		SDL_GetRendererOutputSize(g_renderer, &ww, &wh);
+		SDL_RenderSetLogicalSize(g_renderer, 0, 0);
+		touch_render(g_renderer, ww, wh);
+		SDL_RenderSetLogicalSize(g_renderer, KB_LOGICAL_W, KB_LOGICAL_H);
+	}
+#endif
 	SDL_RenderPresent(g_renderer);
 }
 
@@ -458,7 +468,12 @@ void KB_print(KBenv *env, const char *str) {
 		col = id - (row * 16);
 		letter.x = col * letter.w;
 		letter.y = row * letter.h;
-		KB_getpos(env, &dest.x, &dest.y);
+		{	/* KB_getpos 取 word*;dest.x/y 是 SDL2 的 int → 用 word 暫存再回填
+			 * (clang/mingw 對 int*↔word* 不相容指標報錯,gcc 僅警告) */
+			word gx, gy;
+			KB_getpos(env, &gx, &gy);
+			dest.x = gx; dest.y = gy;
+		}
 		cjk_drawlist_remove(dest.x, dest.y); /* 此格改畫點陣字 → 清掉舊中文 */
 		SDL_BlitSurface(env->font, &letter, env->screen, &dest);
 		env->cursor_x++;
@@ -922,7 +937,10 @@ void* KB_Resolve(int id, int sub_id) {
 		}
 	}
 	if (ret == NULL)
-		KB_errlog("Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, conf->num_modules);
+		/* 解析失敗多為「free 模組未提供某選用資料」(refill_rules 等呼叫端皆 null-guard,
+		 * 缺值時回退 bounty.c 內建預設,不影響執行)。預設靜默,設 KB_VERBOSE=1 才印,
+		 * 避免嚇到玩家 (見 GitHub issue #1 的 DAT_* 訊息)。 */
+		KB_debuglog(0, "Unable to resolve resource %s::%d (from %d modules)\n", KBresid_names[id], sub_id, conf->num_modules);
 	return ret;
 }
 
