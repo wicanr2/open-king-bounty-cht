@@ -33,11 +33,14 @@
   - **驗證**:對齊 `kings-bounty_17.gif` 逐像素均差 **213.8 → 4.8**;引擎內 dump 世界地圖(亮綠草地/藍水/灰石城堡/黃沙/棕山)、location(城堡+雪山+綠谷)皆正確。
   - 定位法(可重用):色散最小對齊 → 反推每 index 真實色 → 一眼看出 off-by-one;比盲試 plane permutation 快。教訓:比 palette **色集**(index 重排下不變)測不到此 bug,要比**渲染後逐像素**。
 - [x] **Amiga 地圖英雄黑框**(commit d9d9617):`GR_HERO = GR_CURSOR`(cursor=英雄 sprite sheet),`AMIGA_Resolve` 的 GR_CURSOR 漏設 `transparent=1` → index0(黑)未轉 colorkey。已加,引擎內驗證 sprite 疊綠底無黑框。
-- [ ] **Genesis tileset 尚未完全破解 — 切換 Genesis 主題地圖仍破碎**(2026-06-22 實機 06-54-21.png):
-  - 現象:**部分 tile 正常**(左側草地+樹),但中右大片是**藍色直條紋 + 破碎 tile**;英雄 sprite 正常。
-  - 研判方向:① 部分 terrain tile 的 LZSS pattern / metatile 組裝對某些 tile 值錯位(藍直條 = plane/pixel 排列 drift 或 cell template 取錯);② 可能 map tile 值 `&0x7F` 後仍有超出 638-tile pattern 範圍者落到未定義區;③ palette line 取錯(類似 Amiga off-by-one,但 Genesis 走 0x3371A 已修草地藍)。
-  - 待辦:對照 Genesis 模擬器實機世界地圖截圖,逐 tile 比對哪些值破碎 → 縮小是 pattern 解碼、metatile 組裝、還是 tile-index 映射問題。可沿用本輪「色散/結構對齊反推」法。
-  - 影響:Genesis 主題地圖不可用;**不影響 free/DOS/Amiga 三主題**(皆正常)。
+- [~] **Genesis tileset 大幅縮小破口 — 用實機圖反推,定位到「水」cell**(2026-06-22,實機 06-54-21.png + `genesis_pic/`):
+  - **72 cell 中約 9 成正確**:草地、森林、海洋(cell 27-39 teal)、沙漠、山、城堡(cell 8-14 灰)、物件(井/樹/招牌/寶箱)皆對。LZSS(ring 0x20、p=8、out_size=header[4..7] BE、pattern skip 2)、638 tiles、palette 0x3371A 4 line、nametable word(idx&0x7FF / hflip bit11 / line bit13-14)、vflip(bit12,引擎目前忽略)都驗證可用。
+  - **破口收斂到 cell-type 0(map 最常見,第一洲 647、全圖 1531)= 內陸水域**:map 結構圖顯示 cell 0 形成蜿蜒水道+湖,與海洋連通(= 河/湖)。cell 0 的 template = **tile 14 重複 30 次**;**tile 14 只被 cell 0-6 使用 = 它就是「水 tile」**(bytes `43 00 00 00` = 細直線 + index0)。
+  - **為何破**:tile 14 用 nibble 4,3,template 標 palette **line 2** → line2 col3/4 = 棕(144,72,0)/暗紅(72,0,0) → 水變「棕線 on 藍底」直條紋。但 line 2 對 grass/山/沙是**正確**的(它們也用 line 2,render 對)→ 所以**我們的 line 2 解碼沒錯,真機上 tile14+line2 也會是棕**。
+  - **關鍵結論**:水**不是**走「template 0 + 畫 tile」這條路徑。cell-type 0 很可能是**「畫水 backdrop」的 sentinel**,或 map-value→cell 映射/水 palette 另有規則(palette 動畫?backdrop 色?)。實測把 cell 0 強制 line 1(藍)→ 河流變藍、整圖連貫(`qa-md/map_cell0_line1.png`),證明 cell 0=水,但 line 1 是**經驗 band-aid 非正解**(原理可能錯,未 ship)。
+  - **下一步(正解,需 RE)**:反組譯 Genesis ROM 的地圖繪製常式,查 cell-type 0 / 水 tile 14 的真實渲染路徑(sentinel? 專用水 palette? palette cycling 動畫?)。沿用本輪「map 結構反推 + 逐 cell render 對照實機」法。先別 ship 猜測修正(正確性優先)。
+  - 影響:Genesis 主題地圖水域顯示錯(棕藍直條);其餘地形正確。**不影響 free/DOS/Amiga 三主題**。
+  - 診斷產物(本機 qa-md/,gitignore):`md_cells_labeled.png`(72 cell 編號圖)、`md_tiles_0_95.png`(pattern tile)、`map_struct.png`(cell0 結構)、`map_render_real.png`/`map_cell0_line1.png`(實圖渲染對照)。
 
 ## ✅ 第八輪完成 (2026-06-21):F8 四主題 — free / DOS / Genesis / Amiga
 
