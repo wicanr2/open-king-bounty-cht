@@ -94,3 +94,6 @@ tools/_*.py
 qa-themes/
 qa-spr/
 qa-md/
+android-project/build/
+android-project/dl/
+android-project/_src/

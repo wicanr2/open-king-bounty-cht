@@ -83,6 +83,26 @@ int main(int argc, char* argv[]) {
 	wipe_config(&KBconf);
 	read_env_config(&KBconf);
 
+#ifdef __ANDROID__
+	/* Android:無命令列/config 檔,APK cwd 唯讀。資料由 Java 端複製到內部儲存,
+	 * 這裡把 datadir/savedir 指過去並掛 free 模組,直接跳過下面的 config 檔流程。 */
+	{
+		extern void android_bootstrap(KBconfig *conf);
+		android_bootstrap(&KBconf);
+		report_config(&KBconf);
+		if (test_directory(KBconf.data_dir, 0)) {
+			KB_errlog("[android] datadir '%s' 不可讀 — assets 未正確複製?\n", KBconf.data_dir);
+			return 1;
+		}
+		if (test_directory(KBconf.save_dir, 1)) {
+			KB_errlog("[android] savedir '%s' 不可寫\n", KBconf.save_dir);
+			return 1;
+		}
+		while (playing > 0) playing = run_game(&KBconf);
+		return 0;
+	}
+#endif
+
 	/* Obtain config from command-line arguments */
 	wipe_config(&CMDconf);
 	read_cmd_config(&CMDconf, argc, argv);
