@@ -130,6 +130,10 @@ KB_ORIGINAL_DOS=/path/to/your/kings-bounty  ./KingsBounty-CHT-x86_64.AppImage
 
 上圖為同一組世界地圖 tile（72 格）在四套主題下的解碼結果,用於說明本專案的跨平台美術解碼與 F8 切換成果。其中 `free` 為 CC-BY-SA 自由美術;DOS、Amiga、Genesis 三套由各原版的資料檔即時解碼而成,僅作技術對照與保存／在地化研究用途(轉化性使用),原版美術版權仍屬原權利人,本專案不散布原版資料本身。
 
+![怪物與反派 sprite 在各主題的對照](docs/screenshots/sprite-themes.png)
+
+怪物（兵種）與反派頭像的跨主題對照(DOS／Amiga／Genesis;`free` 的怪物美術僅含少數,其餘沿用 DOS,故不另列)。Genesis 的 sprite 調色盤在 ROM 內為壓縮資料,本專案以 Genesis 模擬器的 CRAM 內容作為色彩基準還原,讓原本全黑的剪影正確上色。版權同上。
+
 Amiga 美術存放在自帶的容器格式裡:檔頭含子圖數、描述子、32 色 palette、壓縮與解壓尺寸,接著是壓縮資料流。壓縮採 Okumura LZSS,與 Genesis 版同源(`length = (b2 & 0xF) + 3`);像素排列為 sequential planar(5 個 bitplane,plane0 為 LSB,byte 內 MSB-first)。palette 是 12-bit 0RGB,每個 4-bit 通道展開成 8-bit 時用 `nibble << 4`(對應 Amiga OCS/ECS 硬體行為),不是 `× 17`。
 
 Amiga 主題初期配色全錯,根因是 palette off-by-one:真實 palette 從描述子之後的「第一個」word 開始(count=1 時 offset 10),舊碼多跳了一個 word,使每個 pixel index 都顯示成 `palette[i-1]` 的色——天空變 teal、亮綠草地變中綠、sprite 的 index 0 變白而非透明。定位方法是反推:正確對齊時每個 index 應對應參考截圖中的單一顏色(色散最小),由此一眼看出 `index i → palette[i-1]` 的位移規律,比盲試 plane 排列快得多;比對「palette 色集」會被 index 重排隱藏,所以驗證配色必須逐像素比對渲染結果。以真實 Amiga「Plains」截圖為基準,逐像素均差從 213.8 降到 4.8(commit `03ffd6f` / `3cd74fd`)。另修正地圖英雄的黑色方框:`GR_HERO` 與 `GR_CURSOR` 是同一資源,Amiga 載入時漏設 transparent,index 0 未轉成 colorkey,補上後 index 0 透明、可見草地(commit `d9d9617`)。
