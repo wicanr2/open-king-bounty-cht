@@ -91,3 +91,4 @@ qa-*.c
 tools/__pycache__/
 tools/_*.py
 *.log
+qa-themes/
