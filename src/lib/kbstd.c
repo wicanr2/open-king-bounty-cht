@@ -31,6 +31,10 @@
 
 #ifdef USE_WINAPI
 #include <windows.h>
+#include <direct.h>
+/* Windows/mingw 的 mkdir 只吃 1 個參數 (非 POSIX) → 統一轉成 _mkdir(path),忽略 mode。
+ * 一次修好本檔所有 mkdir(path, mode) 呼叫。 */
+#define mkdir(p, m) _mkdir(p)
 #else
 #define USE_ANSI_COLORS
 #endif

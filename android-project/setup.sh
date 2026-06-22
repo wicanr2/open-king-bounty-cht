@@ -37,6 +37,15 @@ rm -rf "$JNI/SDL"; cp -a "$SDL" "$JNI/SDL"
 cp -a "$tmp/SDL2_image-$IMG_VER" "$JNI/SDL2_image"
 cp -a "$tmp/SDL2_mixer-$MIX_VER" "$JNI/SDL2_mixer"
 
+# SDL2_mixer:release tarball 未附 external codec 子專案 (wavpack/ogg/flac/mp3/mod/opus/mid),
+# 其 Android.mk 會 include 不存在的路徑 → 關掉這些格式,只留 SDL 內建 WAV (無 external 相依,可編)。
+# android v1 暫無 OGG 音樂;正式版再補 external codec。
+[ -f "$JNI/SDL2_mixer/Android.mk" ] && \
+  sed -i -E 's/^(SUPPORT_[A-Z0-9_]+[[:space:]]*)\??=[[:space:]]*true/\1:= false/' "$JNI/SDL2_mixer/Android.mk"
+# SDL2_image:同理,只留 PNG (free 美術需要);若 PNG 也需 external 而缺,CI 會再報,屆時補 external/libpng。
+[ -f "$JNI/SDL2_image/Android.mk" ] && \
+  sed -i -E 's/^(SUPPORT_(JPG|WEBP|AVIF|TIF|JXL)[[:space:]]*)\??=[[:space:]]*true/\1:= false/' "$JNI/SDL2_image/Android.mk"
+
 # 3. openkb overlay
 APPMAIN="$BUILD/app/src/main"
 mkdir -p "$APPMAIN/java/org/openkb/cht" "$APPMAIN/res/values" "$JNI/src/openkb"
