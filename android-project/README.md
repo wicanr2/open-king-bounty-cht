@@ -44,12 +44,17 @@ cd android-project/build
    `OpenKBActivity.java` / `jni/src/Android.mk`(引擎源清單)/ `jni/Application.mk` / `config.h`。
 3. 把 repo 的 `src/`、`vendor/` 連結進 `jni/src/`,把 `data/free` + `cjk24.bin` 放進 `assets/data/`。
 
-## 待辦(本 branch 後續)
+## 狀態與待辦(本 branch)
 
-1. NDK build 跑通(config.h 的 HAVE_* 補齊、SDL2_mixer/image android 相依、libhfs/librsrc 納入)。
-2. 觸控覆蓋層:D-pad + A/B + ☰(讓地圖能走、選單能用 Enter/ESC)。
-3. 情境快捷列(讀 keymap)+ 直接點選單項目。
-4. 數字步進器、命名 IME、生命週期(pause/resume 存檔)。
-5. 真機實測 + 手感打磨。
+- [x] **NDK build 跑通**:GitHub Actions 的 android job 綠,產出 APK(libmain.so + SDL2 +
+  WAV-only SDL2_mixer + PNG SDL2_image)。移除 hfs/rsrc;補 config.h;seekdir/telldir 後備;
+  cjkfont/inprint/bgm 納入;SDL_net 的 combat.c 排除。
+- [x] **phase 3 觸控覆蓋層**:`src/touch.c` 左下 D-pad + 右下 A(Enter)/B(ESC);
+  手指→合成 SDLK_* 餵回 KB_event;`KB_present` 畫覆蓋層。地圖可走、選單可用方向鍵+Enter/ESC。
+- [ ] **phase 4 情境快捷列**(讀 keymap)+ 直接點選單項目 → 城鎮/商店字母選單可用。
+- [ ] 數字步進器、命名 IME、生命週期(pause/resume 存檔)。
+- [ ] **真機實測 + 手感打磨**(D-pad 按住連續移動、透明度、左右手、SDL2_mixer 補 OGG)。
+
+> 目前 APK 由 CI 編出且帶觸控控制,但**尚未在真機驗證**;啟動/觸控實際行為待測。
 
 方法論見 skill `retro-keyboard-to-touch`。
