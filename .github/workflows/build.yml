@@ -1,0 +1,183 @@
+name: build
+
+# 多平台打包公開 free 版 (CC-BY-SA / GPL,不含原版版權素材)。
+# 手動觸發 (Actions 分頁 Run workflow) 或推 tag (v*) 時跑;推 tag 會自動建 Release。
+# macOS / Windows 用各自原生 runner;Linux 出 AppImage。
+# Android 需另做 SDL2 android-project 移植 (觸控輸入),見 WORKLIST,暫不在此。
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  # 共用:烤 CJK 點陣字 atlas (cjk24.bin),各平台下載使用,免在 Win/Mac 重裝字型工具鏈
+  font:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk python3 python3-pip
+          pip3 install --user --break-system-packages pillow || pip3 install --user pillow
+      - run: |
+          F=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc
+          [ -f "$F" ] || F=/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc
+          python3 tools/build_cjk_font.py --font "$F" --index 0 --size 24 --mode gray \
+            --text data/free/*.txt data/free/*.ini docs/translation/glossary-draft.md \
+                   src/game.c src/bounty.c src/combat.c src/ui.c src/inprint.c \
+            --out data/cjk24.bin --preview /tmp/preview.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cjk24
+          path: data/cjk24.bin
+
+  linux:
+    needs: font
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential autoconf automake libtool pkg-config git wget curl file libfuse2 \
+            libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev imagemagick
+      - uses: actions/download-artifact@v4
+        with: { name: cjk24, path: data }
+      - run: |
+          sh docker/fetch-vendor.sh
+          sh autogen.sh
+          ./configure
+          (cd vendor/libhfs && ./configure)
+          (cd vendor/librsrc && ./configure)
+          make -j2
+      - name: Package AppImage (free public version)
+        run: sh docker/build-appimage.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KingsBounty-CHT-linux-AppImage
+          path: release/*.AppImage
+
+  windows:
+    needs: font
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: 'msys2 {0}'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git base-devel autoconf automake libtool
+            mingw-w64-x86_64-gcc mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-SDL2_image
+      - uses: actions/download-artifact@v4
+        with: { name: cjk24, path: data }
+      - name: Build
+        run: |
+          sh docker/fetch-vendor.sh
+          sh autogen.sh
+          ./configure
+          (cd vendor/libhfs && ./configure)
+          (cd vendor/librsrc && ./configure)
+          make -j2
+      - name: Bundle (exe + DLLs + free data)
+        run: |
+          mkdir -p dist-win/data
+          cp openkb.exe dist-win/
+          # 把所有 mingw 相依 DLL 帶進去 (SDL2 / SDL2_mixer / vorbis / ogg / winpthread ...)
+          for dll in $(ldd openkb.exe | grep -i 'mingw64\|/ucrt64' | awk '{print $3}'); do cp -v "$dll" dist-win/; done
+          # SDL2_mixer 的 OGG 解碼可能 dlopen → 確保相關 DLL 都在
+          for p in SDL2 SDL2_mixer SDL2_image libvorbis libvorbisfile libogg libFLAC libopus libmpg123 libwinpthread libgcc_s libstdc++; do
+            for f in /mingw64/bin/${p}*.dll; do [ -e "$f" ] && cp -n "$f" dist-win/; done
+          done
+          cp -r data/free dist-win/data/free
+          cp data/cjk24.bin dist-win/data/
+          # free 模組設定 (相對路徑,可攜)
+          printf '[main]\r\ndatadir = data\r\nautodiscover = 0\r\n[sdl]\r\nsound = 1\r\nfullscreen = 0\r\nfilter = normal2x\r\n[module]\r\nname = Free\r\ntype = free\r\npath = data/free/\r\n' > dist-win/openkb.ini
+          printf '@echo off\r\ncd /d "%%~dp0"\r\nopenkb.exe -c openkb.ini --rootdir data %%*\r\n' > dist-win/play.bat
+          cp README.md dist-win/README.txt 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KingsBounty-CHT-windows
+          path: dist-win
+
+  macos:
+    needs: font
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          brew install sdl2 sdl2_mixer sdl2_image autoconf automake libtool pkg-config wget dylibbundler
+      - uses: actions/download-artifact@v4
+        with: { name: cjk24, path: data }
+      - name: Build
+        run: |
+          sh docker/fetch-vendor.sh
+          sh autogen.sh
+          ./configure
+          (cd vendor/libhfs && ./configure)
+          (cd vendor/librsrc && ./configure)
+          make -j3
+      - name: Bundle .app (dylib 內嵌 + free data)
+        run: |
+          APP="KingsBounty-CHT.app"
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/data"
+          cp openkb "$APP/Contents/MacOS/openkb"
+          cp -r data/free "$APP/Contents/Resources/data/free"
+          cp data/cjk24.bin "$APP/Contents/Resources/data/"
+          # 內嵌 SDL2 等 dylib,改 @rpath → 自包含
+          dylibbundler -od -b -x "$APP/Contents/MacOS/openkb" -d "$APP/Contents/libs" -p @executable_path/../libs || true
+          # free 模組設定 + 啟動器 (cd 到 Resources 用相對 data)
+          printf '[main]\ndatadir = data\nautodiscover = 0\n[sdl]\nsound = 1\nfullscreen = 0\nfilter = normal2x\n[module]\nname = Free\ntype = free\npath = data/free/\n' > "$APP/Contents/Resources/openkb.ini"
+          cat > "$APP/Contents/MacOS/launch" <<'SH'
+          #!/bin/bash
+          DIR="$(cd "$(dirname "$0")" && pwd)"
+          cd "$DIR/../Resources"
+          exec "$DIR/openkb" -c openkb.ini --rootdir data "$@"
+          SH
+          chmod +x "$APP/Contents/MacOS/launch"
+          cat > "$APP/Contents/Info.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>CFBundleName</key><string>KingsBounty-CHT</string>
+            <key>CFBundleExecutable</key><string>launch</string>
+            <key>CFBundleIdentifier</key><string>org.openkb.cht</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>CFBundleVersion</key><string>0.0.3</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict></plist>
+          PLIST
+          ditto -c -k --keepParent "$APP" KingsBounty-CHT-macos.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KingsBounty-CHT-macos
+          path: KingsBounty-CHT-macos.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [linux, windows, macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - name: Zip per-platform folders
+        run: |
+          cd artifacts
+          (cd KingsBounty-CHT-windows && zip -r ../KingsBounty-CHT-windows.zip .)
+          cp KingsBounty-CHT-linux-AppImage/*.AppImage . 2>/dev/null || true
+          cp KingsBounty-CHT-macos/*.zip . 2>/dev/null || true
+          ls -la
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*.AppImage
+            artifacts/KingsBounty-CHT-windows.zip
+            artifacts/KingsBounty-CHT-macos.zip

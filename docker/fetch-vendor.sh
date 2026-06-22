@@ -33,9 +33,16 @@ if [ ! -f scale2x.c ]; then
 fi
 
 # 4. hfsutils (libhfs/librsrc,讀 Mac 資源 fork;DOS/Mac 模組才需,free 不需但 Makefile 連結它)
+# 來源用 Debian https 鏡像 (原 ftp://ftp.mars.org 常失效 / CI 不穩);curl 或 wget 皆可,多來源 fallback。
 if [ ! -d libhfs ]; then
-  wget -q "ftp://ftp.mars.org/pub/hfs/hfsutils-3.2.6.tar.gz" -O hfsutils-3.2.6.tar.gz
+  HFS_URLS="https://deb.debian.org/debian/pool/main/h/hfsutils/hfsutils_3.2.6.orig.tar.gz ftp://ftp.mars.org/pub/hfs/hfsutils-3.2.6.tar.gz"
+  for u in $HFS_URLS; do
+    if command -v curl >/dev/null 2>&1; then curl -fsSL "$u" -o hfsutils-3.2.6.tar.gz && break
+    else wget -q "$u" -O hfsutils-3.2.6.tar.gz && break; fi
+  done
   tar xzf hfsutils-3.2.6.tar.gz
+  HFSDIR=$(find . -maxdepth 1 -type d -name 'hfsutils*' | head -1)
+  [ -n "$HFSDIR" ] && [ "$HFSDIR" != "./hfsutils-3.2.6" ] && mv "$HFSDIR" hfsutils-3.2.6
   cp -r hfsutils-3.2.6/libhfs libhfs
   cp -r hfsutils-3.2.6/librsrc librsrc
   cp libhfs/hfs.h hfs.h

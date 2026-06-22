@@ -135,10 +135,15 @@
 - [ ] 其他版本音樂 (dos/genesis/amiga/pc98/apple2):各自抽取/錄音 + scenes.ini (genesis ROM 可試 VGM;Amiga/PC98/Apple2 待評估)。
 - [ ] (選用) 部分 FM Towns 非 UI 圖形採納。
 
-### 其他
+### 跨平台打包 (2026-06-22)
+- [x] **Linux AppImage**:`docker/build-appimage.sh`(公開 free 版 / 個人版綁原版素材)。✅
+- [~] **GitHub Actions 多平台 CI**(`.github/workflows/build.yml`,手動觸發或推 v* tag):
+  - 共用 `font` job 烤 cjk24.bin → linux(AppImage)/ windows(MSYS2 MINGW64,bundle SDL2 等 DLL + openkb.ini + play.bat)/ macos(brew SDL2 + dylibbundler 內嵌 .app)三平台;推 tag 自動建 Release。
+  - 建公開 **free 版**(不含版權素材)。`docker/fetch-vendor.sh` 的 hfsutils 來源改 Debian https 鏡像(原 ftp.mars.org/CI 不穩)。
+  - **v1 未經實跑驗證**:多平台 CI 無法本地測,首跑可能要 1–2 輪修(heredoc 縮排 / configure 跨平台 / ldd 路徑 / dylibbundler)。執行後依失敗 log 修。
+- [ ] **Android(if possible)= 需專門移植,非單純打包**:openkb 無 SDL2 android-project;要 NDK build 全 C 源 + Java SDLActivity + assets 打包 + **觸控輸入對應**(遊戲是鍵盤操作,觸控需 on-screen 控制)。屬獨立 port 工作,CI 無法一步到位。
 - [ ] 片頭 intro 畫面也要能 F8 切換版本。
 - [ ] 部隊畫面版面微調 (UX,目前可接受)。
-- [ ] Windows / macOS / Android 打包 (CLAUDE.md 目標;Android = SDL2 NDK)。
 - [ ] 個人版打包綁多版本素材的流程 (版權:不入公開 repo)。
 - [ ] GitHub Release 發佈 free 版 + 原版啟用說明 (README 已寫)。
 
