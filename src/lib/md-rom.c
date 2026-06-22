@@ -35,7 +35,12 @@
 #define MD_CELL_H (MD_CELL_ROWS * 8) /* 40 (Genesis metatile 原高) */
 #define MD_TILE_H 34                 /* 引擎 RECT_TILE 高 (free ui.ini,全主題共用,F8 不重載) → 降採樣對齊 */
 #define MD_NUM_CELLS 72          /* 引擎 tileset 模型用 72 個 tile (map &0x7F) */
-#define MD_WATER_TILE 14         /* 河流水 tile (僅水 cell 0-6 用);強制 palette line 1 顯示藍水 */
+/* Genesis cell template 比標準 (free/DOS/Amiga) tile 編號偏移 7:
+ * 前 7 個 Genesis template (0-6) 是 Genesis 專屬的水/動畫/結構格,不在標準 72-tile
+ * 模型內。引擎用「遊戲地圖資料 (標準編號) + Genesis 圖塊」渲染,故 canonical cell N
+ * 對應 Genesis template N+7。逐 cell 比對 Amiga(已驗證正確)確認:Amiga[N] == Genesis[N+7]
+ * 全段 (N=0..71,template 7..78) 吻合。不加偏移 → 整張地圖錯位 7 格 (水變棕條紋等)。 */
+#define MD_CELL_BASE 7
 
 /* Genesis 色字 = 0000 BBB0 GGG0 RRR0 (9-bit, 每通道 3-bit)。轉 RGB888 (×36)。
  * rompal 指向 ROM 內 32 bytes (16 色 big-endian word)。*/
@@ -213,7 +218,7 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 
 	f = KB_fopen(romname, "rb");
 	if (!f) return NULL;
-	KB_fseek(f, MD_CELLTPL_OFFSET + cell_type * 60, 0);
+	KB_fseek(f, MD_CELLTPL_OFFSET + (cell_type + MD_CELL_BASE) * 60, 0);
 	if (KB_fread(tplbuf, 1, 60, f) != 60) { KB_fclose(f); return NULL; }
 	KB_fclose(f);
 
@@ -234,12 +239,6 @@ static SDL_Surface *md_build_cell(const char *romname, int cell_type) {
 		int hflip = (e >> 11) & 1;
 		int vflip = (e >> 12) & 1;   /* MD 用 h/v flip 重用同一 tile 拼更多圖案 (省 ROM) */
 		line = (e >> 13) & 3;
-		/* tile 14 = 河流水 tile,只出現在水 cell (0-6)。template 標 palette
-		 * line 2,但該 line 的 index 3/4 是棕色 (被另外 47 個地形 cell 正確當
-		 * 泥土/陰影用,不能全域改);真機水是藍色 (palette cycling 動畫)。
-		 * 依實機截圖證據,此 tile 改用 line 1 (index 3/4 = 藍) → 顯示為藍水。
-		 * index 0 (露底) 已設成海藍,故水 cell 整體呈藍。 */
-		if (idx == MD_WATER_TILE) line = 1;
 		if (idx < ntiles)
 			md_blit_subtile(pat + idx * 32, surf, c * 8, r * 8, hflip, vflip, line * 16);
 		/* idx 越界 (動畫 tile placeholder) → 留 index 0 (透明,露底層) */
