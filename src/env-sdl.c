@@ -458,7 +458,12 @@ void KB_print(KBenv *env, const char *str) {
 		col = id - (row * 16);
 		letter.x = col * letter.w;
 		letter.y = row * letter.h;
-		KB_getpos(env, &dest.x, &dest.y);
+		{	/* KB_getpos 取 word*;dest.x/y 是 SDL2 的 int → 用 word 暫存再回填
+			 * (clang/mingw 對 int*↔word* 不相容指標報錯,gcc 僅警告) */
+			word gx, gy;
+			KB_getpos(env, &gx, &gy);
+			dest.x = gx; dest.y = gy;
+		}
 		cjk_drawlist_remove(dest.x, dest.y); /* 此格改畫點陣字 → 清掉舊中文 */
 		SDL_BlitSurface(env->font, &letter, env->screen, &dest);
 		env->cursor_x++;

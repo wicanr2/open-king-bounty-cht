@@ -26,6 +26,10 @@
 
 #include "free-snd.h"
 
+/* 前向宣告:wavFile_load_FILE 在它定義 (本檔下方) 之前就呼叫它;
+ * clang/mingw 對 implicit declaration 報錯 (gcc 僅警告)。 */
+int wavFile_read_FILE(struct wavFile *wav, KB_File *f, SDL_AudioSpec *wav_obtained);
+
 int wavFile_reset(struct wavFile *tun, Uint16 format) {
 
 	tun->playhead = 0;
