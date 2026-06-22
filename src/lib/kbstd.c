@@ -471,12 +471,37 @@ int test_directory(const char *path, int make) {
 		if (status.st_mode & S_IFDIR) return 0;
 	}
 	if (!make) return 1;
-	if (mkdir(path, 0755))
+
+	/* Recursively create the path (mkdir -p semantics). The save dir is two
+	 * levels below HOME (e.g. ~/.openkb/saves), so on a fresh install the
+	 * parent (~/.openkb) does not exist yet and a single-level mkdir() would
+	 * fail with ENOENT -- this was the "must manually create ~/.openkb" /
+	 * "Can't start without a proper savedir" crash on macOS/Windows.
+	 * Create each component in turn; intermediate errors (EEXIST, drive
+	 * letters like "C:") are ignored and the final result is verified. */
 	{
-		KB_errlog("Unable to create directory '%s'%s\n", path, (errno == EACCES) ? ", permission denied" : "");
-		return -1;
+		char tmp[1024];
+		size_t i, len;
+		KB_strncpy(tmp, path, sizeof(tmp));
+		len = strlen(tmp);
+		while (len > 1 && (tmp[len - 1] == '/' || tmp[len - 1] == '\\'))
+			tmp[--len] = '\0';
+		for (i = 1; i < len; i++) {
+			if (tmp[i] == '/' || tmp[i] == '\\') {
+				char sep = tmp[i];
+				tmp[i] = '\0';
+				mkdir(tmp, 0755); /* ignore errors on intermediate components */
+				tmp[i] = sep;
+			}
+		}
+		mkdir(tmp, 0755);
 	}
-	return 0;
+
+	/* Verify the directory now exists and is usable */
+	if (!stat(path, &status) && (status.st_mode & S_IFDIR)) return 0;
+
+	KB_errlog("Unable to create directory '%s'%s\n", path, (errno == EACCES) ? ", permission denied" : "");
+	return -1;
 }
 
 int hex2dec(const char *hex_str) {
