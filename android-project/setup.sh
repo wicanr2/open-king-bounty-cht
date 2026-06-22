@@ -45,7 +45,7 @@ cp "$HERE/overlay/OpenKBActivity.java" "$APPMAIN/java/org/openkb/cht/OpenKBActiv
 cp "$HERE/overlay/strings.xml"        "$APPMAIN/res/values/strings.xml"
 cp "$HERE/overlay/Application.mk"     "$JNI/Application.mk"
 cp "$HERE/overlay/Android.mk"         "$JNI/src/Android.mk"
-cp "$HERE/overlay/config.h"           "$JNI/src/config.h"
+cp "$HERE/overlay/cfg-android.h"      "$JNI/src/config.h"
 
 # 4. 連結引擎源 (jni/src/openkb -> repo 根),Android.mk 以 $(OKB)=openkb 參照 src/ vendor/
 ln -sfn "$ROOT" "$JNI/src/openkb"

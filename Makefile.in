@@ -68,7 +68,9 @@ MAN_PAGES=$(MAN_SOURCES:.man=.6)
 LIBHFS_BINARY=vendor/libhfs.a
 LIBRSRC_BINARY=vendor/librsrc.a
 
-LIB_OBJECTS=$(LIB_SOURCES:.c=.o) $(LIBHFS_BINARY) $(LIBRSRC_BINARY)
+# libhfs/librsrc (Mac 資源 fork) 已移除:free/dos/genesis/amiga 模組皆未引用 (無 include/
+# 無符號呼叫/IO 層未接);保留只會帶來 ftp 來源 + 古董 configure 在 mac/win 編不過的麻煩。
+LIB_OBJECTS=$(LIB_SOURCES:.c=.o)
 VEND_OBJECTS=$(VEND_SOURCES:.c=.o)
 GAME_OBJECTS=$(GAME_SOURCES:.c=.o) $(GAME_RES_OBJECTS)
 GAME2_OBJECTS=$(GAME2_SOURCES:.c=.o)
@@ -76,14 +78,6 @@ GAME2_OBJECTS=$(GAME2_SOURCES:.c=.o)
 .SUFFIXES: .6 .man
 
 all: $(GAME_BINARY)
-
-$(LIBHFS_BINARY): $(VEND_DEPS)
-	make -C vendor/libhfs
-	cp vendor/libhfs/libhfs.a vendor/.
-
-$(LIBRSRC_BINARY): $(VEND_DEPS)
-	make -C vendor/librsrc
-	cp vendor/librsrc/librsrc.a vendor/.
 
 $(LIB_BINARY): $(CONFIG_HEADER) $(LIB_OBJECTS)
 	ar rcs $(LIB_BINARY) $(LIB_OBJECTS)

@@ -51,8 +51,6 @@ jobs:
           sh docker/fetch-vendor.sh
           sh autogen.sh
           ./configure
-          (cd vendor/libhfs && ./configure)
-          (cd vendor/librsrc && ./configure)
           make -j2
       - name: Package AppImage (free public version)
         run: sh docker/build-appimage.sh
@@ -84,8 +82,6 @@ jobs:
           sh docker/fetch-vendor.sh
           sh autogen.sh
           ./configure
-          (cd vendor/libhfs && ./configure)
-          (cd vendor/librsrc && ./configure)
           make -j2
       - name: Bundle (exe + DLLs + free data)
         run: |
@@ -122,8 +118,6 @@ jobs:
           sh docker/fetch-vendor.sh
           sh autogen.sh
           ./configure
-          (cd vendor/libhfs && ./configure)
-          (cd vendor/librsrc && ./configure)
           make -j3
       - name: Bundle .app (dylib 內嵌 + free data)
         run: |
