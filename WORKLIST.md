@@ -33,7 +33,12 @@
   - **驗證**:對齊 `kings-bounty_17.gif` 逐像素均差 **213.8 → 4.8**;引擎內 dump 世界地圖(亮綠草地/藍水/灰石城堡/黃沙/棕山)、location(城堡+雪山+綠谷)皆正確。
   - 定位法(可重用):色散最小對齊 → 反推每 index 真實色 → 一眼看出 off-by-one;比盲試 plane permutation 快。教訓:比 palette **色集**(index 重排下不變)測不到此 bug,要比**渲染後逐像素**。
 - [x] **Amiga 地圖英雄黑框**(commit d9d9617):`GR_HERO = GR_CURSOR`(cursor=英雄 sprite sheet),`AMIGA_Resolve` 的 GR_CURSOR 漏設 `transparent=1` → index0(黑)未轉 colorkey。已加,引擎內驗證 sprite 疊綠底無黑框。
-- [x] **Genesis tileset 水 cell 修正 + vflip(2026-06-22,實機 `genesis_pic/` 反推 + 第一性原理)**:
+- [x] **Genesis tileset 錯位根因 = cell 編號偏移 +7(2026-06-22,使用者觀察 + Amiga 逐 cell 比對證實)**:
+  - 真正根因:**Genesis cell template 比標準 (free/DOS/Amiga) tile 編號偏移 7**(前 7 個 template 是 Genesis 專屬水/動畫/結構格,不在標準 72-tile 模型)。引擎用「遊戲地圖資料(標準編號)+ Genesis 圖塊」渲染,未加偏移 → 整張地圖錯位 7 格(水變棕條紋等所有症狀)。
+  - 修正 `src/lib/md-rom.c`:`MD_CELL_BASE 7`,canonical cell N → Genesis template N+7。逐 cell 比對 Amiga(已驗證正確)確認 Amiga[N]==Genesis[N+7] 全段(N=0..71,template 7..78)吻合;in-engine dump 與 Amiga grid 對齊。**移除先前的 tile-14 水 hack(治標),此為乾淨根因修正**;保留 vflip(bit12)支援。
+  - 比較表(README `tileset-themes.png`)更新:free 改用真實 free 美術(直接讀 `data/free/tileseta.png`+`tilesetb.png`,先前 dump 因 free GR_TILESET fallback 到 DOS 而誤顯示成 DOS);四主題現各自正確獨立。
+  - **(下方為過程紀錄,水/vflip 為中途發現,最終由 +7 偏移統一解釋)**
+- [x] **(過程)Genesis tileset 水 cell + vflip(2026-06-22)**:
   - **第一性原理判定**:LZSS/tile/template/palette 解碼對(~9 成 cell 正確);唯一破口 = cell-type 0(最常見,河流/內陸水)= tile 14×30 全相同。反證:tile 14 在 line2 的 index3/4 是棕,而該棕被另 47 個地形 cell 正確當泥土/陰影 → 若 cell0 是普通 metatile 真機也會棕,但實機水是藍 → **cell0/tile14 是「水」特例,真機靠 palette cycling 動畫顯示藍**(MD 省 ROM:1 tile 重複 + palette 動畫)。
   - **修正**`src/lib/md-rom.c`:`MD_WATER_TILE 14` 強制 palette line 1(index3/4=藍,≈實機河流藍 `(4,38,132)/(36,110,196)`),不動其他 47 cell;index0 露底已是海藍 → 水 cell 整體呈藍。python+in-engine 雙驗證:cell0 (72,0,0)/(144,72,0) 棕 → (0,36,144)/(36,108,216) 藍;地圖 render 河流連貫(`qa-md/map_WATERFIX.png`)。
   - **補 vflip(bit 12)**:引擎原本忽略 nametable vflip(MD 用 h/v flip 重用 tile 拼圖案省空間);cell 16/27/29/31 有用,已在 `md_blit_subtile` 實作。
