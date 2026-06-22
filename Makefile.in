@@ -23,10 +23,10 @@ GAME_RES_OBJECTS=
 GAME_WIN_VERSION=
 MSYS_TEST=$(shell uname -a | grep -i msys | grep -i mingw)
 ifneq ("$(MSYS_TEST)","")
-	CFLAGS+=-I/mingw/include/SDL2 -DUSE_WINAPI
-	GAME_RESOURCES+=dist/win/openkb.rc
-	GAME_RES_OBJECTS+=dist/win/openkb.rc.o
-	GAME_WIN_VERSION=$(shell echo @VERSION@ | tr . ,),0
+	# Windows/MINGW:只需 -DUSE_WINAPI (SDL include 由 sdl2-config 提供)。
+	# 不建 dist/win/openkb.rc:其 @VERSION@ 在非 automake Makefile.in 未被代換,
+	# windres 會 syntax error;圖示/版本資源非必要,略過。
+	CFLAGS+=-DUSE_WINAPI
 endif
 
 ifneq ("$(datadir)","/usr/local/share")

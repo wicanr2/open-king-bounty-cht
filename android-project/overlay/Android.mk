@@ -20,7 +20,8 @@ LOCAL_C_INCLUDES := \
 
 # config.h (setup.sh 放在 jni/src/config.h,即 $(LOCAL_PATH));#include "config.h" 經此找到
 
-# 引擎源 (對照桌面 Makefile.in 的 LIB_SOURCES + GAME_SOURCES + combat + vendor + android.c)
+# 引擎源 = 桌面 Makefile.in 的 LIB_SOURCES + GAME_SOURCES + vendor + android.c。
+# 不含 combat.c (那是 netkb 多人連線專用,需 SDL_net);不含 libhfs/librsrc (free 未引用)。
 LOCAL_SRC_FILES := \
     $(OKB)/src/lib/kbstd.c $(OKB)/src/lib/kbconf.c \
     $(OKB)/src/lib/kbfile.c $(OKB)/src/lib/kbdir.c $(OKB)/src/lib/kbres.c \
@@ -32,11 +33,8 @@ LOCAL_SRC_FILES := \
     $(OKB)/src/lib/kbauto.c \
     $(OKB)/src/main.c $(OKB)/src/save.c $(OKB)/src/game.c $(OKB)/src/play.c \
     $(OKB)/src/bounty.c $(OKB)/src/env-sdl.c $(OKB)/src/ui.c $(OKB)/src/rogue.c \
-    $(OKB)/src/combat.c \
     $(OKB)/src/android.c \
     $(OKB)/vendor/inprint.c $(OKB)/vendor/savepng.c $(OKB)/vendor/scale2x.c
-    # 註:libhfs/librsrc 為桌面 Makefile 連結但 free 版核心未引用 (無 include/呼叫) → Android 不編。
-    #     若 NDK 連結報缺符號再加回 (建議各自 BUILD_STATIC_LIBRARY 避免 data.c/main.c basename 衝突)。
 
 # 桌面靠 configure 產生這些;Android 無 configure → 用 setup.sh 放的 config.h + 這裡定義
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -DHAVE_LIBSDL -DHAVE_LIBSDL_IMAGE -Wno-format -Wno-implicit-function-declaration
