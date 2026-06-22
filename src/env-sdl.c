@@ -29,6 +29,7 @@
 #include "env.h"
 #include "cjkfont.h"
 #include "bgm.h"
+#include "touch.h"
 
 #ifdef HAVE_LIBSDL_IMAGE
 #include <SDL_image.h>
@@ -350,6 +351,15 @@ void KB_present(KBenv *env) {
 	SDL_RenderClear(g_renderer);
 	SDL_RenderCopy(g_renderer, g_texture, NULL, NULL); /* 320x200 → 視窗 */
 	if (cjk_drawlist_count() > 0) cjk_draw_overlay();  /* 在其上疊中文 */
+#ifdef __ANDROID__
+	{	/* 觸控覆蓋層:暫停 logical 縮放,用真實視窗 px 畫 D-pad/A/B */
+		int ww = 0, wh = 0;
+		SDL_GetRendererOutputSize(g_renderer, &ww, &wh);
+		SDL_RenderSetLogicalSize(g_renderer, 0, 0);
+		touch_render(g_renderer, ww, wh);
+		SDL_RenderSetLogicalSize(g_renderer, KB_LOGICAL_W, KB_LOGICAL_H);
+	}
+#endif
 	SDL_RenderPresent(g_renderer);
 }
 

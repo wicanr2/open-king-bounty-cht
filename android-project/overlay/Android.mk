@@ -34,7 +34,7 @@ LOCAL_SRC_FILES := \
     $(OKB)/src/main.c $(OKB)/src/save.c $(OKB)/src/game.c $(OKB)/src/play.c \
     $(OKB)/src/bounty.c $(OKB)/src/env-sdl.c $(OKB)/src/ui.c $(OKB)/src/rogue.c \
     $(OKB)/src/cjkfont.c $(OKB)/src/inprint.c $(OKB)/src/bgm.c \
-    $(OKB)/src/android.c \
+    $(OKB)/src/android.c $(OKB)/src/touch.c \
     $(OKB)/vendor/savepng.c $(OKB)/vendor/scale2x.c
     # 註:inprint 用 src/inprint.c (對齊桌面 LIB_SOURCES),非 vendor/inprint.c。
     #     vendor/strlcat.c/strlcpy.c 不編:bionic 已內建 (編了會 duplicate symbol)。

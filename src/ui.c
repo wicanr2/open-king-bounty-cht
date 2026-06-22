@@ -24,6 +24,7 @@
 #include "env.h"
 #include "ui.h"
 #include "bgm.h"
+#include "touch.h"
 
 #include "../vendor/vendor.h" /* scale2x, inprint, etc */
 
@@ -299,6 +300,13 @@ int KB_event(KBgamestate *state) {
 
 	if (!eve)
 	while (SDL_PollEvent(&event)) {
+#ifdef __ANDROID__
+		/* 觸控:把 FINGER 事件就地改寫成 KEYDOWN/KEYUP(D-pad/A/B);
+		 * 非控制區則略過。改寫後交給下面既有的按鍵處理。 */
+		if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
+			if (!touch_translate(&event)) continue;
+		}
+#endif
 		/* 視窗大小改變 / 需重繪 → 重新呈現目前畫面,讓內容隨視窗縮放
 		 * (openkb 只在重畫時 present,故 resize 後需主動重呈現)。 */
 		if (event.type == SDL_WINDOWEVENT &&
