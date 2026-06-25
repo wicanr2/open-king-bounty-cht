@@ -29,6 +29,35 @@
 
 #include "lib/kbstd.h"
 
+#include <string.h>
+#ifndef USE_WINAPI
+#include <sys/utsname.h>   /* uname() — 印作業系統 / CPU 架構 */
+#endif
+#ifdef __APPLE__
+#include <sys/sysctl.h>    /* sysctlbyname — 印 Mac 晶片型號 + Rosetta 偵測 */
+#endif
+
+/* 啟動時印出平台 / CPU,方便依使用者 log 直接判斷 Apple Silicon vs Intel
+ * (省去逐一詢問;見 GitHub issue #1)。 */
+static void dump_platform(void) {
+#ifndef USE_WINAPI
+	struct utsname u;
+	if (uname(&u) == 0)
+		KB_stdlog("Platform: %s %s (%s)\n", u.sysname, u.release, u.machine);
+#endif
+#ifdef __APPLE__
+	{
+		char brand[256]; size_t sz = sizeof(brand);
+		int translated = 0; size_t tsz = sizeof(translated);
+		if (sysctlbyname("machdep.cpu.brand_string", brand, &sz, NULL, 0) == 0)
+			KB_stdlog("Mac CPU: %s (%s)\n", brand,
+				strstr(brand, "Apple") ? "Apple Silicon" : "Intel");
+		if (sysctlbyname("sysctl.proc_translated", &translated, &tsz, NULL, 0) == 0 && translated)
+			KB_stdlog("  (running under Rosetta 2 translation)\n");
+	}
+#endif
+}
+
 struct KBconfig KBconf;
 
 extern int run_game(KBconfig *conf);
@@ -42,6 +71,7 @@ void dump_version(void) {
 
 	//KB_stdlog("==============================================================================\n");
 	KB_stdlog("Compiled with SDL %d.%d.%d\n",SDL_MAJOR_VERSION,SDL_MINOR_VERSION,SDL_PATCHLEVEL);
+	dump_platform();
 #ifdef HAVE_LIBSDL_IMAGE
 	KB_stdlog("Compiled with SDL_Image\n");
 #endif
@@ -73,6 +103,7 @@ int main(int argc, char* argv[]) {
 	/* Lots of very boring things must happen for a proper initialisation... */
 	KB_stdlog("openKB version " PACKAGE_VERSION "\n");
 	KB_stdlog("=====================================================\n");
+	dump_platform();
 
 	/* Let's start by searching for a config file,
 	 * then see if there're "data" and "save" directories, and finally
