@@ -167,22 +167,25 @@ int KB_fclose( KB_File * stream )
        A '\0' is stored after the last character in the buffer.
 */
 char* KB_fgets(char *buf, int size, KB_File *stream) {
-	int n, i, parsed;
+	/* 逐字元讀到 '\n' 或 size-1。
+	 * 舊版「fread 一塊 size → 找 \n → fseek(SEEK_CUR) 退回多讀的」在 Windows
+	 * 文字模式下 fread/fseek 的位移不一致,退讀會錯位 → 後續讀行全亂 → 整份
+	 * ini 解析失敗(回全 0)。實際後果:castles.ini 的 continent 被讀成全 0,
+	 * 覆寫掉正確的內建城堡大陸 → 開新遊戲時 "not enough (0) castles to put N
+	 * villains in!"(GitHub issue;Linux 文字=二進位故倖免,只 Windows 中招)。
+	 * Wine 實測:逐字元版正確(filled=26),舊版 filled=0。 */
+	int i = 0;
+	char c;
 
-	n = KB_fread(buf, sizeof(char), size, stream);
-	if (n == 0) return NULL;
-
-	parsed = n;
-	for (i = 0; i < n - 1; i++) {
-		parsed = i + 1;
-		if (buf[i] == '\n') {
-			break;
-		}
+	while (i < size - 1) {
+		if (KB_fread(&c, sizeof(char), 1, stream) != 1) break; /* EOF / 讀盡 */
+		buf[i++] = c;
+		if (c == '\n') break;
 	}
 
-	KB_fseek(stream, -(n - parsed), SEEK_CUR); /* Forward */
+	if (i == 0) return NULL;
 
-	buf[parsed] = '\0';
+	buf[i] = '\0';
 	return buf;
 }
 
