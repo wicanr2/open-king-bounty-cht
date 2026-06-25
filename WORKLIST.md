@@ -40,8 +40,17 @@
 - [x] **併 master + 發 Release**:android-port → master 合併(`5d081d9`),tag `v0.0.3-cht.1` 觸發 CI(run 27957777230)重編五平台 free 版 + 建 GitHub Release。
 - [ ] **(進行中)重打包 mac 完整版**:等 CI 新 mac 引擎(含修復)→ build-dist-all 注入完整資料 → dist-all。同步刷新 win/linux 完整版引擎。
 
+### ✅ 真兇定位 + 修復 (Windows, 2026-06-22 晚)
+使用者提供 Windows 截圖:選角後彈 `Critical Error: Unable to resolve resource DAT_RANGEMIN (from 4 modules)` 對話框。Wine 重現 + addr2line 定位根因鏈:
+- Windows `KB_errlog` 會彈 `MessageBox("Critical Error")`(kbstd.c:108)→ 每個未解析資源都彈框。**已於 DAT 修復(e37e34b)消除**(改 debuglog)。
+- 對話框消失後浮現**真‧NULL deref 崩潰**:`free-data.c:46 GNU_downto_byte` 對 NULL src deref。系統性根因 `KB_strlist_ind(NULL)` 在 `*list` deref NULL → ini 缺失時任何 `KB_strlist_peek` 都炸。
+- 修正(commit `e8c0ee6`,tag `v0.0.3-cht.2`,全部 NULL-safe 退回 bounty.c/DOS):`KB_strlist_ind` NULL guard(最高槓桿)+ `GNU_downto_byte/word` + `GNU_spell/artifact_downto_byte` + `GNU_parse_troop` + army 警告改 debuglog。
+- **這就是 issue #1「選完難度閃退」的真兇**(Windows;Mac 可能同源,待回報者驗)。
+- 待 CI(run 見 /tmp/rid.txt)重編 → Wine 驗證崩潰消失 → 重打包 dist-all + 更新 Release/issue。
+- 附帶待查:Windows 上 free `troops.ini` 似開不到(GNU_extract_ini 回 NULL)→ 完整版有 DOS 兜底、free 版退 bounty.c 預設仍可玩;KB_fopen VFS 的 Windows 路徑根因待追(KB_VERBOSE 診斷)。
+
 ### ⏳ 待辦
-- [ ] **issue #1 選完難度閃退**:Linux 完整遊玩重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
+- [ ] **issue #1 選完難度閃退 (Mac)**:Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
 - [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
 - [ ] 回覆 GitHub issue #1 #2(對外訊息,需使用者確認)。
 - [ ] (選用)在 `free-data.c` 補實作 troop DAT_*(skill/moves/melee/ranged/ammo/gold/group/abilities/dwelling)以消除誤導性錯誤訊息 — 確認非崩潰主因,可延後。
