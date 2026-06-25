@@ -65,7 +65,7 @@ KB_VERBOSE 揪出:`? FREE INI FILE: data\data/free/\troops.ini` → `FAILED TO O
 修(`docker/build-sdl2-from-source.sh` + build.yml macos):**源碼編 pinned 真 SDL2 2.30.9 + image 2.8.2(stb_image)+ mixer 2.8.0(stb_vorbis OGG)+ net 2.2.0,不連任何外部 codec**(libpng/vorbis/fluidsynth 全免)。Linux 先驗配方;cht.6 mac 產物驗證:libs 只剩 4 個、libSDL2=2MB 真 SDL2、SDL3/sdl2-compat/fluidsynth 字串=0。dist-all mac 完整版也重打包成真 SDL2(30MB)。
 - [ ] **回報者驗 cht.6 mac**(#3 PowerSaka)。
 - [ ] **issue #2 黑畫面**(shiun-git,完整版有音樂但黑畫面)→ 疑同 sdl2-compat 繪圖問題,已重打包真 SDL2 完整版待其驗;**需 wicanr2 重新分享 FB 連結(dist-all/KingsBounty-CHT-full-macOS.zip)**。仍黑畫面要晶片+log。
-- [ ] **Windows「not enough castles」**(KB_fgets 解析):分析完成(Windows ini 解析失敗→DAT_CASTLEC 全 0 覆寫好的內建值),修法待定(GNU_extract_ini filled==0 回 NULL / KB_fgets 改逐字元)。隔離測試檔在 /tmp/fgetstest(native 控制組已過)。**未做**。
+- [x] **Windows「not enough castles」已修(KB_fgets,tag v0.0.3-cht.7)**:`KB_fgets` 改逐字元讀(不再 fread+fseek 退讀)。**Wine 隔離測試實證**:舊版 filled=0(重現)、新版 filled=26(修好)。引擎重建 Linux 無回歸。dist-all 三平台 + free Release 皆已含。待 shiun-git 驗 Windows。
 
 ### ⏳ 待辦
 - [ ] (已關閉) issue #1 選完難度閃退 (Mac):Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
