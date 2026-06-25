@@ -21,7 +21,14 @@ OUT="dist-all"
 [ -d "$CIDIR/KingsBounty-CHT-windows" ] || { echo "缺 $CIDIR/KingsBounty-CHT-windows (先 gh run download)"; exit 1; }
 [ -f "$CIDIR/KingsBounty-CHT-macos/KingsBounty-CHT-macos.zip" ] || { echo "缺 macOS CI zip"; exit 1; }
 
-rm -rf "$OUT"; mkdir -p "$OUT"
+mkdir -p "$OUT"
+# 只刪本腳本自己會重生的那幾個輸出檔,不 rm -rf 整個 $OUT
+# (那會連 dev-setup 包與使用者放在 dist-all 的其他東西一起清掉)。
+# 兩個 .zip 必須先刪,因為 zip 會 append 到既有檔;AppImage/README 由 cp/cat 覆蓋。
+rm -f "$OUT/KingsBounty-CHT-full-linux-x86_64.AppImage" \
+      "$OUT/KingsBounty-CHT-full-windows-x64.zip" \
+      "$OUT/KingsBounty-CHT-full-macOS.zip" \
+      "$OUT/README.txt"
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
 
 # 1) 從完整版 AppImage 取出已解壓的完整資料 payload ($SHARE)
