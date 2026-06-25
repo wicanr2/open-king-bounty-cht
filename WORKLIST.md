@@ -60,8 +60,15 @@ KB_VERBOSE 揪出:`? FREE INI FILE: data\data/free/\troops.ini` → `FAILED TO O
 - [ ] **issue #1 macOS `failed loading sdl3 library`**:拆 cht.3 `.app` 驗過 → bundle 是 SDL2、無 SDL3、`@executable_path` 自包含 → 訊息非我們 binary 印。疑 Gatekeeper 拒載未簽 dylib / arm64-Intel 架構 / 下載問題。**已要對方提供晶片型號 + 完整錯誤截圖**。給了 `xattr -dr com.apple.quarantine` 解法。
 - [ ] **macOS ad-hoc codesign 沒生效**:cht.4 加的 `codesign --force --deep -s -` 產物無 `_CodeSignature`(`|| true` 吞錯)。若確認是 Gatekeeper,要改**由下而上逐一簽**:先 `find Contents/libs -name '*.dylib' -exec codesign --force -s - {} \;` 再簽 MacOS/openkb 再簽 .app(去掉 deprecated `--deep`)。待 PowerSaka 回報晶片/錯誤再決定(可能其實是 Intel→需 universal build)。
 
+### ✅ macOS "Failed loading SDL3 library" (issue #3, tag v0.0.3-cht.6)
+回報者比對 `.app/Contents/libs` 證實是 libs 問題。根因:**Homebrew 把 `sdl2` 換成 sdl2-compat**(SDL2 API 架 SDL3,~0.5MB vs 真 SDL2 ~2MB),runtime dlopen libSDL3,dylibbundler 沒打包 SDL3 → 載入失敗。cht.4 是真 SDL2、cht.5 brew 更新後變 compat。
+修(`docker/build-sdl2-from-source.sh` + build.yml macos):**源碼編 pinned 真 SDL2 2.30.9 + image 2.8.2(stb_image)+ mixer 2.8.0(stb_vorbis OGG)+ net 2.2.0,不連任何外部 codec**(libpng/vorbis/fluidsynth 全免)。Linux 先驗配方;cht.6 mac 產物驗證:libs 只剩 4 個、libSDL2=2MB 真 SDL2、SDL3/sdl2-compat/fluidsynth 字串=0。dist-all mac 完整版也重打包成真 SDL2(30MB)。
+- [ ] **回報者驗 cht.6 mac**(#3 PowerSaka)。
+- [ ] **issue #2 黑畫面**(shiun-git,完整版有音樂但黑畫面)→ 疑同 sdl2-compat 繪圖問題,已重打包真 SDL2 完整版待其驗;**需 wicanr2 重新分享 FB 連結(dist-all/KingsBounty-CHT-full-macOS.zip)**。仍黑畫面要晶片+log。
+- [ ] **Windows「not enough castles」**(KB_fgets 解析):分析完成(Windows ini 解析失敗→DAT_CASTLEC 全 0 覆寫好的內建值),修法待定(GNU_extract_ini filled==0 回 NULL / KB_fgets 改逐字元)。隔離測試檔在 /tmp/fgetstest(native 控制組已過)。**未做**。
+
 ### ⏳ 待辦
-- [ ] **issue #1 選完難度閃退 (Mac)**:Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
+- [ ] (已關閉) issue #1 選完難度閃退 (Mac):Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
 - [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
 - [ ] 回覆 GitHub issue #1 #2(對外訊息,需使用者確認)。
 - [ ] (選用)在 `free-data.c` 補實作 troop DAT_*(skill/moves/melee/ranged/ammo/gold/group/abilities/dwelling)以消除誤導性錯誤訊息 — 確認非崩潰主因,可延後。
