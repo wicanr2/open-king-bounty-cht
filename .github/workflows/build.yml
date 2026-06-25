@@ -95,8 +95,9 @@ jobs:
           done
           cp -r data/free dist-win/data/free
           cp data/cjk24.bin dist-win/data/
-          # free 模組設定 (相對路徑,可攜)
-          printf '[main]\r\ndatadir = data\r\nautodiscover = 0\r\n[sdl]\r\nsound = 1\r\nfullscreen = 0\r\nfilter = normal2x\r\n[module]\r\nname = Free\r\ntype = free\r\npath = data/free/\r\n' > dist-win/openkb.ini
+          # free 模組設定 (相對路徑,可攜)。模組 path 相對 datadir (引擎會前綴 datadir);
+          # 不可寫 data/free/ 否則變 data/data/free/ → 開不到檔 (issue #1 Windows/macOS 根因)。
+          printf '[main]\r\ndatadir = data\r\nautodiscover = 0\r\n[sdl]\r\nsound = 1\r\nfullscreen = 0\r\nfilter = normal2x\r\n[module]\r\nname = Free\r\ntype = free\r\npath = free/\r\n' > dist-win/openkb.ini
           printf '@echo off\r\ncd /d "%%~dp0"\r\nopenkb.exe -c openkb.ini --rootdir data %%*\r\n' > dist-win/play.bat
           cp README.md dist-win/README.txt 2>/dev/null || true
       - uses: actions/upload-artifact@v4
@@ -128,8 +129,9 @@ jobs:
           cp data/cjk24.bin "$APP/Contents/Resources/data/"
           # 內嵌 SDL2 等 dylib,改 @rpath → 自包含
           dylibbundler -od -b -x "$APP/Contents/MacOS/openkb" -d "$APP/Contents/libs" -p @executable_path/../libs || true
-          # free 模組設定 + 啟動器 (cd 到 Resources 用相對 data)
-          printf '[main]\ndatadir = data\nautodiscover = 0\n[sdl]\nsound = 1\nfullscreen = 0\nfilter = normal2x\n[module]\nname = Free\ntype = free\npath = data/free/\n' > "$APP/Contents/Resources/openkb.ini"
+          # free 模組設定 + 啟動器 (cd 到 Resources 用相對 data)。模組 path 相對 datadir
+          # (引擎前綴 datadir);不可寫 data/free/ 否則變 data/data/free/ → 開不到檔 (issue #1 根因)。
+          printf '[main]\ndatadir = data\nautodiscover = 0\n[sdl]\nsound = 1\nfullscreen = 0\nfilter = normal2x\n[module]\nname = Free\ntype = free\npath = free/\n' > "$APP/Contents/Resources/openkb.ini"
           cat > "$APP/Contents/MacOS/launch" <<'SH'
           #!/bin/bash
           DIR="$(cd "$(dirname "$0")" && pwd)"
