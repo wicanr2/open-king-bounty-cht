@@ -41,7 +41,13 @@
 
 byte* GNU_downto_byte(dword *src, int len, int freesrc) {
 	int i;
-	byte *b = malloc(sizeof(byte) * len);
+	byte *b;
+	/* src 可能為 NULL (GNU_extract_ini 開不到 ini / 無對應鍵時) → 直接回 NULL,
+	 * 讓上層 KB_Resolve 回 NULL、refill_rules 退回 bounty.c 內建預設,不可 deref。
+	 * (修 Windows 完整版選角後 NULL deref 崩潰: free-data.c:46) */
+	if (src == NULL) return NULL;
+	b = malloc(sizeof(byte) * len);
+	if (b == NULL) { if (freesrc) free(src); return NULL; }
 	for (i = 0; i < len; i++) {
 		b[i] = src[i];
 	}
@@ -52,7 +58,10 @@ byte* GNU_downto_byte(dword *src, int len, int freesrc) {
 }
 word* GNU_downto_word(dword *src, int len, int freesrc) {
 	int i;
-	word *b = malloc(sizeof(word) * len);
+	word *b;
+	if (src == NULL) return NULL; /* 同 GNU_downto_byte:NULL 安全回退 */
+	b = malloc(sizeof(word) * len);
+	if (b == NULL) { if (freesrc) free(src); return NULL; }
 	for (i = 0; i < len; i++) {
 		b[i] = src[i];
 	}
@@ -82,13 +91,15 @@ byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
 	};
 	int num_names = 13;
 
-	byte *actions = malloc(sizeof(byte) * num);
+	byte *actions;
+	if (types == NULL) return NULL; /* ini 缺失 → 回 NULL 安全退回預設, 勿 deref */
+	actions = malloc(sizeof(byte) * num);
 	if (actions == NULL) return NULL;
 
 	for (i = 0; i < num; i++) {
 		char *flag = KB_strlist_peek(types, i);
 		int found = 0;
-		for (j = 0; j < num_names; j++) {
+		for (j = 0; flag && j < num_names; j++) {
 			if (!KB_strcasecmp(names[j], flag)) {
 
 				actions[i] = j;
@@ -98,7 +109,7 @@ byte* GNU_spell_downto_byte(char *types, int num, int freesrc) {
 			}
 		}
 		if (!found) {
-			KB_errlog("Failed to parse `%s` spell type\n", flag);
+			KB_debuglog(0, "Failed to parse `%s` spell type\n", flag ? flag : "(null)");
 		}
 	}
 	if (freesrc) {
@@ -132,13 +143,15 @@ byte* GNU_artifact_downto_byte(char *types, int num, int freesrc) {
 	};
 	int num_names = 8;
 
-	byte *actions = malloc(sizeof(byte) * num);
+	byte *actions;
+	if (types == NULL) return NULL; /* ini 缺失 → 回 NULL 安全退回預設, 勿 deref */
+	actions = malloc(sizeof(byte) * num);
 	if (actions == NULL) return NULL;
 
 	for (i = 0; i < num; i++) {
 		char *flag = KB_strlist_peek(types, i);
 		int found = 0;
-		for (j = 0; j < num_names; j++) {
+		for (j = 0; flag && j < num_names; j++) {
 			if (!KB_strcasecmp(names[j], flag)) {
 
 				actions[i] = powers[j];
@@ -148,7 +161,7 @@ byte* GNU_artifact_downto_byte(char *types, int num, int freesrc) {
 			}
 		}
 		if (!found) {
-			KB_errlog("Failed to parse `%s` artifact type\n", flag);
+			KB_debuglog(0, "Failed to parse `%s` artifact type\n", flag ? flag : "(null)");
 		}
 	}
 	if (freesrc) {
@@ -169,6 +182,7 @@ int GNU_parse_troop(const char *line, byte *type, word *num, char *troop_names) 
 
 		for (i = 0; i < 25; i++) {
 			char *troop_name = KB_strlist_peek(troop_names, i);
+			if (!troop_name) continue; /* troop_names 缺失 → 跳過, 勿 strcasecmp(NULL) */
 			if (!KB_strcasecmp(troop_name, name)) {
 
 				*num = (word)val;
@@ -199,7 +213,7 @@ byte* GNU_army_downto_byte(int first, int num, char **armies, int army_len, char
 				b[j * army_len + i] = type;
 			}
 			else {
-				KB_errlog("! Can't parse army `%s`\n", line);
+				KB_debuglog(0, "! Can't parse army `%s`\n", line);
 				return NULL;
 			}
 		}
@@ -232,7 +246,7 @@ word* GNU_army_downto_word(int first, int num, char **armies, int army_len, char
 				b[j * army_len + i] = type;
 			}
 			else {
-				KB_errlog("! Can't parse army `%s`\n", line);
+				KB_debuglog(0, "! Can't parse army `%s`\n", line);
 				return NULL;
 			}
 		}

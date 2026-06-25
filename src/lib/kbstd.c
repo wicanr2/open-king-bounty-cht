@@ -244,6 +244,7 @@ char* KB_strlist_ind(const char *list, int id)
 {
 	const char *match = list;
 	int w = 0;
+	if (list == NULL) return NULL; /* NULL 字串清單 (ini 開檔失敗等) → 回 NULL, 勿 deref */
 	while (1) {
 		//printf("%c %02x [%02d]\n", *list, *list, w);
 		if (*list == '\0') {
