@@ -95,6 +95,7 @@ jobs:
           done
           cp -r data/free dist-win/data/free
           cp data/cjk24.bin dist-win/data/
+          cp data/icon_32x32.png dist-win/data/   # 視窗 icon (引擎於 rootdir 找)
           # free 模組設定 (相對路徑,可攜)。模組 path 相對 datadir (引擎會前綴 datadir);
           # 不可寫 data/free/ 否則變 data/data/free/ → 開不到檔 (issue #1 Windows/macOS 根因)。
           printf '[main]\r\ndatadir = data\r\nautodiscover = 0\r\n[sdl]\r\nsound = 1\r\nfullscreen = 0\r\nfilter = normal2x\r\n[module]\r\nname = Free\r\ntype = free\r\npath = free/\r\n' > dist-win/openkb.ini
@@ -127,8 +128,13 @@ jobs:
           cp openkb "$APP/Contents/MacOS/openkb"
           cp -r data/free "$APP/Contents/Resources/data/free"
           cp data/cjk24.bin "$APP/Contents/Resources/data/"
+          cp data/icon_32x32.png "$APP/Contents/Resources/data/"   # 視窗 icon
           # 內嵌 SDL2 等 dylib,改 @rpath → 自包含
           dylibbundler -od -b -x "$APP/Contents/MacOS/openkb" -d "$APP/Contents/libs" -p @executable_path/../libs || true
+          # ad-hoc 簽章整個 .app(含 bundled dylib):未簽章的下載 app 被 Gatekeeper quarantine 時,
+          # dyld 會拒載 Contents/libs 內的 SDL dylib(玩家看到「載入 SDL 失敗」)。ad-hoc 簽可緩解。
+          # (仍非 notarized,首次開啟需右鍵→開啟 或 xattr -dr com.apple.quarantine。)
+          codesign --force --deep --sign - "$APP" 2>/dev/null || true
           # free 模組設定 + 啟動器 (cd 到 Resources 用相對 data)。模組 path 相對 datadir
           # (引擎前綴 datadir);不可寫 data/free/ 否則變 data/data/free/ → 開不到檔 (issue #1 根因)。
           printf '[main]\ndatadir = data\nautodiscover = 0\n[sdl]\nsound = 1\nfullscreen = 0\nfilter = normal2x\n[module]\nname = Free\ntype = free\npath = free/\n' > "$APP/Contents/Resources/openkb.ini"

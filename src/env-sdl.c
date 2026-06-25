@@ -272,7 +272,9 @@ KBenv *KB_startENV(KBconfig *conf) {
 	SDL_LoadBMP(iconfile);
 #endif
 	if (!nsys->icon) {
-		KB_errlog("Couldn't open icon file: %s\n", iconfile);
+		/* 視窗 icon 純裝飾,缺它不該中斷遊戲;在 Windows KB_errlog 會彈 MessageBox
+		 * (阻斷玩家,見 issue #2)→ 改 debug 級,預設靜默。 */
+		KB_debuglog(0, "Couldn't open icon file: %s\n", iconfile);
 	} else {
 		SDL_SetWindowIcon(g_window, nsys->icon);
 	}
