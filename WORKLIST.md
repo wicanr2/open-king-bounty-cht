@@ -47,7 +47,13 @@
 - 修正(commit `e8c0ee6`,tag `v0.0.3-cht.2`,全部 NULL-safe 退回 bounty.c/DOS):`KB_strlist_ind` NULL guard(最高槓桿)+ `GNU_downto_byte/word` + `GNU_spell/artifact_downto_byte` + `GNU_parse_troop` + army 警告改 debuglog。
 - **這就是 issue #1「選完難度閃退」的真兇**(Windows;Mac 可能同源,待回報者驗)。
 - 待 CI(run 見 /tmp/rid.txt)重編 → Wine 驗證崩潰消失 → 重打包 dist-all + 更新 Release/issue。
-- 附帶待查:Windows 上 free `troops.ini` 似開不到(GNU_extract_ini 回 NULL)→ 完整版有 DOS 兜底、free 版退 bounty.c 預設仍可玩;KB_fopen VFS 的 Windows 路徑根因待追(KB_VERBOSE 診斷)。
+### ✅ 最底層真兇 + 全修復完成 (tag v0.0.3-cht.3)
+KB_VERBOSE 揪出:`? FREE INI FILE: data\data/free/\troops.ini` → `FAILED TO OPEN`。**路徑雙 data!** 根因:`kbconf.c:231` 對相對模組 path 會前綴 `data_dir`,但 config 同時寫 `datadir=data` + `path=data/free/` → `data/data/free/` → Windows/macOS free 全檔(troops.ini/land.org…)開不到。AppImage 用絕對路徑(`buf2[0]=='/'`)跳過前綴故無症 → 這就是只有 Mac/Win 中招、Linux 沒事的原因。**Mac 與 Windows 同源**(非 arm64 問題)。
+- 修正(`81fce7a`):build.yml 的 windows + macos `openkb.ini` 模組 path `data/free/`→`free/`(相對 datadir)。
+- **Wine + KB_VERBOSE 三輪驗證**:修正後 `data\free/\troops.ini` 開檔成功、`FAILED TO OPEN=0`、4 模組載入、無 Critical Error 對話框、無 page fault。
+- 三層修復全到位:① 路徑(cht.3)② NULL 防護(cht.2)③ 對話框/訊息靜默(cht.1)。
+- **出貨**:Release `v0.0.3-cht.3`(free 版 mac/win/linux,五平台 CI 全綠)+ `dist-all/` 完整版三平台(含修復引擎 + DOS/Genesis/Amiga 美術 + FM-Towns 音樂,openkb.ini=path=free/ 驗證過)。
+- GitHub issue #1 #2 已回報真根因 + 新版,請回報者重測。
 
 ### ⏳ 待辦
 - [ ] **issue #1 選完難度閃退 (Mac)**:Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
