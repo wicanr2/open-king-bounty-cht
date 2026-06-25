@@ -55,6 +55,11 @@ KB_VERBOSE 揪出:`? FREE INI FILE: data\data/free/\troops.ini` → `FAILED TO O
 - **出貨**:Release `v0.0.3-cht.3`(free 版 mac/win/linux,五平台 CI 全綠)+ `dist-all/` 完整版三平台(含修復引擎 + DOS/Genesis/Amiga 美術 + FM-Towns 音樂,openkb.ini=path=free/ 驗證過)。
 - GitHub issue #1 #2 已回報真根因 + 新版,請回報者重測。
 
+### 🔧 回報者再回饋 (cht.4, 2026-06-25)
+- [x] **issue #2 `couldn't open icon file`**:icon 沒打包 + `env-sdl.c:275` 用 `KB_errlog`(Windows 又彈框)。修:icon 載入失敗改 `KB_debuglog`(非致命)+ build.yml win/mac 複製 `data/icon_32x32.png` 進 rootdir。tag `v0.0.3-cht.4`,已驗證 icon 打包。
+- [ ] **issue #1 macOS `failed loading sdl3 library`**:拆 cht.3 `.app` 驗過 → bundle 是 SDL2、無 SDL3、`@executable_path` 自包含 → 訊息非我們 binary 印。疑 Gatekeeper 拒載未簽 dylib / arm64-Intel 架構 / 下載問題。**已要對方提供晶片型號 + 完整錯誤截圖**。給了 `xattr -dr com.apple.quarantine` 解法。
+- [ ] **macOS ad-hoc codesign 沒生效**:cht.4 加的 `codesign --force --deep -s -` 產物無 `_CodeSignature`(`|| true` 吞錯)。若確認是 Gatekeeper,要改**由下而上逐一簽**:先 `find Contents/libs -name '*.dylib' -exec codesign --force -s - {} \;` 再簽 MacOS/openkb 再簽 .app(去掉 deprecated `--deep`)。待 PowerSaka 回報晶片/錯誤再決定(可能其實是 Intel→需 universal build)。
+
 ### ⏳ 待辦
 - [ ] **issue #1 選完難度閃退 (Mac)**:Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
 - [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
