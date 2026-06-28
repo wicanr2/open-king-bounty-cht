@@ -944,7 +944,7 @@ void display_logo() {
 			RECT_Size(&pos, title);
 			RECT_Center(&pos, screen);
 
-			SDL_FillRect(screen , NULL, SDL_RemapColor(screen, 0xFF3366));
+			SDL_FillRect(screen , NULL, SDL_RemapColor(screen, 0x000000)); /* 黑底(原版商標為黑底;原 0xFF3366 粉紅是開發殘留) */
 
 			SDL_BlitSurface(title, NULL , screen, &pos);
 

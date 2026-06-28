@@ -920,7 +920,10 @@ void* KB_Resolve(int id, int sub_id) {
 	/* 型別感知解析 (混合模式):圖形 (GR_*) 優先用 DOS 原版美術,其餘 (字串/資料/
 	 * 音效) 優先用 GNU free (我們的中文翻譯)。每類先試偏好家族,再 fallback 另一個。
 	 * 如此:玩家自備原版資料 → 看到原版美術 + 中文;只有 free → 全 free + 中文。 */
-	int is_graphic = (id >= GR_TROOP && id <= GR_ENDTILES);
+	/* 圖形優先用 kb_gfx_family(原版美術),其餘(字串/資料/音效)優先 free(中文翻譯)。
+	 * GR_LOGO / GR_TITLE 在 enum 上位於 GR_TROOP 之前,原本落在 free 偏好 → 完整版也顯示
+	 * free 的陽春開場標題。納入圖形集 → 有原版資料時顯示原版商標/標題(free 版仍 fallback free)。 */
+	int is_graphic = (id >= GR_TROOP && id <= GR_ENDTILES) || id == GR_LOGO || id == GR_TITLE;
 	int pref = is_graphic ? kb_gfx_family : KBFAMILY_GNU;
 
 	for (pass = 0; pass < 2 && ret == NULL; pass++) {
