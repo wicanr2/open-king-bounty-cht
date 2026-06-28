@@ -1,0 +1,6 @@
+# 錄影/組裝用 image:在 build 環境上加 ffmpeg(x11grab+編碼)+ Noto CJK(標題卡)。
+FROM openkb-build-sdl2
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
+      ffmpeg fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
