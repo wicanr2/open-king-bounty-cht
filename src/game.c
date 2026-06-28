@@ -6102,6 +6102,24 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 	KB_reset(&combat_state);
 	setup_grid(&combat_state, local.map.x, local.map.y, local.map_tile->w, local.map_tile->h, CLEVEL_W, CLEVEL_H);
 
+	/* 進戰鬥先清掉內框區。combat_loop 的重畫只畫戰鬥格(6x5)+ 頂部狀態列,不清
+	 * 整個畫面;而戰鬥是從 attack_foe 進來的,它剛在底部畫了「你的斥候發現了…
+	 * 攻擊 (y/n)?」對話框,加上世界地圖的 sidebar / 邊緣,都會殘留在戰鬥畫面上
+	 * (GitHub 回報:Windows 戰鬥畫面文字/數字殘留)。外框(persistent)不動,只填
+	 * 內容區為黑;draw_combat 隨後在其上畫戰鬥格。 */
+	{
+		SDL_Rect *lf = local.frames[FRAME_LEFT];
+		SDL_Rect *rf = local.frames[FRAME_RIGHT];
+		SDL_Rect *tf = local.frames[FRAME_TOP];
+		SDL_Rect *bf = local.frames[FRAME_BOTTOM];
+		SDL_Rect inner = {
+			lf->w, tf->h,
+			sys->screen->w - lf->w - rf->w,
+			sys->screen->h - tf->h - bf->h
+		};
+		SDL_FillRect(sys->screen, &inner, 0x000000); /* 黑 = 任意 RGB 格式皆 0 */
+	}
+
 	while (!done) {
 		key = KB_event(&combat_state);
 
