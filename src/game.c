@@ -6832,6 +6832,36 @@ int run_game(KBconfig *conf) {
 	/* Preload all resources */
 	prepare_resources();
 
+	/* 開發者 debug:設環境變數 KB_DEBUG_COMBAT 直接切入一場戰鬥(跳過 title/選單),
+	 * 用來驗證戰鬥畫面渲染(headless 一發即達,免在地圖盲走找敵人)。正式版不受影響。
+	 * 用法:KB_DEBUG_COMBAT=1 ./openkb -c ... --rootdir ... */
+	if (getenv("KB_DEBUG_COMBAT")) {
+		byte *land = KB_Resolve(DAT_WORLD, 0);
+		if (land) {
+			char dbgname[] = "Debug";
+			KBgame *dbg;
+			refill_rules();
+			refill_names();
+			dbg = spawn_game(dbgname, 0, 0, land); /* 騎士, 簡單 */
+			free(land);
+			if (dbg) {
+				int fid = FRIENDLY_FOES; /* 第一個敵對 foe (id 5) */
+				furnish_map(dbg);
+				/* 強制給該 foe 一隊兵 → 戰鬥不會瞬間結束、畫面停留供截圖 */
+				dbg->foe_troops[dbg->continent][fid][0] = 0;    /* 農夫 */
+				dbg->foe_numbers[dbg->continent][fid][0] = 20;
+				update_ui_colors(dbg);
+				KB_stdlog("[debug] KB_DEBUG_COMBAT: 直接切入戰鬥 (foe %d)\n", fid);
+				run_combat(dbg, 0, fid);
+				free(dbg);
+			}
+		}
+		free_resources();
+		stop_modules(conf);
+		KB_stopENV(sys);
+		return 0;
+	}
+
 	/* --- X X X --- */
 	display_logo();
 
