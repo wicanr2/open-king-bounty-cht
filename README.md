@@ -8,7 +8,9 @@
 - 🎨 **DOS / Mega Drive / Amiga 三套原版美術,遊戲中 `F8` 一鍵切換** + FM-Towns 背景音樂(`F9`)—— 同一場戰役,四種青春
 - 💻 **三平台免費玩,不需自備原版** —— 免費版用自由授權美術即可開打
 
-### ▶ [立即下載最新版](https://github.com/wicanr2/open-king-bounty-cht/releases/latest)　·　下載,招兵,出發。
+### ▶ [看遊玩影片](https://youtu.be/mg5Wou5gSYo)　·　[立即下載最新版](https://github.com/wicanr2/open-king-bounty-cht/releases/latest)　·　下載,招兵,出發。
+
+[![御封戰將 — King's Bounty 繁體中文化 遊玩影片](https://img.youtube.com/vi/mg5Wou5gSYo/maxresdefault.jpg)](https://youtu.be/mg5Wou5gSYo)
 
 ---
 
