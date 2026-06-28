@@ -67,6 +67,10 @@ KB_VERBOSE 揪出:`? FREE INI FILE: data\data/free/\troops.ini` → `FAILED TO O
 - [ ] **issue #2 黑畫面**(shiun-git,完整版有音樂但黑畫面)→ 疑同 sdl2-compat 繪圖問題,已重打包真 SDL2 完整版待其驗;**需 wicanr2 重新分享 FB 連結(dist-all/KingsBounty-CHT-full-macOS.zip)**。仍黑畫面要晶片+log。
 - [x] **Windows「not enough castles」已修(KB_fgets,tag v0.0.3-cht.7)**:`KB_fgets` 改逐字元讀(不再 fread+fseek 退讀)。**Wine 隔離測試實證**:舊版 filled=0(重現)、新版 filled=26(修好)。引擎重建 Linux 無回歸。dist-all 三平台 + free Release 皆已含。待 shiun-git 驗 Windows。
 
+### ✅ 戰鬥畫面文字/數字殘留 (FB 回報, tag v0.0.3-cht.8)
+FB 截圖:戰術戰鬥「選項/義勇軍 M2」狀態列上同時出現 attack_foe 的「斥候發現…攻擊(y/n)?」文字 = 殘留鐵證。根因:`combat_loop` 重畫只畫戰鬥格(6x5)+ 狀態列,**不清整個畫面** → 從 attack_foe 進來的底框/世界地圖 sidebar 殘留。戰鬥畫面從未實機驗證故長期未發現。
+修:`combat_loop` 進場先填黑內框內容區(外框不動),draw_combat 再畫格子於其上(`src/game.c`)。Linux 編譯+地圖無回歸;**戰鬥外觀待回報者驗**(headless 盲走 130+ 步闖不進戰鬥)。綠底 grainy 研判=FB JPEG 壓縮(地圖實測乾淨)。dist-all 三平台 + free Release 皆已含 cht.8。
+
 ### ⏳ 待辦
 - [ ] (已關閉) issue #1 選完難度閃退 (Mac):Linux 重現不出 → 疑 **macOS 特有**。需向回報者要 macOS crash report(Console.app)/ terminal 末尾 backtrace,或請其測新 build。**不可無 backtrace 盲修**。
 - [ ] **出貨**:savedir 修復需進公開 free 版 → 重編 macOS/Windows 包(CI)+ 視情況併 `android-port`→`master` + 發新 Release。需使用者確認(對外/release)。
