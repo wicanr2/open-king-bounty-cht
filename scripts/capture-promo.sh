@@ -35,9 +35,16 @@ cap() { # $1=name $2=secs $3=extra_env  (driver function 'drive' 已定義)
 
 K(){ xdotool key --window "$1" "$2" 2>/dev/null; }
 
+# ---- Scene 0: 原版開場(停留 NWC 商標 → 原版 King's Bounty 標題)----
+drive(){ local W="$1"
+  sleep 3.2                  # New World Computing Presents 商標停留
+  K "$W" Return; sleep 4.5   # → 原版 King's Bounty 標題停留
+}
+cap cap_intro 8 ""
+
 # ---- Scene A: showcase(進地圖 → F8 循環四主題)----
 drive(){ local W="$1"
-  sleep 1; for n in 1 2 3 4; do K "$W" Return; sleep 0.8; done   # title→char select
+  sleep 1; for n in 1 2 3 4; do K "$W" Return; sleep 0.7; done   # 快速跳過 商標/標題/製作群 → char select
   K "$W" a; sleep 0.8                                            # 騎士
   for c in y u f e n g; do K "$W" "$c"; sleep 0.2; done          # 名字 "yufeng"(隨意)
   K "$W" Return; sleep 1; K "$W" Return; sleep 2.5               # 難度→進地圖
@@ -50,6 +57,6 @@ cap cap_show 26 ""
 drive(){ local W="$1"; sleep 5; }   # 戰鬥畫面自動呈現,停留即可
 cap cap_combat 9 "KB_DEBUG_COMBAT=1"
 echo "=== 擷取完成 ==="
-for f in cap_show cap_combat; do
+for f in cap_intro cap_show cap_combat; do
   echo "  $f: $(ffmpeg -hide_banner -i release/$f.wav -af volumedetect -f null /dev/null 2>&1 | grep mean_volume | grep -oE '\-?[0-9.]+ dB' | head -1) 音量"
 done

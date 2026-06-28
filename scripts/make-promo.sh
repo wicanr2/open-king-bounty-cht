@@ -33,18 +33,20 @@ gameseg(){ # $1 mp4 $2 wav $3 capstrip.png $4 out
 echo "== 卡片 =="
 card "$TMP/t.png" '御封戰將' 'King'"'"'s Bounty (1990)　繁體中文化　Windows · macOS · Linux'
 card "$TMP/e.png" '免費下載' 'github.com/wicanr2/open-king-bounty-cht'
+capstrip "$TMP/cs_intro.png"  '原版開場　·　New World Computing　／　King'"'"'s Bounty 標題'
 capstrip "$TMP/cs_show.png"   '原版美術 ＋ 全程繁體中文化　·　F8 切換 DOS / Genesis / Amiga 美術'
 capstrip "$TMP/cs_combat.png" '戰鬥畫面修復　·　介面乾淨無殘留'
 
 echo "== 片段 =="
 cardseg "$TMP/t.png" "$TMP/seg_t.mp4" 3.5 "$SV/cap_show.wav" 2
+gameseg "$SV/cap_intro.mp4"  "$SV/cap_intro.wav"  "$TMP/cs_intro.png"  "$TMP/seg_intro.mp4"
 gameseg "$SV/cap_show.mp4"   "$SV/cap_show.wav"   "$TMP/cs_show.png"   "$TMP/seg_show.mp4"
 gameseg "$SV/cap_combat.mp4" "$SV/cap_combat.wav" "$TMP/cs_combat.png" "$TMP/seg_combat.mp4"
 cardseg "$TMP/e.png" "$TMP/seg_e.mp4" 3.5 "$SV/cap_show.wav" 14
 
 echo "== concat =="
 L="$TMP/list.txt"; : > "$L"
-for s in seg_t seg_show seg_combat seg_e; do echo "file '$TMP/$s.mp4'" >> "$L"; done
+for s in seg_t seg_intro seg_show seg_combat seg_e; do echo "file '$TMP/$s.mp4'" >> "$L"; done
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$L" -c:v libx264 -pix_fmt yuv420p -crf 20 -c:a aac -b:a 192k -movflags +faststart "$OUT/openkb-cht-promo.mp4"
 rm -rf "$TMP"
 echo "promo -> $OUT/openkb-cht-promo.mp4 ($(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUT/openkb-cht-promo.mp4" 2>/dev/null)s)"
