@@ -1304,6 +1304,12 @@ void draw_combat(KBcombat *war) {
 
 	int draw_army_size = ((KBgame*)war->heroes[0])->options[OPT_ARMYSIZE]; /* Hack -- get player */
 
+	/* 清掉戰鬥格區的文字 overlay。部隊數字 count 走 cjk drawlist(ASCII 數字也在 atlas
+	 * → Noto overlay 層,於 present 時疊上),而 draw_combat 用 SDL_BlitSurface 畫草地、
+	 * 不觸發 FillRect 的自動 remove_region → 不主動清就會殘留舊位置的數字(部隊移動後殘影,
+	 * GitHub issue #4)。重畫前先清此區,下方再依現況重加。 */
+	cjk_drawlist_remove_region(local.map.x, local.map.y, local.map.w, local.map.h);
+
 	/** Draw combat **/
 	{
 		int i, j;
