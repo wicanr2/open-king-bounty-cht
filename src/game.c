@@ -6872,6 +6872,49 @@ int run_game(KBconfig *conf) {
 		return 0;
 	}
 
+	/* 開發者:設 KB_ORACLE 印出固定 seed 下的關鍵狀態 JSON(給 Go 重寫版做 parity 黃金樣本)。
+	 * seed 由 KB_ORACLE_SEED 指定(預設 1)。印畢即退出,正式版不受影響。
+	 * 用法:KB_ORACLE=1 KB_ORACLE_SEED=1 ./openkb -c ... --rootdir ... > golden.json */
+	if (getenv("KB_ORACLE")) {
+		int i;
+		int oseed = getenv("KB_ORACLE_SEED") ? atoi(getenv("KB_ORACLE_SEED")) : 1;
+		byte *oland = KB_Resolve(DAT_WORLD, 0);
+		refill_rules();
+		refill_names();
+		printf("{\n");
+		printf("  \"seed\": %d,\n", oseed);
+		/* 1. KB_rand 序列 → 驗 Go kbrng 與 C 實際用法一致 */
+		srand(oseed);
+		printf("  \"kb_rand_0_99\": [");
+		for (i = 0; i < 20; i++) printf("%s%d", i ? "," : "", KB_rand(0, 99));
+		printf("],\n");
+		/* 2. 四職業(rank 0, 難度 easy)起手狀態 → 驗 Go gamestate 建角 */
+		printf("  \"classes\": [\n");
+		if (oland) {
+			int oc;
+			for (oc = 0; oc < 4; oc++) {
+				char onm[] = "Oracle";
+				KBgame *og;
+				srand(oseed);
+				og = spawn_game(onm, oc, 0, oland);
+				if (!og) continue;
+				printf("    {\"class\":%d,\"gold\":%u,\"base_leadership\":%d,\"leadership\":%d,\"commission\":%d,\"troops\":[",
+					oc, (unsigned)og->gold, og->base_leadership, og->leadership, og->commission);
+				for (i = 0; i < 5; i++) printf("%s%d", i ? "," : "", og->player_troops[i]);
+				printf("],\"numbers\":[");
+				for (i = 0; i < 5; i++) printf("%s%d", i ? "," : "", og->player_numbers[i]);
+				printf("]}%s\n", oc < 3 ? "," : "");
+				free(og);
+			}
+			free(oland);
+		}
+		printf("  ]\n}\n");
+		free_resources();
+		stop_modules(conf);
+		KB_stopENV(sys);
+		return 0;
+	}
+
 	/* --- X X X --- */
 	display_logo();
 
