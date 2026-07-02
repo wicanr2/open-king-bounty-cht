@@ -6908,6 +6908,38 @@ int run_game(KBconfig *conf) {
 			}
 			free(oland);
 		}
+		printf("  ],\n");
+		/* 3. deal_damage 傷害公式黃金樣本(固定 seed,melee 1v1,retaliation=1 → 無反擊/無 shots)*/
+		printf("  \"combat_melee\": [\n");
+		{
+			struct { int atk, an, def, dn; } ccase[] = {
+				{ 2, 10, 0, 20 },  /* 義勇軍x10 打 農夫x20 */
+				{ 24, 5, 0, 3 },   /* 火龍x5 打 農夫x3(整堆殲滅分支)*/
+				{ 8, 6, 2, 8 },    /* 弓箭手x6 近戰 打 義勇軍x8 */
+			};
+			int nc = sizeof(ccase) / sizeof(ccase[0]);
+			int ci;
+			for (ci = 0; ci < nc; ci++) {
+				KBcombat war;
+				int kills;
+				memset(&war, 0, sizeof(war));
+				war.units[0][0].troop_id = ccase[ci].atk;
+				war.units[0][0].count = ccase[ci].an;
+				war.units[0][0].turn_count = ccase[ci].an;
+				war.units[0][0].max_count = ccase[ci].an;
+				war.units[1][0].troop_id = ccase[ci].def;
+				war.units[1][0].count = ccase[ci].dn;
+				war.units[1][0].turn_count = ccase[ci].dn;
+				war.units[1][0].max_count = ccase[ci].dn;
+				war.heroes[0] = NULL;
+				war.heroes[1] = NULL;
+				srand(oseed);
+				kills = deal_damage(&war, 0, 0, 1, 0, 0, 0, 0, 1);
+				printf("    {\"atk\":%d,\"atk_n\":%d,\"def\":%d,\"def_n\":%d,\"kills\":%d,\"def_left\":%d,\"def_injury\":%d}%s\n",
+					ccase[ci].atk, ccase[ci].an, ccase[ci].def, ccase[ci].dn,
+					kills, war.units[1][0].count, war.units[1][0].injury, ci < nc - 1 ? "," : "");
+			}
+		}
 		printf("  ]\n}\n");
 		free_resources();
 		stop_modules(conf);
