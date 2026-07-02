@@ -3225,6 +3225,10 @@ void take_chest(KBgame *game) {
 
 			} else {
 
+				/* 寶箱領導力是永久加成 → 必須加進 base_leadership,否則每週 end_week
+				 * 會把 game->leadership 重設回 base_leadership、抹掉此加成(issue #5:
+				 * 「升上去的領導力過一陣子回到初始值」)。base 供持久、leadership 供即時生效。 */
+				game->base_leadership += leadership;
 				game->leadership += leadership;
 
 			}
