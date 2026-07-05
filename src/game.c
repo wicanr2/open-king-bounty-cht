@@ -4018,7 +4018,7 @@ int freeze_army(KBgame *game, KBcombat *war) {
 
 int resurrect_army(KBgame *game, KBcombat *war) {
 
-	int ok, x, y, side, unit_id;
+	int ok, x, y, side, unit_id, revived;
 
 	KBunit *u = &war->units[war->side][war->unit_id];
 
@@ -4029,7 +4029,25 @@ int resurrect_army(KBgame *game, KBcombat *war) {
 
 	ok = pick_target(war, &x, &y, 3);
 
-	return 0;
+	if (ok) {
+
+		side = UID_AS_SIDE(war->umap[y][x]);
+		unit_id = UID_AS_ID(war->umap[y][x]);
+
+		revived = resurrect_troop(game, war, side, unit_id);
+
+		if (revived == 0) {
+			combat_log("這個法術似乎沒有效果！", 0);
+			return 0;
+		}
+
+		u = &war->units[side][unit_id];
+
+		combat_log("復活了 %d 名 %s", revived, troops[u->troop_id].name);
+
+	}
+
+	return ok;
 }
 
 /* deal_damage() 定義在 play.c,但沒有透過 play.h 對外開放;play.c 內建的

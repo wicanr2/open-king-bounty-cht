@@ -1889,6 +1889,30 @@ int clone_troop(KBgame *game, KBcombat *war, int unit_id) {
 	return (int)clones;
 }
 
+int resurrect_troop(KBgame *game, KBcombat *war, int side, int id) {
+	/* 官方手冊 (original_kb/Kings-Bounty_Manual_DOS_EN_Web-Manual.pdf, p.81)：
+	   "This spell restores creatures destroyed in combat, one per unit of
+	   your spell power. Creatures may only be restored if some of the
+	   original troop remains." —— 每點 spell_power 復活 1 隻，上限為本場
+	   戰死數 (max_count - count)。"原部隊須尚有殘存" 這條件由呼叫端
+	   pick_target(filter=3) 天然保證：umap 只登記 count > 0 的存活單位，
+	   已全滅 (count == 0) 的部隊根本不會出現在戰場上、選不到。 */
+
+	KBunit *u = &war->units[side][id];
+
+	word dead = u->max_count - u->count;
+	word revived = game->spell_power;
+
+	if (revived > dead) revived = dead;
+
+	u->count += revived;
+	u->turn_count = u->count;
+
+	if (u->count > 0) u->dead = 0;
+
+	return (int)revived;
+}
+
 int instant_troop(KBgame *game, byte *w_troop_id) {
 	int i, slot = -1;
 	byte troop_id;
