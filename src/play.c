@@ -1855,7 +1855,7 @@ int magic_damage(KBgame *game, KBcombat *war, int side, int id, word base_damage
 		return -1;
 	}
 
-	int kills = deal_damage(war, side, id, 0, 0, 0, 1, damage, 1);
+	int kills = deal_damage(war, 0, 0, side, id, 0, 1, damage, 1);
 
 	return kills;
 }
