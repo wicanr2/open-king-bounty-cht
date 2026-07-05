@@ -4032,13 +4032,21 @@ int resurrect_army(KBgame *game, KBcombat *war) {
 	return 0;
 }
 
+/* deal_damage() 定義在 play.c,但沒有透過 play.h 對外開放;play.c 內建的
+   magic_damage() 本該是套用法術傷害的封裝，可是它呼叫 deal_damage() 時把
+   目標的 side/id 塞進「攻擊者」欄位，「受害者」欄位卻寫死 (0, 0)——因為
+   magic_damage() 從沒被任何地方呼叫過 (grep 全專案零命中)，這個錯位參數
+   從未被驗證過。這裡直接呼叫 deal_damage()，補上正確的欄位順序。 */
+extern int deal_damage(KBcombat *war, int a_side, int a_id, int t_side, int t_id, int is_ranged, int is_external, int external_damage, int retaliation);
+
 int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id, byte undead) {
 
 	char msg[128];
 
-	int ok, x, y, side, unit_id;
+	int ok, x, y, side, unit_id, kills;
 
 	KBunit *u = &war->units[war->side][war->unit_id];
+	KBunit *victim;
 
 	sprintf(msg, "選擇施放 %s 的敵方部隊", spell_names[spell_id]);
 
@@ -4049,8 +4057,39 @@ int damage_army(KBgame *game, KBcombat *war, word base_damage, byte spell_id, by
 
 	ok = pick_target(war, &x, &y, 4 + undead);
 
+	if (ok) {
+
+		side = UID_AS_SIDE(war->umap[y][x]);
+		unit_id = UID_AS_ID(war->umap[y][x]);
+
+		victim = &war->units[side][unit_id];
+
+		/* 驅散不死必須對不死族才有效；對魔法免疫的兵種一律無效
+		   (deal_damage 的 is_external 路徑不會檢查 ABIL_IMMUNE，得自己擋) */
+		if ((undead && !(troops[victim->troop_id].abilities & ABIL_UNDEAD))
+		 || (troops[victim->troop_id].abilities & ABIL_IMMUNE)) {
+			combat_log("這個法術似乎沒有效果！", 0);
+			return 0;
+		}
+
+		/* 傷害隨施法者的法術威力放大，與 time_stop()/leadership 等法術效果同一套公式 */
+		kills = deal_damage(war, 0, 0, side, unit_id,
+			/*is_ranged=*/0, /*is_external=*/1,
+			/*external_damage=*/base_damage * game->spell_power,
+			/*retaliation=*/1);
+
+		draw_damage(war, victim);
+
+		combat_log("%s 對 %s 施放 %s，殲滅 %d 名",
+			troops[u->troop_id].name, troops[victim->troop_id].name,
+			spell_names[spell_id], kills);
+
+		/* Remove holes */
+		compact_units(war);
+	}
+
 	return ok;
-} 
+}
 
 int teleport_army(KBgame *game, KBcombat *war) {
 
