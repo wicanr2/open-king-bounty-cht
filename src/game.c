@@ -5047,6 +5047,8 @@ void setup_grid(KBgamestate *st, int start_x, int start_y, int cell_w, int cell_
 	}
 }
 
+void game_options_menu(KBgame *game); /* issue #9,定義在下面 */
+
 int debug_cheat_menu(KBgame *game, KBcombat *war) {
 	int i;
 	char *msg = NULL;
@@ -5184,6 +5186,11 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 			msg = "No artifacts found";
 		}
 		break;
+		case 'p':
+			/* issue #9:遊戲調整設定子畫面(P2 基礎架構,值即時寫回 game->opt_*)*/
+			game_options_menu(game);
+			return 0;
+		break;
 		default:
 			msg = "No such command";
 		break;
@@ -5194,6 +5201,107 @@ int debug_cheat_menu(KBgame *game, KBcombat *war) {
 	KB_Wait();
 
 	return 0;
+}
+
+/* issue #9 遊戲調整設定子畫面(F12 debug menu -> 'p')。
+ * P2 基礎架構:只負責顯示/切換/寫回 game->opt_*,不接遊戲機制(那是 P3)。
+ * 字母鍵 A-F 切換/循環對應項目的值,ESC 離開。 */
+void game_options_menu(KBgame *game) {
+
+	enum {
+		OPT_NO_WAGES = 0,
+		OPT_AI_MODE,
+		OPT_DAYS_X2,
+		OPT_FOE_FREQ,
+		OPT_FOE_STRENGTH,
+		OPT_RECRUIT_CAPS,
+		OPT_ITEM_COUNT,
+	};
+
+	char *item_names[OPT_ITEM_COUNT] = {
+		"允許不支付薪水",
+		"戰鬥 AI 模式",
+		"回合數延長兩倍",
+		"隨機敵人出現頻率",
+		"隨機敵人出現強度",
+		"限制高階兵種招募上限",
+	};
+
+	SDL_Rect *fs = &sys->font_size;
+	SDL_Rect *left_frame = local.frames[FRAME_LEFT];
+	SDL_Rect *bar_frame = local.frames[FRAME_MIDDLE];
+	Uint32 *colors = local.message_colors;
+
+	SDL_Rect border;
+	RECT_Text(&border, OPT_ITEM_COUNT + 2, 30);
+	border.x = left_frame->w;
+	border.y = bar_frame->y + bar_frame->h;
+
+	KB_TopBox(MSG_CENTERED, "按 'ESC' 離開");
+
+	int done = 0;
+	int redraw = 1;
+	int key = 0;
+	int i;
+
+	while (!done) {
+
+		if (redraw) {
+			redraw = 0;
+
+			SDL_TextRect(sys->screen, &border, colors[COLOR_FRAME1], colors[COLOR_BACKGROUND], 0);
+
+			KB_icolor(colors + COLOR_SELECTION);
+			KB_iloc(border.x + fs->w, border.y + fs->h / 8);
+			KB_iprint("遊戲調整設定");
+
+			for (i = 0; i < OPT_ITEM_COUNT; i++) {
+				KB_icolor(colors);
+				KB_iloc(border.x + fs->w, border.y + fs->h + i * (fs->h + fs->h / 8));
+				KB_iprintf("%c) %s：", 'A' + i, item_names[i]);
+
+				switch (i) {
+					case OPT_NO_WAGES:
+						KB_iprint(game->opt_no_wages ? "開" : "關");
+					break;
+					case OPT_AI_MODE:
+						KB_iprint(game->opt_ai_mode ? "進化版(P4 才實作)" : "原版");
+					break;
+					case OPT_DAYS_X2:
+						KB_iprint(game->opt_days_x2 ? "開" : "關");
+					break;
+					case OPT_FOE_FREQ:
+						KB_iprint(game->opt_foe_freq == 1 ? "多" :
+						          game->opt_foe_freq == 2 ? "少" : "正常");
+					break;
+					case OPT_FOE_STRENGTH:
+						KB_iprint(game->opt_foe_strength ? "強(隨機龍)" : "正常");
+					break;
+					case OPT_RECRUIT_CAPS:
+						KB_iprint(game->opt_recruit_caps ? "開" : "關");
+					break;
+				}
+			}
+
+			KB_flip(sys);
+		}
+
+		key = KB_event(&alphabet_letter);
+
+		if (key == 0xFF) { done = 1; break; }
+
+		if (key >= 1 && key <= OPT_ITEM_COUNT) {
+			switch (key - 1) {
+				case OPT_NO_WAGES:     game->opt_no_wages     = 1 - game->opt_no_wages;     break;
+				case OPT_AI_MODE:      game->opt_ai_mode      = 1 - game->opt_ai_mode;      break;
+				case OPT_DAYS_X2:      game->opt_days_x2      = 1 - game->opt_days_x2;      break;
+				case OPT_FOE_FREQ:     game->opt_foe_freq     = (game->opt_foe_freq + 1) % 3; break;
+				case OPT_FOE_STRENGTH: game->opt_foe_strength = 1 - game->opt_foe_strength; break;
+				case OPT_RECRUIT_CAPS: game->opt_recruit_caps = 1 - game->opt_recruit_caps; break;
+			}
+			redraw = 1;
+		}
+	}
 }
 
 int combat_options_menu(KBgame *game) {

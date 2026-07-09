@@ -172,6 +172,14 @@ struct KBgame {
 	byte unknown1;	/* Unknown values from the original game */
 	byte unknown2;	/* We carry them over to maintain savefile compatibility */
 	byte unknown3;
+
+	/* issue #9 遊戲調整設定(F12 選單,隨存檔持久;P3 才接機制) */
+	byte opt_no_wages;      /* 允許不支付薪水 0/1 */
+	byte opt_ai_mode;       /* combat AI 模式 0=原版 1=進化版(進化版 P4 才實作) */
+	byte opt_days_x2;       /* 遊戲結束回合數延長兩倍 0/1 */
+	byte opt_foe_freq;      /* 隨機敵人出現頻率 0=正常 1=多 2=少 */
+	byte opt_foe_strength;  /* 隨機敵人出現強度 0=正常 1=強(隨機龍) */
+	byte opt_recruit_caps;  /* 限制高階兵種招募上限 0/1(啟用時套 Archmage50/Dragon15/Demon20/Vampire20/Knight20) */
 };
 
 #define MAX_TROOPS	25

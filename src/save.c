@@ -22,6 +22,11 @@
 
 #define DAT_SIZE 20421
 
+/* issue #9 遊戲調整設定:存檔本體(DAT_SIZE)之後追加的一小塊區塊。
+ * 不改 DAT_SIZE、不動 buf 版面,向後相容舊存檔(讀不到/magic 不符 -> 全部設定預設 0)。 */
+#define KB_OPT_MAGIC 0xE9
+#define KB_OPT_COUNT 6
+
 #define RPOS(STR) printf("%s Pos: %06x\n", STR, p - &buf[0])
 
 KBgame* KB_loadDAT_amiga(const char* filename);
@@ -31,13 +36,24 @@ KBgame* KB_loadDAT(const char* filename) {
 	FILE *f;
 	int n, k, map_size;
 	int x, y;
+	byte opt_block[1 + KB_OPT_COUNT];
+	int opt_block_ok = 0;
 
 	f = fopen(filename, "rb");
 	if (f == NULL) return NULL;
 
 	n = fread(buf, sizeof(char), DAT_SIZE, f);
+	if (n != DAT_SIZE) { fclose(f); return NULL; }
+
+	/* issue #9:嘗試讀存檔尾端追加的遊戲調整設定區塊。
+	 * 舊存檔在 DAT_SIZE 處就是 EOF,下面這個 fread 讀不滿 -> opt_block_ok 維持 0,設定全部預設關。
+	 * 必須在 fclose(f) 之前讀,檔案關掉就沒機會了。 */
+	if (fread(opt_block, sizeof(char), 1, f) == 1 && opt_block[0] == KB_OPT_MAGIC) {
+		if (fread(&opt_block[1], sizeof(char), KB_OPT_COUNT, f) == (size_t)KB_OPT_COUNT)
+			opt_block_ok = 1;
+	}
+
 	fclose(f);
-	if (n != DAT_SIZE) return NULL;
 
 	game = malloc(sizeof(KBgame));
 	if (game == NULL) return NULL;
@@ -270,6 +286,24 @@ KBgame* KB_loadDAT(const char* filename) {
 
 	if (p - &buf[0] != DAT_SIZE)
 	fprintf(stdout, "Save file: %d bytes (needed %d)\n", p - &buf[0], DAT_SIZE);
+
+	/* issue #9 遊戲調整設定:opt_block_ok 才套用讀到的值,否則明確預設 0(關閉),
+	 * 別讓 malloc() 未初始化的記憶體亂入(這個 struct 不是 calloc 出來的)。 */
+	if (opt_block_ok) {
+		game->opt_no_wages     = opt_block[1];
+		game->opt_ai_mode      = opt_block[2];
+		game->opt_days_x2      = opt_block[3];
+		game->opt_foe_freq     = opt_block[4];
+		game->opt_foe_strength = opt_block[5];
+		game->opt_recruit_caps = opt_block[6];
+	} else {
+		game->opt_no_wages = 0;
+		game->opt_ai_mode = 0;
+		game->opt_days_x2 = 0;
+		game->opt_foe_freq = 0;
+		game->opt_foe_strength = 0;
+		game->opt_recruit_caps = 0;
+	}
 
 	return game;
 }
@@ -770,6 +804,22 @@ int KB_saveDAT(const char* filename, KBgame *game) {
 
 	/** DONE **/
 	n = fwrite(buf, sizeof(char), DAT_SIZE, f);
+
+	/* issue #9 遊戲調整設定:寫在 DAT_SIZE 本體之後的追加區塊(magic byte + 6 個設定 byte)。
+	 * 不佔用/不改 buf 版面,DAT_SIZE 與原版存檔格式不變;舊版 openkb / 原版 DOS 讀我們存的檔
+	 * 一樣只會讀到前 DAT_SIZE bytes,不受影響。 */
+	if (n == DAT_SIZE) {
+		byte opt_block[1 + KB_OPT_COUNT];
+		opt_block[0] = KB_OPT_MAGIC;
+		opt_block[1] = game->opt_no_wages;
+		opt_block[2] = game->opt_ai_mode;
+		opt_block[3] = game->opt_days_x2;
+		opt_block[4] = game->opt_foe_freq;
+		opt_block[5] = game->opt_foe_strength;
+		opt_block[6] = game->opt_recruit_caps;
+		fwrite(opt_block, sizeof(char), 1 + KB_OPT_COUNT, f);
+	}
+
 	fclose(f);
 
 	/* Wrong filesize */
