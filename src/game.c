@@ -5265,7 +5265,7 @@ void game_options_menu(KBgame *game) {
 						KB_iprint(game->opt_no_wages ? "開" : "關");
 					break;
 					case OPT_AI_MODE:
-						KB_iprint(game->opt_ai_mode ? "進化版(P4 才實作)" : "原版");
+						KB_iprint(game->opt_ai_mode ? "進化版" : "原版");
 					break;
 					case OPT_DAYS_X2:
 						KB_iprint(game->opt_days_x2 ? "開" : "關");
@@ -6178,6 +6178,98 @@ int ai_unit_think(KBcombat *combat) {
 	return !acted;
 }
 
+/* issue #9 P4: 進化版目標選擇。原版挑「每名 hp 最低」(打最弱);
+ * 進化版改挑「威脅最高」:優先敵方射手 -> 高階/高傷 ->
+ * 近戰時偏好已反擊過的目標(打它不會再挨還手)。分數越高越優先。 */
+int ai_pick_target_evolved(KBcombat *combat, int nearby) {
+	int under_control = !combat->units[combat->side][combat->unit_id].out_of_control;
+	int side, i, j;
+	int pick = -1;
+	int best_score = -1;
+	for (j = 0; j < MAX_SIDES; j++) {
+	side = j;
+	for (i = 0; i < MAX_UNITS; i++) {
+		KBunit *u = &combat->units[side][i];
+		KBtroop *ut;
+		int score;
+		if (!u->count) continue;
+		if (side == combat->side && i == combat->unit_id) continue;
+		if (side == combat->side && under_control) continue;
+		if (nearby && !unit_touching(combat, side, i, combat->side, combat->unit_id)) continue;
+
+		ut = &troops[u->troop_id];
+		score = 0;
+		if (u->shots && ut->ranged_ammo) score += 1000;   /* 先解決敵方射手 */
+		score += ut->skill_level * 20;                     /* 偏好高階兵種 */
+		score += ut->melee_max + ut->ranged_max;           /* 偏好高傷 */
+		if (nearby && u->retaliated) score += 30;          /* 近戰:打已反擊過的不挨還手 */
+
+		if (score > best_score) {
+			best_score = score;
+			pick = PACK_UID(side, i);
+		}
+	}
+	}
+	return pick;
+}
+
+/* issue #9 P4: 進化版單位決策。結構沿用 ai_unit_think,差異:
+ * (a) 目標一律用 ai_pick_target_evolved;
+ * (b) 新增「射手被貼身無法射擊時,改近戰攻擊而非空等」。 */
+int ai_unit_think_evolved(KBcombat *combat) {
+	KBunit *u = &combat->units[combat->side][combat->unit_id];
+	KBtroop *t = &troops[u->troop_id];
+	int close_target = ai_pick_target_evolved(combat, 1);
+	int acted = 0;
+
+	if (!acted && u->frozen) {
+		u->acted = 1; acted = 1;
+		combat_log("%s 被凍結", t->name);
+	}
+
+	/* 有射擊且無貼身敵人 -> 射 far 目標 */
+	if (!acted && u->shots && close_target == -1) {
+		int far_target = ai_pick_target_evolved(combat, 0);
+		if (far_target != -1) {
+			unit_ranged_damage(combat, UID_AS_SIDE(far_target), UID_AS_ID(far_target));
+			acted = 1;
+		}
+	}
+
+	/* 新增:射手被貼身(不能射)-> 改近戰攻擊,不空等 */
+	if (!acted && u->shots && close_target != -1) {
+		int ox, oy;
+		unit_move_offset(combat, combat->side, combat->unit_id, close_target, &ox, &oy);
+		if (ox != 0 || oy != 0) {
+			acted = move_unit(combat, combat->side, combat->unit_id, ox, oy);
+			if (acted == 1) { draw_combat(combat); combat_log("%s 移動", t->name); }
+		}
+	}
+
+	/* 可飛且無貼身敵人 -> 飛向 far 目標 */
+	if (!acted && u->flights && close_target == -1) {
+		int nx, ny;
+		int far_target = ai_pick_target_evolved(combat, 0);
+		unit_fly_offset(combat, combat->side, combat->unit_id, far_target, &nx, &ny);
+		if (nx != u->x || ny != u->y)
+			acted = fly_unit(combat, combat->side, combat->unit_id, nx, ny);
+	}
+
+	/* 無射擊 -> 移動/近戰向目標 */
+	if (!acted && !u->shots) {
+		int ox, oy;
+		if (close_target == -1) close_target = ai_pick_target_evolved(combat, 0);
+		unit_move_offset(combat, combat->side, combat->unit_id, close_target, &ox, &oy);
+		if (ox != 0 || oy != 0) {
+			acted = move_unit(combat, combat->side, combat->unit_id, ox, oy);
+			if (acted == 1) { draw_combat(combat); combat_log("%s 移動", t->name); }
+		}
+	}
+
+	if (!acted) return unit_try_wait(combat);
+	return !acted;
+}
+
 /* "grid_heurisitc" -- given a currently selected unit and an arbitary combat tile,
  * determine what will happen if player performs a click on such tile.
  * returns a value from this enum:
@@ -6412,7 +6504,7 @@ int combat_loop(KBgame *game, KBcombat *combat) {
 			if (++combat->units[combat->side][combat->unit_id].frame > 3) {
 				combat->units[combat->side][combat->unit_id].frame = 0;
 				if (auto_battle || combat->side == 1 || combat->units[combat->side][combat->unit_id].out_of_control
-				) pass = ai_unit_think(combat); /* AI makes his move */
+				) pass = (game->opt_ai_mode ? ai_unit_think_evolved(combat) : ai_unit_think(combat)); /* AI makes his move */
 			}
 
 			frame++;
