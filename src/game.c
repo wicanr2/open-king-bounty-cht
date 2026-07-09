@@ -5222,7 +5222,7 @@ void game_options_menu(KBgame *game) {
 		"允許不支付薪水",
 		"戰鬥 AI 模式",
 		"回合數延長兩倍",
-		"隨機敵人出現頻率",
+		"敵人每週成長",
 		"隨機敵人出現強度",
 		"限制高階兵種招募上限",
 	};
@@ -5271,11 +5271,11 @@ void game_options_menu(KBgame *game) {
 						KB_iprint(game->opt_days_x2 ? "開" : "關");
 					break;
 					case OPT_FOE_FREQ:
-						KB_iprint(game->opt_foe_freq == 1 ? "多" :
-						          game->opt_foe_freq == 2 ? "少" : "正常");
+						KB_iprint(game->opt_foe_freq == 1 ? "加速" :
+						          game->opt_foe_freq == 2 ? "停止" : "正常");
 					break;
 					case OPT_FOE_STRENGTH:
-						KB_iprint(game->opt_foe_strength ? "強(隨機龍)" : "正常");
+						KB_iprint(game->opt_foe_strength ? "強(兵力x2)" : "正常");
 					break;
 					case OPT_RECRUIT_CAPS:
 						KB_iprint(game->opt_recruit_caps ? "開" : "關");
@@ -5294,7 +5294,12 @@ void game_options_menu(KBgame *game) {
 			switch (key - 1) {
 				case OPT_NO_WAGES:     game->opt_no_wages     = 1 - game->opt_no_wages;     break;
 				case OPT_AI_MODE:      game->opt_ai_mode      = 1 - game->opt_ai_mode;      break;
-				case OPT_DAYS_X2:      game->opt_days_x2      = 1 - game->opt_days_x2;      break;
+				case OPT_DAYS_X2:
+					/* issue #9 P3: 切換當下就即時調整剩餘天數,不等下次生效 */
+					game->opt_days_x2 = 1 - game->opt_days_x2;
+					if (game->opt_days_x2) game->days_left *= 2;        /* 開:立即加倍剩餘天數 */
+					else game->days_left = (game->days_left + 1) / 2;    /* 關:折半還原 */
+				break;
 				case OPT_FOE_FREQ:     game->opt_foe_freq     = (game->opt_foe_freq + 1) % 3; break;
 				case OPT_FOE_STRENGTH: game->opt_foe_strength = 1 - game->opt_foe_strength; break;
 				case OPT_RECRUIT_CAPS: game->opt_recruit_caps = 1 - game->opt_recruit_caps; break;

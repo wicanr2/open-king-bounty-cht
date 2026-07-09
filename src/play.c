@@ -94,6 +94,9 @@ void repopulate_foe(KBgame *game, int continent, int foe_id) {
 
 		roll_creature(continent, &troop_id, &troop_count);
 
+		/* issue #9 P3: opt_foe_strength 開啟時,新產生的敵人兵力加倍 */
+		if (game->opt_foe_strength) troop_count *= 2;
+
 		game->foe_troops[continent][foe_id][i] = troop_id;
 		game->foe_numbers[continent][foe_id][i] = troop_count;
 	}
@@ -606,7 +609,33 @@ int army_leadership(KBgame *game, byte troop_id) {
 /* Calculate and return "MAX YOU CAN HANDLE" troop count */
 int army_max_troop_count(KBgame *game, byte troop_id)
 {
-	return army_leadership(game, troop_id) / troops[troop_id].hit_points;
+	int max = army_leadership(game, troop_id) / troops[troop_id].hit_points;
+
+	/* issue #9 P3: opt_recruit_caps 開啟時,把高階兵種的可招募數量夾到
+	 * 「上限 - 目前已持有」;troop id 已對照 troops[] 表核實
+	 * (0x14 法師/Archmage, 0x15 吸血鬼/Vampire, 0x17 惡魔/Demon,
+	 *  0x18 火龍/Dragon, 0x0E 武士/Knight) */
+	if (game->opt_recruit_caps) {
+		int cap = -1;
+		switch (troop_id) {
+			case 0x14: cap = 50; break; /* Archmage 法師 */
+			case 0x18: cap = 15; break; /* Dragon 火龍 */
+			case 0x17: cap = 20; break; /* Demon 惡魔 */
+			case 0x15: cap = 20; break; /* Vampire 吸血鬼 */
+			case 0x0E: cap = 20; break; /* Knight 武士 */
+		}
+		if (cap >= 0) {
+			int held = 0, i;
+			for (i = 0; i < 5; i++)
+				if (game->player_troops[i] == troop_id)
+					held += game->player_numbers[i];
+			int room = cap - held;
+			if (room < 0) room = 0;
+			if (max > room) max = room;
+		}
+	}
+
+	return max;
 }
 
 /* Calculate and return morale for troop */
@@ -1020,11 +1049,13 @@ byte end_week(KBgame *game) {
 	/* Count Boat */
 	credit += player_has_boat(game) ? boat_cost(game) : 0;
 
-	/* Count Army */
-	for (i = 0; i < 5; i++) {
-		if (game->player_numbers[i] == 0) break;
-		credit +=
-			game->player_numbers[i] * (troops[ game->player_troops[i] ].recruit_cost / 10);
+	/* Count Army (issue #9 P3: opt_no_wages 開啟時完全跳過軍隊維護費扣款) */
+	if (!game->opt_no_wages) {
+		for (i = 0; i < 5; i++) {
+			if (game->player_numbers[i] == 0) break;
+			credit +=
+				game->player_numbers[i] * (troops[ game->player_troops[i] ].recruit_cost / 10);
+		}
 	}
 
 	/* Spend gold */
@@ -1051,10 +1082,16 @@ byte end_week(KBgame *game) {
 			if (game->dwelling_troop[cont][i] == creature)
 				game->dwelling_population[cont][i] = troops[creature].max_population;
 
-		for (j = 0; j < MAX_FOES; j++)
-			for (i = 0; i < 3; i++)
-				if (game->foe_troops[cont][j][i] == creature)
-					game->foe_numbers[cont][j][i] += troops[creature].growth;
+		/* issue #9 P3: opt_foe_freq 調整敵人每週成長量(1=加速x2、2=停止、0=正常) */
+		{
+			word grow = troops[creature].growth;
+			if (game->opt_foe_freq == 1) grow *= 2;      /* 加速 */
+			else if (game->opt_foe_freq == 2) grow = 0;   /* 停止 */
+			for (j = 0; j < MAX_FOES; j++)
+				for (i = 0; i < 3; i++)
+					if (game->foe_troops[cont][j][i] == creature)
+						game->foe_numbers[cont][j][i] += grow;
+		}
 	}
 	for (j = 0; j < MAX_CASTLES; j++)
 		if (game->castle_owner[j] != 0xFF) /* Not owned by player */

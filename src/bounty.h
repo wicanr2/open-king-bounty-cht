@@ -177,8 +177,8 @@ struct KBgame {
 	byte opt_no_wages;      /* 允許不支付薪水 0/1 */
 	byte opt_ai_mode;       /* combat AI 模式 0=原版 1=進化版(進化版 P4 才實作) */
 	byte opt_days_x2;       /* 遊戲結束回合數延長兩倍 0/1 */
-	byte opt_foe_freq;      /* 隨機敵人出現頻率 0=正常 1=多 2=少 */
-	byte opt_foe_strength;  /* 隨機敵人出現強度 0=正常 1=強(隨機龍) */
+	byte opt_foe_freq;      /* 敵人每週成長 0=正常 1=加速(x2) 2=停止(P3 接線於 end_week 的 foe 成長迴圈) */
+	byte opt_foe_strength;  /* 敵人兵力 0=正常 1=強(新產生的敵人兵力x2,接線於 repopulate_foe) */
 	byte opt_recruit_caps;  /* 限制高階兵種招募上限 0/1(啟用時套 Archmage50/Dragon15/Demon20/Vampire20/Knight20) */
 };
 
